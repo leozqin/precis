@@ -1,0 +1,4 @@
+- name: The Verge
+  category: tech
+  type: rss
+  url: http://www.theverge.com/rss/index.xml
