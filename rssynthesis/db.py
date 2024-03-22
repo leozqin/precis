@@ -45,4 +45,5 @@ class DB:
     def update_poll_state(self, feed: Feed, now: int):
         table = self.db.table("poll")
 
-        table.insert({"id": feed.id, "last_polled_at": now})
+        query = Query().id.matches(feed.id)
+        table.upsert({"id": feed.id, "last_polled_at": now}, cond=query)

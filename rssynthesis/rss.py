@@ -1,18 +1,16 @@
-from typing import List, Union, ClassVar, Optional, Any, Type
 from yaml import load, SafeLoader
 from logging import getLogger
-from tinydb import TinyDB
+from calendar import timegm
 
-from time import struct_time
-from datetime import datetime, timedelta
+from datetime import datetime, timezone
 
-from fastapi_utils.tasks import repeat_every
 from rssynthesis.db import DB
 from rssynthesis.models import Feed
 
 logger = getLogger("uvicorn.error")
 
 db = DB()
+
 
 def load_feeds(config_path: str) -> None:
     with open(config_path, "r") as fp:
@@ -27,16 +25,18 @@ def load_feeds(config_path: str) -> None:
 
 
 def check_feeds():
-    now = int(datetime.now().timestamp())
+    now = int(datetime.now(tz=timezone.utc).timestamp())
+    logger.info(f"Checking feeds starting at time {now}")
     new_items = []
 
     for feed in db.get_feeds():
-        logger.info(f"Polling feed {id}: {feed.name}")
+        logger.info(f"Polling feed {feed.id}: {feed.name}")
 
         poll_state = db.get_poll_state(feed)
         if poll_state:
             for entry in feed.rss.entries:
-                published_time: struct_time = int(entry.published_time)
+                published_time = timegm(entry.published_parsed)
+                logger.info(published_time)
 
                 if published_time > poll_state:
                     new_items.append(entry)
@@ -46,11 +46,6 @@ def check_feeds():
 
         db.update_poll_state(feed=feed, now=now)
 
-    for item in new_items:
-        logger.info(f"Found new item {item}")
+    logger.info(f"Found {len(new_items)} new item(s)")
 
     return new_items
-
-@repeat_every(seconds=60 * 5)
-def poll_feeds():
-    check_feeds()
