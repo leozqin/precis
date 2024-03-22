@@ -32,7 +32,11 @@ dependencies = [
     "pydantic",
     "feedparser",
     "aenum",
-    "pyyaml"
+    "pyyaml",
+    "fastapi",
+    "uvicorn[standard]",
+    "tinydb",
+    "fastapi-utils"
 ]
 
 [project.urls]
