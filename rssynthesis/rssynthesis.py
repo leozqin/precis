@@ -1,5 +1,6 @@
 from pathlib import Path
 from fastapi import FastAPI
+from fastapi.templating import Jinja2Templates
 from fastapi_utils.tasks import repeat_every
 
 from contextlib import asynccontextmanager
@@ -7,13 +8,17 @@ from logging import getLogger
 from tinydb import TinyDB
 
 from rssynthesis.rss import load_feeds, check_feeds
+from rssynthesis.ui import list_feeds
 
 logger = getLogger("uvicorn.error")
+base_path = Path(__file__).parent
 
-db_path = Path(Path(__file__).parent, "../", "db.json").resolve()
+db_path = Path(base_path, "../", "db.json").resolve()
 db = TinyDB(db_path)
 
-config_path = Path(Path(__file__).parent, "../", "config.yml").resolve()
+config_path = Path(base_path, "../", "feeds.yml").resolve()
+
+templates = Jinja2Templates(directory=Path(base_path, "templates").resolve())
 
 
 @repeat_every(seconds=60, logger=logger)
@@ -30,5 +35,12 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=lifespan, title="RSSynthesis", openapi_url="/openapi.json")
 
+
+@app.get("/")
+def root():
+
+    return templates.TemplateResponse(
+        "index.html", {"request": {}, "feeds": list_feeds()}
+    )
