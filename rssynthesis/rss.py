@@ -16,11 +16,11 @@ def load_feeds(config_path: str) -> None:
     with open(config_path, "r") as fp:
         configs = load(fp, Loader=SafeLoader)
 
+    db.clear_active_feeds()
     for config in configs:
         feed = Feed(**config)
         logger.info(f"Found feed id {feed.id} with contents {feed.dict()}")
 
-        db.clear_active_feeds()
         db.insert_feed(feed)
 
 
@@ -36,7 +36,6 @@ def check_feeds():
         if poll_state:
             for entry in feed.rss.entries:
                 published_time = timegm(entry.published_parsed)
-                logger.info(published_time)
 
                 if published_time > poll_state:
                     new_items.append(entry)

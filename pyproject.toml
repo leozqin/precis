@@ -36,7 +36,8 @@ dependencies = [
     "fastapi",
     "uvicorn[standard]",
     "tinydb",
-    "fastapi-utils"
+    "fastapi-utils",
+    "jinja2"
 ]
 
 [project.urls]
