@@ -1,6 +1,6 @@
 from pathlib import Path
 from tinydb import TinyDB, Query
-from rssynthesis.models import Feed
+from rssynthesis.models import Feed, FeedEntry
 from typing import List, Optional
 
 
@@ -47,3 +47,32 @@ class DB:
 
         query = Query().id.matches(feed.id)
         table.upsert({"id": feed.id, "last_polled_at": now}, cond=query)
+
+    def upsert_feed_entry(self, feed: Feed, entry: FeedEntry):
+        table = self.db.table("entries")
+
+        row = {
+            "id": entry.id,
+            "feed_id": feed.id,
+            "entry": entry.dict(),
+        }
+
+        query = Query().id.matches(entry.id)
+        table.upsert(row, cond=query)
+
+    def get_entries(self, feed: Feed = None):
+        table = self.db.table("entries")
+        
+        if feed:
+            query = Query().feed_id.matches(feed.id)
+            entries = table.search(query)
+        else:
+            entries = table.all()
+
+        return [
+            {
+                "entry": FeedEntry(**i["entry"]),
+                "feed_id": i["feed_id"],
+                "id": i["id"]
+            } for i in entries
+        ]

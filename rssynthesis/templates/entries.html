@@ -8,31 +8,29 @@
         <div class="container px-5 py-12 mx-auto">
             <div class="flex flex-col flex-wrap">
                 <h1 class="text-4xl font-medium my-10">
-                    RSSynthesis - All Feeds
+                    RSSynthesis - Feed Entries
                 </h1>
             </div>
             <table class="table-auto w-3/4">
                 <thead>
                     <tr>
                       <th class="text-center">ID</th>
-                      <th class="text-center">Name</th>
-                      <th class="text-center">Category</th>
-                      <th class="text-center">Type</th>
+                      <th class="text-center">Title</th>
                       <th class="text-center">URL</th>
+                      <th class="text-center">Published At</th>
+                      <th class="text-center">Updated At</th>
+                      <th class="text-center">Preview</th>
                     </tr>
                   </thead>
-                {% for feed in feeds %}
+                {% for entry in entries %}
                 <tbody>
                   <tr>
-                    <td class="text-center">
-                        <a href="{{ url_for('list_entries_by_feed', feed_id=feed.id) }}">
-                          {{ feed.id }}
-                        </a>
-                      </td>
-                    <td class="text-center">{{ feed.name }}</td>
-                    <td class="text-center">{{ feed.category }}</td>
-                    <td class="text-center">{{ feed.type }}</td>
-                    <td class="text-center">{{ feed.url }}</td>
+                    <td class="text-center">{{ entry.id }}</td>
+                    <td class="text-center">{{ entry.title }}</td>
+                    <td class="text-center">{{ entry.url }}</td>
+                    <td class="text-center">{{ entry.published_at }}</td>
+                    <td class="text-center">{{ entry.updated_at }}</td>
+                    <td class="text-center">{{ entry.preview }}</td>
                   </tr>
                 </tbody>
                 {% endfor %}
