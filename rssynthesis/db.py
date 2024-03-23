@@ -1,7 +1,11 @@
 from pathlib import Path
 from tinydb import TinyDB, Query
-from rssynthesis.models import Feed
+from rssynthesis.models import Feed, FeedEntry, EntryContent
 from typing import List, Optional
+import requests
+from html2text import HTML2Text
+from readability import Document
+from markdown2 import markdown
 
 
 class DB:
@@ -47,3 +51,65 @@ class DB:
 
         query = Query().id.matches(feed.id)
         table.upsert({"id": feed.id, "last_polled_at": now}, cond=query)
+
+    def upsert_feed_entry(self, feed: Feed, entry: FeedEntry):
+        table = self.db.table("entries")
+
+        row = {
+            "id": entry.id,
+            "feed_id": feed.id,
+            "entry": entry.dict(),
+        }
+
+        query = Query().id.matches(entry.id)
+        table.upsert(row, cond=query)
+
+    def get_entries(self, feed: Feed = None):
+        table = self.db.table("entries")
+
+        if feed:
+            query = Query().feed_id.matches(feed.id)
+            entries = table.search(query)
+        else:
+            entries = table.all()
+
+        return [
+            {"entry": FeedEntry(**i["entry"]), "feed_id": i["feed_id"], "id": i["id"]}
+            for i in entries
+        ]
+
+    def get_feed_entry(self, id: str):
+        table = self.db.table("entries")
+
+        query = Query().id.matches(id)
+        entry = table.search(query)[0]
+
+        return FeedEntry(**entry["entry"])
+
+    def get_entry_content(self, entry: FeedEntry) -> EntryContent:
+        table = self.db.table("entry_contents")
+        query = Query().id.matches(entry.id)
+
+        existing = table.search(query)
+        if existing:
+            return EntryContent(**existing[0]["entry_contents"])
+
+        else:
+            raw_content = requests.get(entry.url)
+            document = Document(raw_content.content)
+
+            converter = HTML2Text()
+            converter.ignore_images = True
+            converter.ignore_links = True
+
+            entry_content = EntryContent(
+                url=entry.url,
+                content=markdown(converter.handle(document.summary(html_partial=True))),
+                summary=None,
+            )
+
+            table.insert(
+                {"id": entry_content.id, "entry_contents": entry_content.dict()}
+            )
+
+            return entry_content

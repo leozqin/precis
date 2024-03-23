@@ -18,3 +18,24 @@ class Feed(BaseModel):
     def id(self) -> str:
         id = dumps([self.name, self.category, self.type, self.url])
         return md5(id.encode()).hexdigest()
+    
+class FeedEntry(BaseModel):
+    title: str
+    url: str
+    published_at: int
+    updated_at: int
+    authors: list[str] = []
+    preview: str = None
+
+    @property
+    def id(self) -> str:
+        return md5(self.url.encode()).hexdigest()
+    
+class EntryContent(BaseModel):
+    url: str
+    content: str = None
+    summary: str = None
+
+    @property
+    def id(self) -> str:
+        return md5(self.url.encode()).hexdigest()
