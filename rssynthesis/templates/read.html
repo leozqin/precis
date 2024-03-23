@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+    <title>RSSynthesis - {{ content.title }}</title>
+</head>
+
+<style>
+    body {
+        background-color: black;
+        color: white;
+    }
+
+    code {
+        margin-bottom: 1em;
+        margin-top: 1em;
+    }
+
+    p {
+        margin-bottom: 0.75em
+    }
+
+    h1 {
+        font-size: 150%;
+        font-weight: bold;
+        margin-bottom: 0.75em
+    }
+
+    h2 {
+        font-size: 120%;
+        font-weight: bold;
+        margin-bottom: 0.75em
+    }
+
+    h3 {
+        font-size: 110%;
+        font-style: italic;
+        margin-bottom: 0.75em
+    }
+
+    li {
+        list-style-type: disc;
+        margin-top: .5em;
+        margin-bottom: .5em;
+        margin-left: 3%;
+        margin-right: 0;
+      }
+</style>
+
+<body>
+    <section class="w-auto mx-10 my-5">
+        <h1>{{ content.title }}</h1>
+        <h2><a href="{{ content.url }}" class="text-blue-400 hover:underline">Link to Content</a>
+        </h2>
+        {% if content.byline %}
+        <h2>By: {{ content.byline }}</h2>
+        {% endif %}
+    </section>
+    <section class="w-auto mx-10">
+        <div>{{ content.content| safe }}</div>
+    </section>
+</body>
+
+</html>

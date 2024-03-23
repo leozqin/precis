@@ -30,3 +30,12 @@ class FeedEntry(BaseModel):
     @property
     def id(self) -> str:
         return md5(self.url.encode()).hexdigest()
+    
+class EntryContent(BaseModel):
+    url: str
+    content: str = None
+    summary: str = None
+
+    @property
+    def id(self) -> str:
+        return md5(self.url.encode()).hexdigest()

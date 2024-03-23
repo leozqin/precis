@@ -1,41 +1,98 @@
 <!DOCTYPE html>
 <html>
-  <head>
-      <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
-  </head>
-  <body>
-    <section class="bg-auto">
-        <div class="container px-5 py-12 mx-auto">
-            <div class="flex flex-col flex-wrap">
-                <h1 class="text-4xl font-medium my-10">
-                    RSSynthesis - Feed Entries
-                </h1>
-            </div>
-            <table class="table-auto w-3/4">
-                <thead>
-                    <tr>
-                      <th class="text-center">ID</th>
-                      <th class="text-center">Title</th>
-                      <th class="text-center">URL</th>
-                      <th class="text-center">Published At</th>
-                      <th class="text-center">Updated At</th>
-                      <th class="text-center">Preview</th>
-                    </tr>
-                  </thead>
-                {% for entry in entries %}
-                <tbody>
-                  <tr>
-                    <td class="text-center">{{ entry.id }}</td>
-                    <td class="text-center">{{ entry.title }}</td>
-                    <td class="text-center">{{ entry.url }}</td>
-                    <td class="text-center">{{ entry.published_at }}</td>
-                    <td class="text-center">{{ entry.updated_at }}</td>
-                    <td class="text-center">{{ entry.preview }}</td>
-                  </tr>
-                </tbody>
-                {% endfor %}
-              </table>
-        </div>
-    </section>
-  </body>
+
+<head>
+  <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+  <title>RSSynthesis - Feed Entries</title>
+</head>
+
+<style>
+  body {
+    background-color: black;
+    color: white;
+  }
+
+  code {
+    margin-bottom: 1em;
+    margin-top: 1em;
+  }
+
+  p {
+    margin-bottom: 0.75em
+  }
+
+  h1 {
+    font-size: 150%;
+    font-weight: bold;
+    margin-bottom: 0.75em
+  }
+
+  h2 {
+    font-size: 120%;
+    font-weight: bold;
+    margin-bottom: 0.75em
+  }
+
+  h3 {
+    font-size: 110%;
+    font-style: italic;
+    margin-bottom: 0.75em
+  }
+
+  li {
+    list-style-type: disc;
+    margin-top: .5em;
+    margin-bottom: .5em;
+    margin-left: 3%;
+    margin-right: 0;
+  }
+</style>
+
+<body>
+  <section class="bg-auto px-10">
+    <div class="flex flex-col flex-wrap">
+      <h1 class="text-4xl font-medium my-10">
+        RSSynthesis - Feed Entries
+      </h1>
+    </div>
+    <div class="w-90">
+      <table class="table-fixed border-separate [border-spacing:0.75rem]">
+        <thead>
+          <tr>
+            <th class="text-left">ID</th>
+            <th class="text-left">Title</th>
+            <th class="text-center">Published At</th>
+            <th class="text-center">Updated At</th>
+            <th class="text-center">Full Article</th>
+          </tr>
+        </thead>
+        {% for entry in entries %}
+        <tbody>
+          <tr>
+            <td class="text-left">
+              {{ entry.id|truncate(9, end='') }}
+            </td>
+            <td class="text-left">
+              <a href="{{ url_for('read', feed_entry_id=entry.id) }}"
+                class="text-blue-400 hover:underline">
+                {{ entry.title }}
+              </a>
+            </td>
+            <td class="text-center">{{ entry.published_at }}</td>
+            <td class="text-center">{{ entry.updated_at }}</td>
+            <td>
+              <a href="{{ entry.url }}">
+                <button class="rounded-full text-blue-400">
+                  Full Article Here
+                </button>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+        {% endfor %}
+      </table>
+    </div>
+  </section>
+</body>
+
 </html>

@@ -37,7 +37,11 @@ dependencies = [
     "uvicorn[standard]",
     "tinydb",
     "fastapi-utils",
-    "jinja2"
+    "jinja2",
+    "html2text",
+    "requests",
+    "readability-lxml",
+    "markdown2[all]"
 ]
 
 [project.urls]

@@ -68,3 +68,4 @@ def add_feed_entries(feed: Feed, entries: List) -> None:
         )
 
         db.upsert_feed_entry(feed=feed, entry=feed_entry)
+        db.get_entry_content(entry=feed_entry)
