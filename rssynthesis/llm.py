@@ -7,12 +7,21 @@ from tempfile import NamedTemporaryFile
 
 bullet_prompt = """
 Write a summary in markdown format of the following text.
-The summary should be a number of bullet points.
-The tone should be informational and authoritative.
+
+The summary should cover all the key points and main ideas presented in the original text
+while also condensing the information into a concise and easy-to-understand format. 
+Ensure that the summary includes relevant details and examples that support the main ideas, 
+while avoiding any unnecessary information or repetition. The length of the summary should
+be appropriate for the length and complexity of the original text, providing a clear and 
+accurate overview without omitting any important information. The summary should not repeat
+the original text without adding anything new.
+
+The summary should be bullet points. The tone should be informational and authoritative.
+
 <BEGIN TEXT>
 {text}
 <END TEXT>
-<BEGIN SUMMARY>:
+Summary:
 """
 
 paragraph_prompt = """
@@ -27,7 +36,7 @@ The tone should be informational and authoritative.
 
 
 llm = ollama.Ollama(
-    base_url="https://ollama.leozq.in", model="openhermes:v2.5", num_ctx=8000
+    base_url="https://ollama.leozq.in", model="openhermes:v2.5", num_ctx=8192
 )
 
 
