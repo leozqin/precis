@@ -41,7 +41,10 @@ dependencies = [
     "html2text",
     "requests",
     "readability-lxml",
-    "markdown2[all]"
+    "markdown2[all]",
+    "langchain",
+    "unstructured",
+    "markdown"
 ]
 
 [project.urls]
