@@ -45,7 +45,7 @@
         margin-bottom: .5em;
         margin-left: 3%;
         margin-right: 0;
-      }
+    }
 
     tr {
         margin-left: 0.1em;
@@ -54,41 +54,40 @@
 </style>
 
 <body>
-    <section class="bg-auto mx-5 my-5">
-        <div class="flex flex-col flex-wrap">
-            <h1 class="text-4xl font-medium my-5">
-                RSSynthesis - All Feeds
-            </h1>
-        </div>
-        <table class="table-auto w-5/6">
-            <thead>
-                <tr>
-                    <th class="text-center">ID</th>
-                    <th class="text-center">Name</th>
-                    <th class="text-center">Category</th>
-                    <th class="text-center">Type</th>
-                    <th class="text-center">URL</th>
-                </tr>
-            </thead>
-            {% for feed in feeds %}
-            <tbody>
-                <tr>
-                    <td class="text-center">
-                        {{ feed.id|truncate(9, end='')}}
-                    </td>
-                    <td class="text-center">
-                        <a href="{{ url_for('list_entries_by_feed', feed_id=feed.id) }}" class="text-blue-400 hover:underline">
-                            {{ feed.name }}
-                        </a>
-                    </td>
-                    <td class="text-center">{{ feed.category }}</td>
-                    <td class="text-center">{{ feed.type }}</td>
-                    <td class="text-center">{{ feed.url }}</td>
-                </tr>
-            </tbody>
-            {% endfor %}
-        </table>
-    </section>
+    <div class="md:w-3/5 md:mx-auto my-5">
+        <h1 class="text-4xl font-medium text-center">
+            RSSynthesis - All Feeds
+        </h1>
+    </div>
+    <table class="table-auto md:w-3/5 md:mx-auto">
+        <thead>
+            <tr>
+                <th class="text-center">ID</th>
+                <th class="text-center">Name</th>
+                <th class="text-center">Category</th>
+                <th class="text-center">Type</th>
+                <th class="text-center">URL</th>
+            </tr>
+        </thead>
+        {% for feed in feeds %}
+        <tbody>
+            <tr>
+                <td class="text-center">
+                    {{ feed.id|truncate(9, end='')}}
+                </td>
+                <td class="text-center">
+                    <a href="{{ url_for('list_entries_by_feed', feed_id=feed.id) }}"
+                        class="text-blue-400 hover:underline">
+                        {{ feed.name }}
+                    </a>
+                </td>
+                <td class="text-center">{{ feed.category }}</td>
+                <td class="text-center">{{ feed.type }}</td>
+                <td class="text-center">{{ feed.url }}</td>
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
 </body>
 
 </html>

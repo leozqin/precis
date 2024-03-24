@@ -20,6 +20,7 @@ class Feed(BaseModel):
         return md5(id.encode()).hexdigest()
     
 class FeedEntry(BaseModel):
+    feed_id: str
     title: str
     url: str
     published_at: int

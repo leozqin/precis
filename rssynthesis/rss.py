@@ -58,6 +58,7 @@ def add_feed_entries(feed: Feed, entries: List) -> None:
                 "published_at": timegm(entry.published_parsed),
                 "updated_at": timegm(entry.updated_parsed),
                 "preview": entry.summary,
+                "feed_id": feed.id,
                 "authors": (
                     [i["name"] for i in entry.authors] if "authors" in entry else []
                 ),

@@ -9,6 +9,10 @@ logger = getLogger("uvicorn.error")
 db = DB()
 
 
+def _format_time(time: int) -> str:
+    return strftime("%Y-%m-%d %I:%M %p", localtime(time)).lower()
+
+
 def list_feeds():
     feeds = db.get_feeds()
 
@@ -39,12 +43,8 @@ def list_entries(feed_id: None):
         yield {
             "title": feed_entry.title,
             "url": feed_entry.url,
-            "published_at": strftime(
-                "%Y-%m-%d %H:%M", localtime(feed_entry.published_at)
-            ),
-            "updated_at": strftime(
-                "%Y-%m-%d %H:%M", localtime(feed_entry.updated_at)
-            ),
+            "published_at": _format_time(feed_entry.published_at),
+            "updated_at": _format_time(feed_entry.updated_at),
             "preview": feed_entry.preview,
             "id": entry["id"],
             "feed_id": entry["feed_id"],
@@ -52,12 +52,16 @@ def list_entries(feed_id: None):
 
 
 def get_entry_content(feed_entry_id):
-    entry = db.get_feed_entry(id=feed_entry_id)
+    entry: FeedEntry = db.get_feed_entry(id=feed_entry_id)
     content: EntryContent = db.get_entry_content(entry=entry)
 
     return {
+        "feed_id": entry.feed_id,
         "title": entry.title,
         "url": entry.url,
+        "published_at": _format_time(entry.published_at),
+        "updated_at": _format_time(entry.updated_at),
         "content": content.content,
+        "summary": content.summary,
         "byline": ", ".join(entry.authors) if entry.authors else None,
     }
