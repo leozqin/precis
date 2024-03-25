@@ -1,25 +1,33 @@
-from simplematrixbotlib import Bot, Creds
-from os import environ
 from logging import getLogger
-from rssynthesis.models import Feed, FeedEntry
+from pydantic import BaseModel
+from typing import Any, Mapping, ClassVar, Type
+from pathlib import Path
+from yaml import load, SafeLoader
 
-creds = Creds(
-    homeserver=environ["MATRIX_HOMESERVER_URL"],
-    username=environ["MATRIX_BOT_USERNAME"],
-    password=environ["MATRIX_BOT_PASSWORD"],
-)
-
-bot = Bot(creds=creds)
-room_id = environ["MATRIX_BOT_ROOM_ID"]
+from rssynthesis.notification_handlers.matrix import MatrixNotificationHandler
+from rssynthesis.models import NotificationHandler
+from rssynthesis.constants import CONFIG_DIR
 
 logger = getLogger("uvicorn.error")
 
-def _make_read_link(entry: FeedEntry):
-    base_url = environ["RSS_BASE_URL"]
-    return f"{base_url}/read/{entry.id}"
+
+class NotificationEngine(BaseModel):
+    type: str
+    config: Mapping[str, Any] = {}
+
+    handlers: ClassVar = {"matrix": MatrixNotificationHandler}
+
+    def get_handler(self) -> Type[NotificationHandler]:
+        logger.info(f"loading notification handler of type {self.type}")
+        return self.handlers[self.type](**self.config)
 
 
-async def send_notification(feed: Feed, entry: FeedEntry):
-    msg = f"{feed.name}: [{entry.title}]({_make_read_link(entry)})"
-    logger.info(f"Sending notification to {room_id}")
-    await bot.api.send_markdown_message(room_id=room_id, message=msg)
+def load_notification_config() -> NotificationEngine:
+    notification_config_path = Path(CONFIG_DIR, "notification.yml").resolve()
+
+    with open(notification_config_path, "r") as fp:
+        config = load(fp, Loader=SafeLoader)
+
+    return NotificationEngine(**config)
+
+notification_handler = load_notification_config().get_handler()

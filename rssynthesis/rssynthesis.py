@@ -4,22 +4,21 @@ from fastapi.templating import Jinja2Templates
 from fastapi_utils.tasks import repeat_every
 from fastapi.responses import HTMLResponse
 from fastapi.requests import Request
+from os import environ
 
 from contextlib import asynccontextmanager
 from logging import getLogger
 from tinydb import TinyDB
 
-from rssynthesis.rss import load_feeds, check_feeds
+from rssynthesis.rss import check_feeds, load_feeds
 from rssynthesis.ui import list_feeds, list_entries, get_entry_content
-from rssynthesis.notifications import bot
+from rssynthesis.notifications import notification_handler
 
 logger = getLogger("uvicorn.error")
 base_path = Path(__file__).parent
 
 db_path = Path(base_path, "../", "db.json").resolve()
 db = TinyDB(db_path)
-
-config_path = Path(base_path, "../", "feeds.yml").resolve()
 
 templates = Jinja2Templates(directory=Path(base_path, "templates").resolve())
 
@@ -32,14 +31,14 @@ async def poll_feeds():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    load_feeds(config_path=config_path)
+    load_feeds()
     
-    await bot.api.login()
+    await notification_handler.login()
     await poll_feeds()
 
     yield
 
-    bot.api.async_client.logout()
+    await notification_handler.logout()
 
 
 app = FastAPI(lifespan=lifespan, title="RSSynthesis", openapi_url="/openapi.json")
@@ -72,7 +71,7 @@ def list_all_entries(request: Request):
 
 
 @app.get("/read/{feed_entry_id}", response_class=HTMLResponse)
-def read(feed_entry_id: str, request: Request, ):
+def read(feed_entry_id: str, request: Request):
 
     return templates.TemplateResponse(
         "read.html",
