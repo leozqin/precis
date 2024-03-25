@@ -2,7 +2,7 @@ from logging import getLogger
 from time import localtime, strftime
 
 from rssynthesis.db import DB
-from rssynthesis.models import Feed, FeedEntry, EntryContent
+from rssynthesis.models import FeedEntry, EntryContent
 
 logger = getLogger("uvicorn.error")
 

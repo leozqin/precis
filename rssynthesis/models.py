@@ -6,7 +6,6 @@ from feedparser import parse, FeedParserDict
 from typing import Type, Mapping, Any, ClassVar
 from json import dumps
 from hashlib import md5
-from enum import Enum
 
 
 class Feed(BaseModel):

@@ -1,7 +1,7 @@
 from yaml import load, SafeLoader
 from logging import getLogger
 from calendar import timegm
-from typing import List, Mapping
+from typing import List
 from pathlib import Path
 
 from datetime import datetime, timezone

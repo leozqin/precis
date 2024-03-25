@@ -1,6 +1,6 @@
 from pathlib import Path
 from tinydb import TinyDB, Query
-from rssynthesis.models import Feed, FeedEntry, EntryContent, LLM
+from rssynthesis.models import Feed, FeedEntry, EntryContent
 from rssynthesis.llm import summarize_single
 from typing import List, Optional
 import requests
