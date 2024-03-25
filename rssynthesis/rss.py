@@ -1,21 +1,22 @@
 from yaml import load, SafeLoader
 from logging import getLogger
 from calendar import timegm
-from typing import List
+from typing import List, Mapping
+from pathlib import Path
 
 from datetime import datetime, timezone
 
 from rssynthesis.db import DB
 from rssynthesis.models import Feed, FeedEntry
-from rssynthesis.notifications import send_notification
+from rssynthesis.notifications import notification_handler
+from rssynthesis.constants import CONFIG_DIR
 
 logger = getLogger("uvicorn.error")
 
 db = DB()
 
-
-def load_feeds(config_path: str) -> None:
-    with open(config_path, "r") as fp:
+def load_feeds() -> None:
+    with open(Path(CONFIG_DIR, "feeds.yml").resolve(), "r") as fp:
         configs = load(fp, Loader=SafeLoader)
 
     db.clear_active_feeds()
@@ -25,8 +26,8 @@ def load_feeds(config_path: str) -> None:
 
         db.insert_feed(feed)
 
-
 async def check_feeds() -> List:
+
     now = int(datetime.now(tz=timezone.utc).timestamp())
     logger.info(f"Checking feeds starting at time {now}")
 
@@ -45,12 +46,13 @@ async def check_feeds() -> List:
             # if we have no history, take the first 5
             new_items.extend(feed.rss.entries[0:5])
 
-        await db.update_poll_state(feed=feed, now=now)
+        db.update_poll_state(feed=feed, now=now)
         await add_feed_entries(feed=feed, entries=new_items)
         logger.info(f"Found {len(new_items)} new item(s) for feed {feed.name}")
 
 
 async def add_feed_entries(feed: Feed, entries: List) -> None:
+
     for entry in entries:
         feed_entry = FeedEntry(
             **{
@@ -69,7 +71,7 @@ async def add_feed_entries(feed: Feed, entries: List) -> None:
             f"Upserting entry from {feed.name}: {feed_entry.title} - id {feed_entry.id}"
         )
 
-        await db.upsert_feed_entry(feed=feed, entry=feed_entry)
-        await db.get_entry_content(entry=feed_entry)
+        db.upsert_feed_entry(feed=feed, entry=feed_entry)
+        db.get_entry_content(entry=feed_entry)
 
-        await send_notification(feed=feed, entry=feed_entry)
+        await notification_handler.send_notification(feed=feed, entry=feed_entry)

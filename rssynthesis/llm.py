@@ -1,9 +1,13 @@
-from langchain_community.llms import ollama
 from langchain.prompts import PromptTemplate
 from langchain_community.document_loaders.markdown import UnstructuredMarkdownLoader
 from langchain.chains.combine_documents.stuff import StuffDocumentsChain
 from langchain.chains.llm import LLMChain
 from tempfile import NamedTemporaryFile
+from yaml import load, SafeLoader
+from pathlib import Path
+
+from rssynthesis.models import LLM
+from rssynthesis.constants import CONFIG_DIR
 
 bullet_prompt = """
 Write a summary in markdown format of the following text.
@@ -34,17 +38,21 @@ The tone should be informational and authoritative.
 <BEGIN SUMMARY>:
 """
 
+def load_llm_config() -> LLM:
+    llm_config_path = Path(CONFIG_DIR, "llm.yml").resolve()
 
-llm = ollama.Ollama(
-    base_url="https://ollama.leozq.in", model="openhermes:v2.5", num_ctx=8192
-)
+    with open(llm_config_path, 'r') as fp:
+        config = load(fp, Loader=SafeLoader)
+    
+    return LLM(**config)
 
 
 def summarize_single(mk: str) -> str:
     mk_len = len(mk.split())
-
     if mk_len <= 500:
         return None
+    
+    llm = load_llm_config()
 
     prompt = PromptTemplate.from_template(bullet_prompt)
     with NamedTemporaryFile() as tmp:
@@ -52,7 +60,7 @@ def summarize_single(mk: str) -> str:
         loader = UnstructuredMarkdownLoader(file_path=tmp.name)
         docs = loader.load()
 
-    chain = LLMChain(llm=llm, prompt=prompt)
+    chain = LLMChain(llm=llm.llm, prompt=prompt)
     stuff_chain = StuffDocumentsChain(llm_chain=chain, document_variable_name="text")
 
     return stuff_chain.run(docs)
