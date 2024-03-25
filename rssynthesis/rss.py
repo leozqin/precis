@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 
 from rssynthesis.db import DB
 from rssynthesis.models import Feed, FeedEntry
+from rssynthesis.notifications import send_notification
 
 logger = getLogger("uvicorn.error")
 
@@ -25,7 +26,7 @@ def load_feeds(config_path: str) -> None:
         db.insert_feed(feed)
 
 
-def check_feeds() -> List:
+async def check_feeds() -> List:
     now = int(datetime.now(tz=timezone.utc).timestamp())
     logger.info(f"Checking feeds starting at time {now}")
 
@@ -44,12 +45,12 @@ def check_feeds() -> List:
             # if we have no history, take the first 5
             new_items.extend(feed.rss.entries[0:5])
 
-        db.update_poll_state(feed=feed, now=now)
-        add_feed_entries(feed=feed, entries=new_items)
+        await db.update_poll_state(feed=feed, now=now)
+        await add_feed_entries(feed=feed, entries=new_items)
         logger.info(f"Found {len(new_items)} new item(s) for feed {feed.name}")
 
 
-def add_feed_entries(feed: Feed, entries: List) -> None:
+async def add_feed_entries(feed: Feed, entries: List) -> None:
     for entry in entries:
         feed_entry = FeedEntry(
             **{
@@ -68,5 +69,7 @@ def add_feed_entries(feed: Feed, entries: List) -> None:
             f"Upserting entry from {feed.name}: {feed_entry.title} - id {feed_entry.id}"
         )
 
-        db.upsert_feed_entry(feed=feed, entry=feed_entry)
-        db.get_entry_content(entry=feed_entry)
+        await db.upsert_feed_entry(feed=feed, entry=feed_entry)
+        await db.get_entry_content(entry=feed_entry)
+
+        await send_notification(feed=feed, entry=feed_entry)
