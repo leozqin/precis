@@ -11,6 +11,7 @@ from tinydb import TinyDB
 
 from rssynthesis.rss import load_feeds, check_feeds
 from rssynthesis.ui import list_feeds, list_entries, get_entry_content
+from rssynthesis.notifications import bot
 
 logger = getLogger("uvicorn.error")
 base_path = Path(__file__).parent
@@ -26,15 +27,19 @@ templates = Jinja2Templates(directory=Path(base_path, "templates").resolve())
 @repeat_every(seconds=60*5, logger=logger)
 async def poll_feeds():
     logger.info("Checking feeds for updates")
-    check_feeds()
+    await check_feeds()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     load_feeds(config_path=config_path)
+    
+    await bot.api.login()
     await poll_feeds()
 
     yield
+
+    bot.api.async_client.logout()
 
 
 app = FastAPI(lifespan=lifespan, title="RSSynthesis", openapi_url="/openapi.json")

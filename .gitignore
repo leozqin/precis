@@ -163,3 +163,5 @@ cython_debug/
 # system stuff
 *.yml
 *.json
+session.txt
+.envrc

@@ -44,7 +44,8 @@ dependencies = [
     "markdown2[all]",
     "langchain",
     "unstructured",
-    "markdown"
+    "markdown",
+    "simplematrixbotlib"
 ]
 
 [project.urls]
