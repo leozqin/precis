@@ -7,6 +7,7 @@ import requests
 from html2text import HTML2Text
 from readability import Document
 from markdown2 import markdown
+from rssynthesis.constants import DATA_DIR
 
 
 class DB:
@@ -14,7 +15,7 @@ class DB:
     Use this class to encapsulate DB interactions
     """
 
-    db_path = Path(Path(__file__).parent, "../", "db.json").resolve()
+    db_path = Path(DATA_DIR, "db.json").resolve()
     db = TinyDB(db_path)
 
     def clear_active_feeds(self) -> None:
