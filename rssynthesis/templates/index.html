@@ -54,36 +54,32 @@
 </style>
 
 <body>
-    <div class="md:w-3/5 md:mx-auto my-5">
+    <div class="lg:w-3/5 sm:w-95 sm:text-3xl lg:mx-auto my-5">
         <h1 class="text-4xl font-medium text-center">
             RSSynthesis - All Feeds
         </h1>
     </div>
-    <table class="table-auto md:w-3/5 md:mx-auto">
+    <table class="table-auto lg:w-3/5 sm:w-95 sm:text-2xl sm:text-lg lg:text-base mx-auto">
         <thead>
             <tr>
-                <th class="text-center">ID</th>
-                <th class="text-center">Name</th>
-                <th class="text-center">Category</th>
-                <th class="text-center">Type</th>
-                <th class="text-center">URL</th>
+                <th class="text-center px-8 py-2">ID</th>
+                <th class="text-center px-8 py-2">Name</th>
+                <th class="text-center px-8 py-2">Category</th>
             </tr>
         </thead>
         {% for feed in feeds %}
         <tbody>
             <tr>
-                <td class="text-center">
+                <td class="text-center px-8 py-2">
                     {{ feed.id|truncate(9, end='')}}
                 </td>
-                <td class="text-center">
+                <td class="text-center px-8 py-2">
                     <a href="{{ url_for('list_entries_by_feed', feed_id=feed.id) }}"
                         class="text-blue-400 hover:underline">
                         {{ feed.name }}
                     </a>
                 </td>
-                <td class="text-center">{{ feed.category }}</td>
-                <td class="text-center">{{ feed.type }}</td>
-                <td class="text-center">{{ feed.url }}</td>
+                <td class="text-center px-8 py-2">{{ feed.category }}</td>
             </tr>
         </tbody>
         {% endfor %}

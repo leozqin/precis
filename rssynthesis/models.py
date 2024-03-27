@@ -1,9 +1,7 @@
 from pydantic import BaseModel
-from abc import ABC
-from langchain_community.llms import ollama
-from langchain_core.language_models.llms import BaseLLM
+from abc import ABC, abstractmethod
 from feedparser import parse, FeedParserDict
-from typing import Type, Mapping, Any, ClassVar
+from typing import Type
 from json import dumps
 from hashlib import md5
 
@@ -48,19 +46,6 @@ class EntryContent(BaseModel):
         return md5(self.url.encode()).hexdigest()
 
 
-class LLM(BaseModel):
-    type: str
-    config: Mapping[str, Any] = {}
-
-    llm_type_map: ClassVar = {"ollama": ollama.Ollama}
-
-    @property
-    def llm(self) -> Type[BaseLLM]:
-        if self.type not in self.llm_type_map:
-            raise ValueError(f"supported llm types are {list(self.llm_type_map.keys())}")
-        return self.llm_type_map[self.type](**self.config)
-
-
 class NotificationHandler(ABC):
 
     async def login(self):
@@ -73,3 +58,16 @@ class NotificationHandler(ABC):
         pass
 
 
+class SummarizationHandler(BaseModel, ABC):
+
+    @abstractmethod
+    def summarize(self, feed: Feed, entry: FeedEntry, mk: str):
+        pass
+
+    def get_prompt(self, mk: str):
+        prompt = f"""
+What is this article about?
+
+{mk}
+"""
+        return prompt

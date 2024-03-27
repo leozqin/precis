@@ -45,7 +45,8 @@ dependencies = [
     "langchain",
     "unstructured",
     "markdown",
-    "simplematrixbotlib"
+    "simplematrixbotlib",
+    "ollama"
 ]
 
 [project.urls]
@@ -67,3 +68,4 @@ rssynthesis = "rssynthesis.rssynthesis:main"
 # If there are data files included in your packages that need to be
 # installed, specify them here.
 package-data = {"sample" = ["*.dat"]}
+packages = ["rssynthesis"]

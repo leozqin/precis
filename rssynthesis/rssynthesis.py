@@ -4,7 +4,6 @@ from fastapi.templating import Jinja2Templates
 from fastapi_utils.tasks import repeat_every
 from fastapi.responses import HTMLResponse
 from fastapi.requests import Request
-from os import environ
 
 from contextlib import asynccontextmanager
 from logging import getLogger
