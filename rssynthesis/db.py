@@ -1,7 +1,7 @@
 from pathlib import Path
 from tinydb import TinyDB, Query
 from rssynthesis.models import Feed, FeedEntry, EntryContent
-from rssynthesis.llm import summarize_single
+from rssynthesis.summarization.engine import summarization_handler
 from typing import List, Optional
 import requests
 from html2text import HTML2Text
@@ -105,7 +105,10 @@ class DB:
             converter.ignore_links = True
 
             content = converter.handle(document.summary(html_partial=True))
-            summary = summarize_single(mk=content)
+
+            summary = summarization_handler.summarize(
+                feed=self.get_feed(entry.feed_id), entry=FeedEntry, mk=content
+            )
 
             entry_content = EntryContent(
                 url=entry.url,

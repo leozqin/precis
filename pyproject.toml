@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rssynthesis"
-version = "0.0.1"
+version = "0.0.2"
 description = "A framework for automating your media diet"
 requires-python = ">=3.11"
 license = {file = "LICENSE"}
@@ -42,10 +42,8 @@ dependencies = [
     "requests",
     "readability-lxml",
     "markdown2[all]",
-    "langchain",
-    "unstructured",
-    "markdown",
-    "simplematrixbotlib"
+    "simplematrixbotlib",
+    "ollama"
 ]
 
 [project.urls]
@@ -67,3 +65,4 @@ rssynthesis = "rssynthesis.rssynthesis:main"
 # If there are data files included in your packages that need to be
 # installed, specify them here.
 package-data = {"sample" = ["*.dat"]}
+packages = ["rssynthesis"]

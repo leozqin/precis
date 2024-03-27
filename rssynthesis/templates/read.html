@@ -49,7 +49,7 @@
 </style>
 
 <body>
-    <section class="md:w-3/5 md:mx-auto my-5">
+    <section class="sm:w-full sm:px-10 lg:w-3/5 lg:mx-auto my-5">
         <h1>{{ content.title }}</h1>
         <h2><a href="{{ content.url }}" class="text-blue-400 hover:underline">Link to Content</a>
         </h2>
@@ -60,16 +60,16 @@
         {% endif %}
     </section>
     {% if content.summary %}
-    <section class="md:w-3/5 md:mx-auto">
+    <section class="sm:w-full sm:px-10 lg:w-3/5 lg:mx-auto">
         <h1>TL;DR</h1>
         <div>{{ content.summary| safe }}</div>
     </section>
     {% endif %}
-    <section class="md:w-3/5 md:mx-auto">
+    <section class="sm:w-full sm:px-10 lg:w-3/5 lg:mx-auto">
         <h1>Full Article</h1>
         <div class="justify-center">{{ content.content| safe }}</div>
     </section>
-    <section class="md:w-3/5 md:mx-auto">
+    <section class="sm:w-full sm:mx-10 lg:w-3/5 lg:mx-auto ">
         <div class="text-center my-10">
             <a href="{{ url_for('list_entries_by_feed', feed_id=content.feed_id) }}">
                 <button type="button"
