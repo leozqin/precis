@@ -42,9 +42,6 @@ dependencies = [
     "requests",
     "readability-lxml",
     "markdown2[all]",
-    "langchain",
-    "unstructured",
-    "markdown",
     "simplematrixbotlib",
     "ollama"
 ]
