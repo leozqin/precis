@@ -5,6 +5,7 @@ from rssynthesis.summarization.engine import summarization_handler
 from typing import List, Optional
 import requests
 from html2text import HTML2Text
+from readabilipy import simple_json_from_html_string
 from readability import Document
 from markdown2 import markdown
 from rssynthesis.constants import DATA_DIR
@@ -125,13 +126,18 @@ class DB:
 
         else:
             raw_content = requests.get(entry.url)
-            document = Document(raw_content.content)
+
+            # extract the main content
+            document = simple_json_from_html_string(raw_content.text)
+
+            # clean it up more
+            cleaned_document = Document(input=document["content"])
 
             converter = HTML2Text()
             converter.ignore_images = True
             converter.ignore_links = True
 
-            content = converter.handle(document.summary(html_partial=True))
+            content = converter.handle(cleaned_document.summary(html_partial=True))
 
             if (
                 len(content.split()) < 100

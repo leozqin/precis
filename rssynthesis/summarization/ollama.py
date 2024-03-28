@@ -35,7 +35,8 @@ class OllamaSummarizationHandler(SummarizationHandler, BaseModel):
         system = """
 Your goal is to extract the main article body from this web page. Do not include ads, links, images, or navigation.
 Only include the primary content of the page. Convert the article body to markdown. Add whitespace as needed to
-improve readability and separate paragraphs from each other.
+improve readability and separate paragraphs from each other. Look for things like the <article> tag, a number of different
+paragraphs all in a row, or a articleBody json, to identify the main article body. 
         """
 
         prompt = f"Extract the main article: {html}"

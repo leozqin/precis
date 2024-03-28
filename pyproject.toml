@@ -40,6 +40,7 @@ dependencies = [
     "jinja2",
     "html2text",
     "requests",
+    "readabilipy",
     "readability-lxml",
     "markdown2[all]",
     "simplematrixbotlib",
