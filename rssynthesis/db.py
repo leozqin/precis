@@ -48,6 +48,21 @@ class DB:
         if results:
             return results[0]["last_polled_at"]
 
+    def set_feed_start_ts(self, feed: Feed, start_ts: int):
+        table = self.db.table("feed_start")
+
+        query = Query().id.matches(feed.id)
+        table.upsert({"id": feed.id, "start_ts": start_ts}, cond=query)
+
+    def get_feed_start_ts(self, feed: Feed) -> int:
+        table = self.db.table("feed_start")
+
+        query = Query().id.matches(feed.id)
+        results = table.search(query)
+
+        if results:
+            return results[0]["start_ts"]
+
     def update_poll_state(self, feed: Feed, now: int):
         table = self.db.table("poll")
 
@@ -87,6 +102,15 @@ class DB:
         entry = table.search(query)[0]
 
         return FeedEntry(**entry["entry"])
+
+    def feed_entry_exists(self, id: str):
+        table = self.db.table("entries")
+
+        query = Query().id.matches(id)
+        if table.search(query):
+            return True
+        else:
+            return False
 
     def get_entry_content(self, entry: FeedEntry) -> EntryContent:
         table = self.db.table("entry_contents")
