@@ -51,11 +51,12 @@ def list_entries(feed_id: None):
         }
 
 
-def get_entry_content(feed_entry_id):
+def get_entry_content(feed_entry_id, redrive: bool = False):
     entry: FeedEntry = db.get_feed_entry(id=feed_entry_id)
-    content: EntryContent = db.get_entry_content(entry=entry)
+    content: EntryContent = db.get_entry_content(entry=entry, redrive=redrive)
 
     return {
+        "id": feed_entry_id,
         "feed_id": entry.feed_id,
         "title": entry.title,
         "url": entry.url,
