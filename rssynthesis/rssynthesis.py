@@ -22,7 +22,7 @@ db = TinyDB(db_path)
 templates = Jinja2Templates(directory=Path(base_path, "templates").resolve())
 
 
-@repeat_every(seconds=60*5, logger=logger)
+@repeat_every(seconds=60 * 5, logger=logger)
 async def poll_feeds():
     logger.info("Checking feeds for updates")
     await check_feeds()
@@ -31,7 +31,7 @@ async def poll_feeds():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     load_feeds()
-    
+
     await notification_handler.login()
     await poll_feeds()
 
@@ -70,9 +70,16 @@ def list_all_entries(request: Request):
 
 
 @app.get("/read/{feed_entry_id}", response_class=HTMLResponse)
-def read(feed_entry_id: str, request: Request):
+def read(
+    request: Request,
+    feed_entry_id: str,
+    redrive: bool = False
+):
 
     return templates.TemplateResponse(
         "read.html",
-        {"request": request, "content": get_entry_content(feed_entry_id=feed_entry_id)},
+        {
+            "request": request,
+            "content": get_entry_content(feed_entry_id=feed_entry_id, redrive=redrive),
+        },
     )

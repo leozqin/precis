@@ -116,15 +116,18 @@ class DB:
         else:
             return False
 
-    def get_entry_content(self, entry: FeedEntry) -> EntryContent:
+    def get_entry_content(self, entry: FeedEntry, redrive: bool = False) -> EntryContent:
         table = self.db.table("entry_contents")
         query = Query().id.matches(entry.id)
 
         existing = table.search(query)
-        if existing:
+        if existing and not redrive:
             return EntryContent(**existing[0]["entry_contents"])
 
         else:
+            if redrive:
+                logger.info(f"starting redrive for feed entry {entry.id}")
+
             raw_content = requests.get(entry.url)
 
             # extract the main content
@@ -161,8 +164,9 @@ class DB:
                 summary=markdown(summary) if summary else None,
             )
 
-            table.insert(
-                {"id": entry_content.id, "entry_contents": entry_content.dict()}
+            query = Query().id.matches(entry.id)
+            table.upsert(
+                {"id": entry_content.id, "entry_contents": entry_content.dict()}, cond=query
             )
 
             return entry_content
