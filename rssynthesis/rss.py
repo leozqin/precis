@@ -50,7 +50,6 @@ async def check_feeds() -> List:
         start_ts = db.get_feed_start_ts(feed=feed)
         for entry in entries:
             published_time = timegm(entry.published_parsed)
-
             feed_entry = FeedEntry(
                 **{
                     "title": entry.title,

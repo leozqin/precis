@@ -15,7 +15,9 @@ class SummarizationEngine(BaseModel):
     type: str
     config: Mapping[str, Any] = {}
 
-    handlers: ClassVar = {"ollama": OllamaSummarizationHandler}
+    handlers: ClassVar = {
+        "ollama": OllamaSummarizationHandler
+    }
 
     def get_handler(self) -> Type[SummarizationHandler]:
         logger.info(f"loading summarization handler of type {self.type}")
@@ -29,5 +31,6 @@ def load_summarization_config() -> SummarizationEngine:
         config = load(fp, Loader=SafeLoader)
 
     return SummarizationEngine(**config)
+
 
 summarization_handler = load_summarization_config().get_handler()
