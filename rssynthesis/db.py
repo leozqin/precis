@@ -8,6 +8,9 @@ from html2text import HTML2Text
 from readability import Document
 from markdown2 import markdown
 from rssynthesis.constants import DATA_DIR
+from logging import getLogger
+
+logger = getLogger("uvicorn.error")
 
 
 class DB:
@@ -129,6 +132,18 @@ class DB:
             converter.ignore_links = True
 
             content = converter.handle(document.summary(html_partial=True))
+
+            if (
+                len(content.split()) < 100
+                and summarization_handler.supports_fallback_extractor
+            ):
+                logger.info(
+                    f"Content was too short, falling back to summarization html extractor!"
+                )
+                fallback = summarization_handler.fallback_html_extractor(
+                    html=raw_content.content.decode()
+                )
+                content = converter.handle(fallback)
 
             summary = summarization_handler.summarize(
                 feed=self.get_feed(entry.feed_id), entry=FeedEntry, mk=content

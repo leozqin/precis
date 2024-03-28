@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from abc import ABC, abstractmethod
 from feedparser import parse, FeedParserDict
-from typing import Type
+from typing import Type, ClassVar
 from json import dumps
 from hashlib import md5
 
@@ -59,15 +59,26 @@ class NotificationHandler(ABC):
 
 
 class SummarizationHandler(BaseModel, ABC):
+    supports_fallback_extractor: ClassVar[bool] = False
 
     @abstractmethod
     def summarize(self, feed: Feed, entry: FeedEntry, mk: str):
         pass
 
+    def fallback_html_extractor(self, html: str):
+        pass
+
     def get_prompt(self, mk: str):
         prompt = f"""
-What is this article about?
+Summarize this article:
 
 {mk}
 """
         return prompt
+
+    @property
+    def system_prompt(self):
+        return """
+Your goal is to write a brief but detailed summary of the text given to you.
+Only output the summary without any additional text. Provide the summary in markdown.
+    """
