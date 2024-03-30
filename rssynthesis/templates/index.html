@@ -2,88 +2,27 @@
 <html>
 
 <head>
-    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+    <link href="./static/output.css" rel="stylesheet">
     <title>RSSynthesis - Feeds</title>
 </head>
 
-<style>
-    body {
-        background-color: black;
-        color: white;
-    }
-
-    code {
-        margin-bottom: 1em;
-        margin-top: 1em;
-    }
-
-    p {
-        margin-bottom: 0.75em
-    }
-
-    h1 {
-        font-size: 150%;
-        font-weight: bold;
-        margin-bottom: 0.75em
-    }
-
-    h2 {
-        font-size: 120%;
-        font-weight: bold;
-        margin-bottom: 0.75em
-    }
-
-    h3 {
-        font-size: 110%;
-        font-style: italic;
-        margin-bottom: 0.75em
-    }
-
-    li {
-        list-style-type: disc;
-        margin-top: .5em;
-        margin-bottom: .5em;
-        margin-left: 3%;
-        margin-right: 0;
-    }
-
-    tr {
-        margin-left: 0.1em;
-        margin-right: 0.1em;
-    }
-</style>
-
-<body>
-    <div class="lg:w-3/5 sm:w-95 sm:text-3xl lg:mx-auto my-5">
-        <h1 class="text-4xl font-medium text-center">
+<body class="prose lg:w-3/5 mx-auto max-w-none sm:prose-xl md:prose-xl lg:prose-lg my-5">
+    <div>
+        <h1 class="my-10 flex justify-center">
             RSSynthesis - All Feeds
         </h1>
     </div>
-    <table class="table-auto lg:w-3/5 sm:w-95 sm:text-2xl sm:text-lg lg:text-base mx-auto">
-        <thead>
-            <tr>
-                <th class="text-center px-8 py-2">ID</th>
-                <th class="text-center px-8 py-2">Name</th>
-                <th class="text-center px-8 py-2">Category</th>
-            </tr>
-        </thead>
+    <div class="grid-flow-row lg:grid-cols-4 s:grid-cols-1 grid gap-4">
         {% for feed in feeds %}
-        <tbody>
-            <tr>
-                <td class="text-center px-8 py-2">
-                    {{ feed.id|truncate(9, end='')}}
-                </td>
-                <td class="text-center px-8 py-2">
-                    <a href="{{ url_for('list_entries_by_feed', feed_id=feed.id) }}"
-                        class="text-blue-400 hover:underline">
-                        {{ feed.name }}
-                    </a>
-                </td>
-                <td class="text-center px-8 py-2">{{ feed.category }}</td>
-            </tr>
-        </tbody>
+        <div class="w-5/6">
+            <a href="{{ url_for('list_entries_by_feed', feed_id=feed.id) }}" class="no-underline">
+                <button class="btn btn-block btn-lg bg-base-300">
+                    {{ feed.name }}
+                </button>
+            </a>
+        </div>
         {% endfor %}
-    </table>
+    </div>
 </body>
 
 </html>

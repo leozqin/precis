@@ -2,97 +2,39 @@
 <html>
 
 <head>
-  <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+  <link href="./../static/output.css" rel="stylesheet">
   <title>RSSynthesis - Feed Entries</title>
 </head>
 
-<style>
-  body {
-    background-color: black;
-    color: white;
-  }
-
-  code {
-    margin-bottom: 1em;
-    margin-top: 1em;
-  }
-
-  p {
-    margin-bottom: 0.75em
-  }
-
-  h1 {
-    font-size: 150%;
-    font-weight: bold;
-    margin-bottom: 0.75em
-  }
-
-  h2 {
-    font-size: 120%;
-    font-weight: bold;
-    margin-bottom: 0.75em
-  }
-
-  h3 {
-    font-size: 110%;
-    font-style: italic;
-    margin-bottom: 0.75em
-  }
-
-  li {
-    list-style-type: disc;
-    margin-top: .5em;
-    margin-bottom: .5em;
-    margin-left: 3%;
-    margin-right: 0;
-  }
-</style>
-
-<body>
-  <div class="flex flex-col flex-wrap">
-    <h1 class="text-4xl font-medium my-10 mx-auto">
-      RSSynthesis - Feed Entries
+<body class="prose lg:w-3/5 mx-auto max-w-none sm:prose-xl md:prose-xl lg:prose-lg my-5">
+  <section>
+    <h1 class="my-10 flex justify-center">
+      Feed Entries - {{ entries[0].feed_name }}
     </h1>
+  </section>
+  <div class="my-10 flex justify-center mx-auto">
+    <a href="{{ url_for('root') }}">
+      <button class="btn btn-wide btn-accent">Back to Feeds</button>
+    </a>
   </div>
-  <div class="w-90">
-    <table class="table-fixed border-separate [border-spacing:0.75rem] mx-auto text-wrap">
-      <thead>
-        <tr>
-          <th class="text-left text-wrap px-5">Title</th>
-          <th class="text-center text-wrap px-5">Published At</th>
-          <th class="text-center text-wrap px-5">Full Article</th>
-        </tr>
-      </thead>
-      {% for entry in entries|sort(attribute='published_at', reverse = True) %}
-      <tbody>
-        <tr>
-          <td class="text-left text-wrap px-5">
-            <a href="{{ url_for('read', feed_entry_id=entry.id) }}" class="text-blue-400 hover:underline">
+  <div class="grid-flow-row lg:grid-cols-4 md:grid-cols-2 s:grid-cols-1 grid gap-4">
+    {% for entry in entries|sort(attribute='sort_time', reverse = True) %}
+    <div>
+      <div class="card card-compact w-5/6 shadow-xl bg-base-300">
+        <div class="card-body">
+          <h2 class="card-title">
+            <a href="{{ url_for('read', feed_entry_id=entry.id) }}" class="no-underline">
               {{ entry.title }}
             </a>
-          </td>
-          <td class="text-center text-wrap px-5">{{ entry.published_at }}</td>
-          <td>
-            <a href="{{ entry.url }}">
-              <button class="rounded-full text-blue-400">
-                Full Article Here
-              </button>
-            </a>
-          </td>
-        </tr>
-      </tbody>
-      {% endfor %}
-    </table>
-    <section class="md:w-3/5 md:mx-auto">
-      <div class="text-center my-10">
-          <a href="{{ url_for('root') }}">
-              <button type="button"
-                  class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
-                  Back to Feeds
-              </button>
-          </a>
+          </h2>
+          <p>
+            From: {{ entry.feed_name }}<br />
+            Last Updated: {{ entry.published_at }}
+          </p>
+        </div>
       </div>
-  </section>
+    </div>
+    {% endfor %}
   </div>
 </body>
 

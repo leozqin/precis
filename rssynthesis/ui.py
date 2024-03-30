@@ -2,7 +2,7 @@ from logging import getLogger
 from time import localtime, strftime
 
 from rssynthesis.db import DB
-from rssynthesis.models import FeedEntry, EntryContent
+from rssynthesis.models import FeedEntry, EntryContent, Feed
 
 logger = getLogger("uvicorn.error")
 
@@ -41,10 +41,12 @@ def list_entries(feed_id: None):
         feed_entry: FeedEntry = entry["entry"]
 
         yield {
+            "feed_name": feed.name if feed else "All",
             "title": feed_entry.title,
             "url": feed_entry.url,
             "published_at": _format_time(feed_entry.published_at),
             "updated_at": _format_time(feed_entry.updated_at),
+            "sort_time": feed_entry.published_at,
             "preview": feed_entry.preview,
             "id": entry["id"],
             "feed_id": entry["feed_id"],
@@ -54,10 +56,12 @@ def list_entries(feed_id: None):
 def get_entry_content(feed_entry_id, redrive: bool = False):
     entry: FeedEntry = db.get_feed_entry(id=feed_entry_id)
     content: EntryContent = db.get_entry_content(entry=entry, redrive=redrive)
+    feed: Feed = db.get_feed(entry.feed_id)
 
     return {
         "id": feed_entry_id,
         "feed_id": entry.feed_id,
+        "feed_name": feed.name,
         "title": entry.title,
         "url": entry.url,
         "published_at": _format_time(entry.published_at),

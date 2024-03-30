@@ -2,57 +2,26 @@
 <html>
 
 <head>
-    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
-    <title>RSSynthesis - {{ content.title }}</title>
+    <link href="./../static/output.css" rel="stylesheet">
+    <title>RSS - {{ content.title }}</title>
 </head>
 
-<style>
-    body {
-        background-color: black;
-        color: white;
-    }
-
-    code {
-        margin-bottom: 1em;
-        margin-top: 1em;
-    }
-
-    p {
-        margin-bottom: 0.75em
-    }
-
-    h1 {
-        font-size: 150%;
-        font-weight: bold;
-        margin-bottom: 0.75em
-    }
-
-    h2 {
-        font-size: 120%;
-        font-weight: bold;
-        margin-bottom: 0.75em
-    }
-
-    h3 {
-        font-size: 110%;
-        font-style: italic;
-        margin-bottom: 0.75em
-    }
-
-    li {
-        list-style-type: disc;
-        margin-top: .5em;
-        margin-bottom: .5em;
-        margin-left: 3%;
-        margin-right: 0;
-    }
-</style>
-
-<body>
-    <section class="sm:w-full sm:px-10 lg:w-3/5 lg:mx-auto my-5">
+<body class="prose lg:w-3/5 mx-auto max-w-none sm:prose-xl md:prose-xl lg:prose-lg my-5">
+    <section class="flex justify-center">
+        <div class="grid grid-cols-3 w-2/5 content-center">
+            <a href="{{ content.url }}">
+                <button class="btn btn-accent">View Original Article</button>
+            </a>
+            <a href="{{ url_for('list_entries_by_feed', feed_id=content.feed_id) }}">
+                <button class="btn btn-accent">Return to {{content.feed_name}}</button>
+            </a>
+            <a href="{{ url_for('read', feed_entry_id=content.id).include_query_params(redrive=True) }}">
+                <button class="btn btn-accent">Redrive this Article</button>
+            </a>
+        </div>
+    </section>
+    <section class="sm:px-10 my-5">
         <h1>{{ content.title }}</h1>
-        <h2><a href="{{ content.url }}" class="text-blue-400 hover:underline">Link to Content</a>
-        </h2>
         {% if content.byline %}
         <h2>By: {{ content.byline }}</h2>
         <div>Published: {{ content.published_at }}</div>
@@ -60,33 +29,15 @@
         {% endif %}
     </section>
     {% if content.summary %}
-    <section class="sm:w-full sm:px-10 lg:w-3/5 lg:mx-auto">
+    <section class="sm:px-10">
         <h1>TL;DR</h1>
         <div>{{ content.summary| safe }}</div>
     </section>
     {% endif %}
-    <section class="sm:w-full sm:px-10 lg:w-3/5 lg:mx-auto">
+    <article class="sm:px-10">
         <h1>Full Article</h1>
-        <div class="justify-center">{{ content.content| safe }}</div>
-    </section>
-    <section class="sm:w-full sm:mx-10 lg:w-3/5 lg:mx-auto ">
-        <div class="text-center my-10">
-            <a href="{{ url_for('list_entries_by_feed', feed_id=content.feed_id) }}">
-                <button type="button"
-                    class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
-                    Back to Feed Entries
-                </button>
-            </a>
-        </div>
-        <div class="text-center my-10">
-            <a href="{{ url_for('read', feed_entry_id=content.id).include_query_params(redrive=True) }}">
-                <button type="button"
-                    class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
-                    Redrive this Feed Entry
-                </button>
-            </a>
-        </div>
-    </section>
+        <div class="justify-center ">{{ content.content| safe }}</div>
+    </article>
 </body>
 
 </html>
