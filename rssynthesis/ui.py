@@ -3,6 +3,7 @@ from time import localtime, strftime
 
 from rssynthesis.db import DB
 from rssynthesis.models import FeedEntry, EntryContent, Feed
+from typing import List
 
 logger = getLogger("uvicorn.error")
 
@@ -15,6 +16,15 @@ def _format_time(time: int) -> str:
 
 def list_feeds():
     feeds = db.get_feeds()
+    entries: List[FeedEntry] = [i["entry"] for i in db.get_entries()]
+
+    entry_agg = {}
+
+    for entry in entries:
+        if entry.feed_id in entry_agg:
+            entry_agg[entry.feed_id] += 1
+        else:
+            entry_agg[entry.feed_id] = 1
 
     return [
         {
@@ -23,6 +33,7 @@ def list_feeds():
             "category": feed.category,
             "type": feed.type,
             "url": feed.url,
+            "entry_count": entry_agg[feed.id]
         }
         for feed in feeds
     ]

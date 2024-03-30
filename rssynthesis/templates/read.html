@@ -6,7 +6,7 @@
     <title>RSS - {{ content.title }}</title>
 </head>
 
-<body class="w-full lg:w-4/5 my-5 mx-auto">
+<body class="w-full lg:w-4/5 mx-auto">
 
     <section class="mx-auto justify-center flex w-full lg:w-3/5">
         <div class="navbar bg-accent h-28 lg:h-20">
@@ -26,7 +26,7 @@
                         </svg>
                     </div>
                     <ul tabindex="0"
-                        class="menu menu-lg dropdown-content mt-12 z-[1] p-2 shadow bg-neutral rounded-box w-screen lg:w-96">
+                        class="menu menu-lg dropdown-content mt-12 z-[1] p-2 shadow bg-neutral rounded-box w-screen lg:w-96 outline">
 
                         <li>
                             <a href="{{ content.url }}" class="text-4xl lg:text-xl text-nowrap">
@@ -54,7 +54,7 @@
                 </div>
             </div>
     </section>
-    <section class="my-5 w-11/12 lg:w-3/5  mx-auto">
+    <section class="my-10 w-11/12 lg:w-3/5  mx-auto">
         <h1 class="text-6xl lg:3xl">{{ content.title }}</h1>
         {% if content.byline %}
         <h2 class="text-4xl lg:xl my-5">By: {{ content.byline }}</h2>

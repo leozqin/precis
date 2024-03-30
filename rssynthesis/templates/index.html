@@ -15,7 +15,7 @@
     <div class="justify-center grid-flow-row grid-cols-1 lg:grid-cols-3 grid gap-4">
         {% for feed in feeds %}
         <a href="{{ url_for('list_entries_by_feed', feed_id=feed.id) }}" class="no-underline">
-            <div class="card sm:card-normal lg:card-compact w-full bg-neutral shadow-xl">
+            <div class="card sm:card-normal lg:card-compact w-full bg-neutral shadow-xl outline mb-5">
                 <div class="card-body">
                     <h1 class="card-title">{{ feed.name }}</h1>
                     <div class="card-actions justify-center lg:justify-end my-5">
@@ -27,6 +27,10 @@
                             <div class="stat">
                                 <div class="stat-title text-neutral">Category</div>
                                 <div class="stat-value text-neutral">{{ feed.category }}</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-title text-neutral">Entries</div>
+                                <div class="stat-value text-neutral">{{ feed.entry_count }}</div>
                             </div>
                         </div>
                     </div>

@@ -5,6 +5,7 @@ from fastapi_utils.tasks import repeat_every
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from fastapi.requests import Request
+from starlette.concurrency import run_in_threadpool
 
 from contextlib import asynccontextmanager
 from logging import getLogger
