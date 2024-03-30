@@ -2,6 +2,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.templating import Jinja2Templates
 from fastapi_utils.tasks import repeat_every
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from fastapi.requests import Request
 
@@ -42,6 +43,12 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan, title="RSSynthesis", openapi_url="/openapi.json")
 
+app.mount(
+    "/static",
+    StaticFiles(directory=Path(Path(__file__).parent, "static")),
+    name="static",
+)
+
 
 @app.get("/", response_class=HTMLResponse)
 def root(request: Request):
@@ -70,11 +77,7 @@ def list_all_entries(request: Request):
 
 
 @app.get("/read/{feed_entry_id}", response_class=HTMLResponse)
-def read(
-    request: Request,
-    feed_entry_id: str,
-    redrive: bool = False
-):
+def read(request: Request, feed_entry_id: str, redrive: bool = False):
 
     return templates.TemplateResponse(
         "read.html",
