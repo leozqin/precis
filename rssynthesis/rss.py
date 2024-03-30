@@ -80,7 +80,7 @@ async def add_feed_entry(feed: Feed, entry: FeedEntry) -> None:
 
     logger.info(f"Upserting entry from {feed.name}: {entry.title} - id {entry.id}")
 
-    await run_in_threadpool(db.upsert_feed_entry(feed=feed, entry=entry))
-    await run_in_threadpool(db.get_entry_content(entry=entry))
+    db.upsert_feed_entry(feed=feed, entry=entry)
+    db.get_entry_content(entry=entry)
 
     await notification_handler.send_notification(feed=feed, entry=entry)
