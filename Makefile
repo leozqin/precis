@@ -1,6 +1,6 @@
 .PHONY: tw
 tw:
-	npx tailwindcss -i ./rssynthesis/templates/input.css -o ./rssynthesis/static/output.css --watch
+	npx tailwindcss -i ./rssynthesis/templates/input.css -o ./rssynthesis/static/output.css --watch --minify
 
 .PHONY: install
 install:

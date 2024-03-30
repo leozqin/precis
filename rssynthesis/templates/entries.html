@@ -6,33 +6,49 @@
   <title>RSSynthesis - Feed Entries</title>
 </head>
 
-<body class="prose sm:w-5/6 lg:w-4/5 mx-auto max-w-none sm:prose-2xl lg:prose-base my-5">
-  <section>
-    <h1 class="my-10 flex justify-center">
-      Feed Entries - {{ entries[0].feed_name }}
-    </h1>
+<body class="w-screen lg:w-3/5 mx-auto">
+  <section class="mx-auto justify-center w-screen lg:w-full mb-10">
+    <div class="navbar bg-accent h-28 lg:h-20">
+      <div class="navbar-center lg:navbar-start">
+        <h1 class="text-5xl lg:text-3xl text-neutral">
+          Feed Entries - {{ entries[0].feed_name }}
+        </h1>
+      </div>
+      <div class="navbar-end">
+        <div class="dropdown dropdown-bottom dropdown-end">
+          <div tabindex="0" role="button" class="btn btn-accent h-16 w-16">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
+            </svg>
+          </div>
+          <ul tabindex="0"
+            class="menu menu-lg dropdown-content mt-12 z-[1] p-2 shadow bg-neutral rounded-box w-screen lg:w-96 outline">
+            <li>
+              <a href="{{ url_for('root') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
+                Return to All Feeds
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
   </section>
-  <div class="my-10 flex justify-center mx-auto">
-    <a href="{{ url_for('root') }}">
-      <button class="btn btn-wide btn-accent sm:scale-125">Back to Feeds</button>
-    </a>
-  </div>
-  <div class="justify-center grid-flow-row lg:grid-cols-3 s:grid-cols-1 grid gap-10">
+  <div class="justify-center grid-flow-row grid-cols-1 grid gap-10">
     {% for entry in entries|sort(attribute='sort_time', reverse = True) %}
-    <div class="card sm:card-normal lg:card-compact w-full shadow-xl bg-neutral mx-auto">
+    <div class="card sm:card-normal lg:card-compact w-11/12 lg:w-4/5 shadow-xl bg-neutral mx-auto outline">
       <a href="{{ url_for('read', feed_entry_id=entry.id) }}" class="no-underline">
         <div class="card-body">
-          <h1 class="card-title">
+          <h1 class="card-title text-5xl lg:text-2xl">
             {{ entry.title }}
           </h1>
-        <div class="card-actions">
-          <p>
-            {{ entry.feed_name }}
-          </p>
-          <p>
-            Published: {{ entry.published_at }}
-          </p>
-        </div>
+          <div class="card-actions text-3xl lg:text-lg">
+            <p>
+              {{ entry.feed_name }}
+            </p>
+            <p>
+              Published: {{ entry.published_at }}
+            </p>
+          </div>
         </div>
       </a>
     </div>
