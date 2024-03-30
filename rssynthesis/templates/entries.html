@@ -6,7 +6,7 @@
   <title>RSSynthesis - Feed Entries</title>
 </head>
 
-<body class="prose lg:w-3/5 mx-auto max-w-none sm:prose-xl md:prose-xl lg:prose-lg my-5">
+<body class="prose sm:w-5/6 lg:w-4/5 mx-auto max-w-none sm:prose-2xl lg:prose-base my-5">
   <section>
     <h1 class="my-10 flex justify-center">
       Feed Entries - {{ entries[0].feed_name }}
@@ -14,24 +14,21 @@
   </section>
   <div class="my-10 flex justify-center mx-auto">
     <a href="{{ url_for('root') }}">
-      <button class="btn btn-wide btn-accent">Back to Feeds</button>
+      <button class="btn btn-wide btn-accent sm:scale-125">Back to Feeds</button>
     </a>
   </div>
-  <div class="grid-flow-row lg:grid-cols-4 md:grid-cols-2 s:grid-cols-1 grid gap-4">
+  <div class="flex justify-center grid-flow-row lg:grid-cols-3 s:grid-cols-1 grid gap-10">
     {% for entry in entries|sort(attribute='sort_time', reverse = True) %}
-    <div>
-      <div class="card card-compact w-5/6 shadow-xl bg-base-300">
-        <div class="card-body">
-          <h2 class="card-title">
-            <a href="{{ url_for('read', feed_entry_id=entry.id) }}" class="no-underline">
-              {{ entry.title }}
-            </a>
-          </h2>
-          <p>
-            From: {{ entry.feed_name }}<br />
-            Last Updated: {{ entry.published_at }}
-          </p>
-        </div>
+    <div class="card card-compact w-full shadow-xl bg-neutral mx-auto">
+      <div class="card-body">
+        <h1 class="card-title">
+          <a href="{{ url_for('read', feed_entry_id=entry.id) }}" class="no-underline">
+            {{ entry.title }}
+          </a>
+        </h1>
+        <h3>
+          From: {{ entry.feed_name }} | Published: {{ entry.published_at }}
+        </h3>
       </div>
     </div>
     {% endfor %}

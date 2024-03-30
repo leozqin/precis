@@ -6,17 +6,17 @@
     <title>RSSynthesis - Feeds</title>
 </head>
 
-<body class="prose lg:w-3/5 mx-auto max-w-none sm:prose-xl md:prose-xl lg:prose-lg my-5">
+<body class="prose sm:w-5/6 lg:w-3/5 mx-auto max-w-none sm:prose-2xl lg:prose-lg my-5">
     <div>
         <h1 class="my-10 flex justify-center">
             RSSynthesis - All Feeds
         </h1>
     </div>
-    <div class="grid-flow-row lg:grid-cols-4 s:grid-cols-1 grid gap-4">
+    <div class="sm:flex sm:justify-center grid-flow-row lg:grid-cols-4 s:grid-cols-1 grid gap-4">
         {% for feed in feeds %}
         <div class="w-5/6">
             <a href="{{ url_for('list_entries_by_feed', feed_id=feed.id) }}" class="no-underline">
-                <button class="btn btn-block btn-lg bg-base-300">
+                <button class="btn btn-block btn-lg bg-neutral scale-125">
                     {{ feed.name }}
                 </button>
             </a>
