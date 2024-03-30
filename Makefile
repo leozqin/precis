@@ -9,4 +9,4 @@ install:
 
 .PHONY: run
 run:
-	uvicorn rssynthesis.rssynthesis:app
+	uvicorn rssynthesis.rssynthesis:app --reload

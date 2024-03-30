@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html data-theme="synthwave">
 
 <head>
   <link href="./../static/output.css" rel="stylesheet">
@@ -17,20 +17,26 @@
       <button class="btn btn-wide btn-accent sm:scale-125">Back to Feeds</button>
     </a>
   </div>
-  <div class="flex justify-center grid-flow-row lg:grid-cols-3 s:grid-cols-1 grid gap-10">
+  <div class="justify-center grid-flow-row lg:grid-cols-3 s:grid-cols-1 grid gap-10">
     {% for entry in entries|sort(attribute='sort_time', reverse = True) %}
-    <div class="card card-compact w-full shadow-xl bg-neutral mx-auto">
-      <div class="card-body">
-        <h1 class="card-title">
-          <a href="{{ url_for('read', feed_entry_id=entry.id) }}" class="no-underline">
+    <div class="card sm:card-normal lg:card-compact w-full shadow-xl bg-neutral mx-auto">
+      <a href="{{ url_for('read', feed_entry_id=entry.id) }}" class="no-underline">
+        <div class="card-body">
+          <h1 class="card-title">
             {{ entry.title }}
-          </a>
-        </h1>
-        <h3>
-          From: {{ entry.feed_name }} | Published: {{ entry.published_at }}
-        </h3>
-      </div>
+          </h1>
+        <div class="card-actions">
+          <p>
+            {{ entry.feed_name }}
+          </p>
+          <p>
+            Published: {{ entry.published_at }}
+          </p>
+        </div>
+        </div>
+      </a>
     </div>
+
     {% endfor %}
   </div>
 </body>

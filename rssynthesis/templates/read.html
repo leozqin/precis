@@ -1,43 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html data-theme="synthwave">
 
 <head>
     <link href="./../static/output.css" rel="stylesheet">
     <title>RSS - {{ content.title }}</title>
 </head>
 
-<body class="prose sm:w-full lg:w-4/5 mx-auto max-w-none sm:prose-2xl lg:prose-lg my-5 justify-items-center">
-    <section class="flex justify-center">
-        <div class="grid grid-cols-3 lg:w-3/5 sm:w-3/5 scale-125 my-5 content-center">
-            <a href="{{ content.url }}">
-                <button class="btn btn-accent">View Original Article</button>
-            </a>
-            <a href="{{ url_for('list_entries_by_feed', feed_id=content.feed_id) }}">
-                <button class="btn btn-accent">Return to {{content.feed_name}}</button>
-            </a>
-            <a href="{{ url_for('read', feed_entry_id=content.id).include_query_params(redrive=True) }}">
-                <button class="btn btn-accent">Redrive this Article</button>
-            </a>
-        </div>
+<body class="w-full lg:w-4/5 my-5 mx-auto">
+
+    <section class="mx-auto justify-center flex w-full lg:w-3/5">
+        <div class="navbar bg-accent h-28 lg:h-20">
+            <div class="navbar-start">
+                <a href="{{ url_for('list_entries_by_feed', feed_id=content.feed_id) }}"
+                    class="btn btn-ghost text-5xl lg:text-3xl text-neutral">
+                    {{ content.feed_name}}
+                </a>
+            </div>
+            <div class="navbar-end">
+                <div class="dropdown dropdown-bottom dropdown-end">
+                    <div tabindex="0" role="button" class="btn btn-accent h-16 w-16">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h8m-8 6h16" />
+                        </svg>
+                    </div>
+                    <ul tabindex="0"
+                        class="menu menu-lg dropdown-content mt-12 z-[1] p-2 shadow bg-neutral rounded-box w-screen lg:w-96">
+
+                        <li>
+                            <a href="{{ content.url }}" class="text-4xl lg:text-xl text-nowrap">
+                                View Original Article
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('list_entries_by_feed', feed_id=content.feed_id) }}"
+                                class="text-4xl lg:text-xl text-nowrap">
+                                Return to {{ content.feed_name }}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('root') }}" class="text-4xl lg:text-xl text-nowrap">
+                                Return to All Feeds
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('read', feed_entry_id=content.id).include_query_params(redrive=True) }}"
+                                class="text-4xl lg:text-xl text-nowrap">
+                                Redrive this Article
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
     </section>
-    <section class="sm:px-10 my-5">
-        <h1>{{ content.title }}</h1>
+    <section class="my-5 w-11/12 lg:w-3/5  mx-auto">
+        <h1 class="text-6xl lg:3xl">{{ content.title }}</h1>
         {% if content.byline %}
-        <h2>By: {{ content.byline }}</h2>
-        <div>Published: {{ content.published_at }}</div>
-        <div>Updated: {{ content.updated_at }}</div>
+        <h2 class="text-4xl lg:xl my-5">By: {{ content.byline }}</h2>
+        <div class="text-3xl lg:xl my-5">Published: {{ content.published_at }}</div>
+        <div class="text-3xl lg:xl my-5">Updated: {{ content.updated_at }}</div>
         {% endif %}
     </section>
-    {% if content.summary %}
-    <section class="sm:px-10">
-        <h1>TL;DR</h1>
-        <div>{{ content.summary| safe }}</div>
+    <section class="w-11/12 lg:w-3/5 mx-auto">
+        {% if content.summary %}
+        <section class="prose sm:prose-2xl lg:prose-lg max-w-none">
+            <h2>TL;DR</h2>
+            <div>{{ content.summary| safe }}</div>
+        </section>
+        {% endif %}
+        <article class="prose sm:prose-2xl lg:prose-lg max-w-none">
+            <h2>Full Article</h2>
+            <div class="justify-center ">{{ content.content| safe }}</div>
+        </article>
     </section>
-    {% endif %}
-    <article class="sm:px-10">
-        <h1>Full Article</h1>
-        <div class="justify-center ">{{ content.content| safe }}</div>
-    </article>
 </body>
 
 </html>
