@@ -1,26 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html data-theme="synthwave">
 
 <head>
     <link href="./static/output.css" rel="stylesheet">
     <title>RSSynthesis - Feeds</title>
 </head>
 
-<body class="prose sm:w-5/6 lg:w-3/5 mx-auto max-w-none sm:prose-2xl lg:prose-lg my-5">
+<body class="prose sm:prose-2xl lg:prose-lg w-11/12 lg:w-3/5 mx-auto max-w-none my-5">
     <div>
         <h1 class="my-10 flex justify-center">
-            RSSynthesis - All Feeds
+            All Feeds
         </h1>
     </div>
-    <div class="sm:flex sm:justify-center grid-flow-row lg:grid-cols-4 s:grid-cols-1 grid gap-4">
+    <div class="justify-center grid-flow-row grid-cols-1 lg:grid-cols-3 grid gap-4">
         {% for feed in feeds %}
-        <div class="w-5/6">
-            <a href="{{ url_for('list_entries_by_feed', feed_id=feed.id) }}" class="no-underline">
-                <button class="btn btn-block btn-lg bg-neutral scale-125">
-                    {{ feed.name }}
-                </button>
-            </a>
-        </div>
+        <a href="{{ url_for('list_entries_by_feed', feed_id=feed.id) }}" class="no-underline">
+            <div class="card sm:card-normal lg:card-compact w-full bg-neutral shadow-xl">
+                <div class="card-body">
+                    <h1 class="card-title">{{ feed.name }}</h1>
+                    <div class="card-actions justify-center lg:justify-end my-5">
+                        <div class="stats shadow bg-accent">
+                            <div class="stat">
+                                <div class="stat-title text-neutral">Feed Type</div>
+                                <div class="stat-value text-neutral">{{ feed.type }}</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-title text-neutral">Category</div>
+                                <div class="stat-value text-neutral">{{ feed.category }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
         {% endfor %}
     </div>
 </body>
