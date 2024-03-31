@@ -52,10 +52,10 @@ class MatrixNotificationHandler(NotificationHandler):
             room = self.destinations.get(feed.notify_destination, self.default_room)
             logger.info(
                 "Sending notification to destination "
-                f"{feed.notify_destination} - {self.room_id}"
+                f"{feed.notify_destination} - {room}"
             )
         else:
             room = self.default_room
-            logger.info(f"Sending notification to default {self.room_id}")
+            logger.info(f"Sending notification to default {room}")
 
         await self.bot.api.send_markdown_message(room_id=room, message=msg)
