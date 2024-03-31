@@ -33,7 +33,7 @@ def list_feeds():
             "category": feed.category,
             "type": feed.type,
             "url": feed.url,
-            "entry_count": entry_agg[feed.id]
+            "entry_count": entry_agg.get(feed.id, 0)
         }
         for feed in feeds
     ]
