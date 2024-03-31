@@ -11,6 +11,10 @@ class Feed(BaseModel):
     category: str = "uncategorized"
     type: str = "rss"
     url: str
+    notify_destination: str = None
+    notify: bool = True
+    preview_only: bool = False
+    
 
     @property
     def rss(self) -> Type[FeedParserDict]:
@@ -52,6 +56,10 @@ class NotificationHandler(ABC):
         pass
 
     async def logout(self):
+        pass
+
+    @property
+    def destinations(self):
         pass
 
     async def send_notification(self, feed: Feed, entry: FeedEntry):
