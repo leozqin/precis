@@ -66,10 +66,9 @@ def list_entries(feed_id: None):
 
 def get_entry_content(feed_entry_id, redrive: bool = False):
     entry: FeedEntry = db.get_feed_entry(id=feed_entry_id)
-    content: EntryContent = db.get_entry_content(entry=entry, redrive=redrive)
     feed: Feed = db.get_feed(entry.feed_id)
 
-    return {
+    base = {
         "id": feed_entry_id,
         "feed_id": entry.feed_id,
         "feed_name": feed.name,
@@ -77,7 +76,21 @@ def get_entry_content(feed_entry_id, redrive: bool = False):
         "url": entry.url,
         "published_at": _format_time(entry.published_at),
         "updated_at": _format_time(entry.updated_at),
-        "content": content.content,
-        "summary": content.summary,
-        "byline": ", ".join(entry.authors) if entry.authors else None,
+        "byline": ", ".join(entry.authors) if entry.authors else None
     }
+
+    if feed.preview_only:
+        return {
+            **base,
+            "preview": entry.preview,
+            "content": None,
+            "summary": None
+        }
+    else:
+        content: EntryContent = db.get_entry_content(entry=entry, redrive=redrive)
+        return {
+            **base,
+            "preview": None,
+            "content": content.content,
+            "summary": content.summary
+        }

@@ -81,6 +81,8 @@ async def add_feed_entry(feed: Feed, entry: FeedEntry) -> None:
     logger.info(f"Upserting entry from {feed.name}: {entry.title} - id {entry.id}")
 
     db.upsert_feed_entry(feed=feed, entry=entry)
-    db.get_entry_content(entry=entry)
+
+    if not feed.preview_only:
+        db.get_entry_content(entry=entry)
 
     await notification_handler.send_notification(feed=feed, entry=entry)

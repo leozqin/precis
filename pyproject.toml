@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rssynthesis"
-version = "0.0.9"
+version = "0.0.10"
 description = "A framework for automating your media diet"
 requires-python = ">=3.11"
 license = {file = "LICENSE"}
@@ -57,7 +57,7 @@ dependencies = [
 # The following would provide a command line executable called `sample`
 # which executes the function `main` from this package when invoked.
 [project.scripts]
-rssynthesis = "rssynthesis.rssynthesis:main"
+rss = "rssynthesis.cli:cli"
 
 
 # This is configuration specific to the `setuptools` build backend.

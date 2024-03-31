@@ -44,15 +44,18 @@
                                 Return to All Feeds
                             </a>
                         </li>
+                        {% if content.content %}
                         <li>
                             <a href="{{ url_for('read', feed_entry_id=content.id).include_query_params(redrive=True) }}"
                                 class="text-4xl lg:text-xl text-nowrap">
                                 Redrive this Article
                             </a>
                         </li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
+        </div>
     </section>
     <section class="my-10 w-11/12 lg:w-3/5  mx-auto">
         <h1 class="text-6xl lg:3xl">{{ content.title }}</h1>
@@ -63,16 +66,31 @@
         {% endif %}
     </section>
     <section class="w-11/12 lg:w-3/5 mx-auto">
+        {% if content.preview %}
+        <section class="prose sm:prose-2xl lg:prose-lg max-w-none">
+            <h2>Preview</h2>
+            <div>{{ content.preview| safe }}</div>
+        </section>
+        <section class="justify-center flex">
+            <a href="{{ content.url }}">
+                <button class="btn btn-accent btn-lg rounded-xl text-4xl lg:text-lg text-nowrap"">
+                    View Original Article
+                </button>
+            </a>
+        </section>
+        {% endif %}
         {% if content.summary %}
         <section class="prose sm:prose-2xl lg:prose-lg max-w-none">
             <h2>TL;DR</h2>
             <div>{{ content.summary| safe }}</div>
         </section>
         {% endif %}
+        {% if content.content %}
         <article class="prose sm:prose-2xl lg:prose-lg max-w-none">
             <h2>Full Article</h2>
             <div class="justify-center ">{{ content.content| safe }}</div>
         </article>
+        {% endif %}
     </section>
 </body>
 
