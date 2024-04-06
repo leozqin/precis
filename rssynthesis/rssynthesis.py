@@ -78,12 +78,12 @@ def list_all_entries(request: Request):
 
 
 @app.get("/read/{feed_entry_id}", response_class=HTMLResponse)
-def read(request: Request, feed_entry_id: str, redrive: bool = False):
+async def read(request: Request, feed_entry_id: str, redrive: bool = False):
 
     return templates.TemplateResponse(
         "read.html",
         {
             "request": request,
-            "content": get_entry_content(feed_entry_id=feed_entry_id, redrive=redrive),
+            "content": await get_entry_content(feed_entry_id=feed_entry_id, redrive=redrive),
         },
     )

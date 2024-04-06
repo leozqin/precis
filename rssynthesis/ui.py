@@ -64,7 +64,7 @@ def list_entries(feed_id: None):
         }
 
 
-def get_entry_content(feed_entry_id, redrive: bool = False):
+async def get_entry_content(feed_entry_id, redrive: bool = False):
     entry: FeedEntry = db.get_feed_entry(id=feed_entry_id)
     feed: Feed = db.get_feed(entry.feed_id)
 
@@ -87,7 +87,7 @@ def get_entry_content(feed_entry_id, redrive: bool = False):
             "summary": None
         }
     else:
-        content: EntryContent = db.get_entry_content(entry=entry, redrive=redrive)
+        content: EntryContent = await db.get_entry_content(entry=entry, redrive=redrive)
         return {
             **base,
             "preview": None,

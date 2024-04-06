@@ -14,7 +14,6 @@ class Feed(BaseModel):
     notify_destination: str = None
     notify: bool = True
     preview_only: bool = False
-    
 
     @property
     def rss(self) -> Type[FeedParserDict]:
@@ -90,3 +89,10 @@ Summarize this article:
 Your goal is to write a brief but detailed summary of the text given to you.
 Only output the summary without any additional text. Provide the summary in markdown.
     """
+
+
+class ContentRetriever(ABC):
+
+    @abstractmethod
+    async def get_content(self, url: str) -> str:
+        pass

@@ -6,6 +6,7 @@ tw:
 install:
 	npm install -D tailwindcss @tailwindcss/typography daisyui@latest
 	pip install -e .
+	playright install
 
 .PHONY: run
 run:

@@ -2,6 +2,7 @@ from pathlib import Path
 from tinydb import TinyDB, Query
 from rssynthesis.models import Feed, FeedEntry, EntryContent
 from rssynthesis.summarization.engine import summarization_handler
+from rssynthesis.contents import content_handler
 from typing import List, Optional
 import requests
 from html2text import HTML2Text
@@ -116,7 +117,27 @@ class DB:
         else:
             return False
 
-    def get_entry_content(self, entry: FeedEntry, redrive: bool = False) -> EntryContent:
+    @staticmethod
+    async def _get_entry_html(url: str) -> str:
+
+        return await content_handler.get_content(url)
+
+    @staticmethod
+    def _get_entry_md(content: str) -> str:
+
+        md = simple_json_from_html_string(html=content)
+
+        cleaned_document = Document(input=md["content"])
+
+        converter = HTML2Text()
+        converter.ignore_images = True
+        converter.ignore_links = True
+
+        return converter.handle(cleaned_document.summary(html_partial=True))
+
+    async def get_entry_content(
+        self, entry: FeedEntry, redrive: bool = False
+    ) -> EntryContent:
         table = self.db.table("entry_contents")
         query = Query().id.matches(entry.id)
 
@@ -128,31 +149,8 @@ class DB:
             if redrive:
                 logger.info(f"starting redrive for feed entry {entry.id}")
 
-            raw_content = requests.get(entry.url)
-
-            # extract the main content
-            document = simple_json_from_html_string(raw_content.text)
-
-            # clean it up more
-            cleaned_document = Document(input=document["content"])
-
-            converter = HTML2Text()
-            converter.ignore_images = True
-            converter.ignore_links = True
-
-            content = converter.handle(cleaned_document.summary(html_partial=True))
-
-            if (
-                len(content.split()) < 100
-                and summarization_handler.supports_fallback_extractor
-            ):
-                logger.info(
-                    f"Content was too short, falling back to summarization html extractor!"
-                )
-                fallback = summarization_handler.fallback_html_extractor(
-                    html=raw_content.content.decode()
-                )
-                content = converter.handle(fallback)
+            raw_content = await self._get_entry_html(entry.url)
+            content = self._get_entry_md(content=raw_content)
 
             summary = summarization_handler.summarize(
                 feed=self.get_feed(entry.feed_id), entry=FeedEntry, mk=content
@@ -166,7 +164,8 @@ class DB:
 
             query = Query().id.matches(entry.id)
             table.upsert(
-                {"id": entry_content.id, "entry_contents": entry_content.dict()}, cond=query
+                {"id": entry_content.id, "entry_contents": entry_content.dict()},
+                cond=query,
             )
 
             return entry_content
