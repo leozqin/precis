@@ -25,12 +25,12 @@ class SummarizationEngine(BaseModel):
 
 
 def load_summarization_config() -> SummarizationEngine:
-    summarization_config_path = Path(CONFIG_DIR, "summarization.yml").resolve()
+    summarization_config_path = Path(CONFIG_DIR, "settings.yml").resolve()
 
     with open(summarization_config_path, "r") as fp:
         config = load(fp, Loader=SafeLoader)
 
-    return SummarizationEngine(**config)
+    return SummarizationEngine(**config.get("summarization", {}))
 
 
 summarization_handler = load_summarization_config().get_handler()

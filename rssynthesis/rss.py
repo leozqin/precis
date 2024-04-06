@@ -83,6 +83,7 @@ async def add_feed_entry(feed: Feed, entry: FeedEntry) -> None:
     db.upsert_feed_entry(feed=feed, entry=entry)
 
     if not feed.preview_only:
-        db.get_entry_content(entry=entry)
+        await db.get_entry_content(entry=entry)
 
-    await notification_handler.send_notification(feed=feed, entry=entry)
+    if feed.notify:
+        await notification_handler.send_notification(feed=feed, entry=entry)

@@ -4,7 +4,7 @@ from typing import Any, Mapping, ClassVar, Type
 from pathlib import Path
 from yaml import load, SafeLoader
 
-from rssynthesis.notification_handlers.matrix import MatrixNotificationHandler
+from rssynthesis.notification.matrix import MatrixNotificationHandler
 from rssynthesis.models import NotificationHandler
 from rssynthesis.constants import CONFIG_DIR
 
@@ -23,11 +23,12 @@ class NotificationEngine(BaseModel):
 
 
 def load_notification_config() -> NotificationEngine:
-    notification_config_path = Path(CONFIG_DIR, "notification.yml").resolve()
+    notification_config_path = Path(CONFIG_DIR, "settings.yml").resolve()
 
     with open(notification_config_path, "r") as fp:
         config = load(fp, Loader=SafeLoader)
 
-    return NotificationEngine(**config)
+    return NotificationEngine(**config.get("notification", {}))
+
 
 notification_handler = load_notification_config().get_handler()

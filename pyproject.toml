@@ -44,7 +44,8 @@ dependencies = [
     "readability-lxml",
     "markdown2[all]",
     "simplematrixbotlib",
-    "ollama"
+    "ollama",
+    "playwright"
 ]
 
 [project.urls]
