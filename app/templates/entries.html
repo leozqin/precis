@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-theme="synthwave">
+<html data-theme="forest">
 
 <head>
   <link href="./../static/output.css" rel="stylesheet">
@@ -35,10 +35,10 @@
   </section>
   <div class="justify-center grid-flow-row grid-cols-1 grid gap-10">
     {% for entry in entries|sort(attribute='sort_time', reverse = True) %}
-    <div class="card sm:card-normal lg:card-compact w-11/12 lg:w-4/5 shadow-xl bg-neutral mx-auto outline">
+    <div class="card card-normal lg:card-compact w-11/12 lg:w-4/5 shadow-xl bg-neutral mx-auto outline">
       <a href="{{ url_for('read', feed_entry_id=entry.id) }}" class="no-underline">
         <div class="card-body">
-          <h1 class="card-title text-5xl lg:text-2xl">
+          <h1 class="card-title text-4xl lg:text-2xl">
             {{ entry.title }}
           </h1>
           <div class="card-actions text-3xl lg:text-lg">

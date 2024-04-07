@@ -8,7 +8,7 @@ from yaml import SafeLoader, load
 from app.constants import CONFIG_DIR
 from app.content.playwright import PlaywrightContentRetriever
 from app.content.requests import RequestsContentRetriever
-from app.models import ContentRetriever
+from app.models import ContentRetrievalHandler
 
 logger = getLogger("uvicorn.error")
 
@@ -22,7 +22,7 @@ class ContentRetrievalEngine(BaseModel):
         "playwright": PlaywrightContentRetriever,
     }
 
-    def get_handler(self) -> Type[ContentRetriever]:
+    def get_handler(self) -> Type[ContentRetrievalHandler]:
         logger.info(f"loading content handler of type {self.type}")
         return self.handlers[self.type](**self.config)
 
