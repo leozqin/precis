@@ -1,4 +1,5 @@
-# Precis
+![The Precis logo... for now](assets/logo-with-name-light.svg)
+--
 Precis (properly Précis, pronounced "pray-see") is a extensibility-oriented RSS reader that can use LLMs to summarize and synthesize information from numerous different sources, with an emphasis on timely delivery of information via notifications.
 
 The following components of the app are extensible:
