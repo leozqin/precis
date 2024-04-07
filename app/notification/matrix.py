@@ -1,16 +1,15 @@
-from rssynthesis.models import NotificationHandler
+from logging import getLogger
+from os import environ
+from typing import Mapping
 
 from simplematrixbotlib import Bot, Creds
-from os import environ
-from logging import getLogger
-from typing import Mapping
-from rssynthesis.models import Feed, FeedEntry
+
+from app.models import Feed, FeedEntry, NotificationHandler
 
 logger = getLogger("uvicorn.error")
 
 
 class MatrixNotificationHandler(NotificationHandler):
-
     def __init__(
         self,
         homeserver: str,

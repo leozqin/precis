@@ -1,16 +1,17 @@
-from typing import Mapping, Any, Type, ClassVar
-from yaml import load, SafeLoader
 from logging import getLogger
 from pathlib import Path
+from typing import Any, ClassVar, Mapping, Type
 
 from pydantic import BaseModel
-from rssynthesis.content.playwright import PlaywrightContentRetriever
-from rssynthesis.content.requests import RequestsContentRetriever
+from yaml import SafeLoader, load
 
-from rssynthesis.models import ContentRetriever
-from rssynthesis.constants import CONFIG_DIR
+from app.constants import CONFIG_DIR
+from app.content.playwright import PlaywrightContentRetriever
+from app.content.requests import RequestsContentRetriever
+from app.models import ContentRetriever
 
 logger = getLogger("uvicorn.error")
+
 
 class ContentRetrievalEngine(BaseModel):
     type: str

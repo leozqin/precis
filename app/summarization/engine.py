@@ -1,12 +1,13 @@
 from logging import getLogger
-from pydantic import BaseModel
-from typing import Any, Mapping, ClassVar, Type
 from pathlib import Path
-from yaml import load, SafeLoader
+from typing import Any, ClassVar, Mapping, Type
 
-from rssynthesis.summarization.ollama import OllamaSummarizationHandler
-from rssynthesis.models import SummarizationHandler
-from rssynthesis.constants import CONFIG_DIR
+from pydantic import BaseModel
+from yaml import SafeLoader, load
+
+from app.constants import CONFIG_DIR
+from app.models import SummarizationHandler
+from app.summarization.ollama import OllamaSummarizationHandler
 
 logger = getLogger("uvicorn.error")
 
@@ -15,9 +16,7 @@ class SummarizationEngine(BaseModel):
     type: str
     config: Mapping[str, Any] = {}
 
-    handlers: ClassVar = {
-        "ollama": OllamaSummarizationHandler
-    }
+    handlers: ClassVar = {"ollama": OllamaSummarizationHandler}
 
     def get_handler(self) -> Type[SummarizationHandler]:
         logger.info(f"loading summarization handler of type {self.type}")

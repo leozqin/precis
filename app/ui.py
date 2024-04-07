@@ -1,9 +1,9 @@
 from logging import getLogger
 from time import localtime, strftime
-
-from rssynthesis.db import DB
-from rssynthesis.models import FeedEntry, EntryContent, Feed
 from typing import List
+
+from app.db import DB
+from app.models import EntryContent, Feed, FeedEntry
 
 logger = getLogger("uvicorn.error")
 
@@ -33,7 +33,7 @@ def list_feeds():
             "category": feed.category,
             "type": feed.type,
             "url": feed.url,
-            "entry_count": entry_agg.get(feed.id, 0)
+            "entry_count": entry_agg.get(feed.id, 0),
         }
         for feed in feeds
     ]
@@ -76,21 +76,16 @@ async def get_entry_content(feed_entry_id, redrive: bool = False):
         "url": entry.url,
         "published_at": _format_time(entry.published_at),
         "updated_at": _format_time(entry.updated_at),
-        "byline": ", ".join(entry.authors) if entry.authors else None
+        "byline": ", ".join(entry.authors) if entry.authors else None,
     }
 
     if feed.preview_only:
-        return {
-            **base,
-            "preview": entry.preview,
-            "content": None,
-            "summary": None
-        }
+        return {**base, "preview": entry.preview, "content": None, "summary": None}
     else:
         content: EntryContent = await db.get_entry_content(entry=entry, redrive=redrive)
         return {
             **base,
             "preview": None,
             "content": content.content,
-            "summary": content.summary
+            "summary": content.summary,
         }

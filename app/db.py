@@ -1,16 +1,17 @@
+from logging import getLogger
 from pathlib import Path
-from tinydb import TinyDB, Query
-from rssynthesis.models import Feed, FeedEntry, EntryContent
-from rssynthesis.summarization.engine import summarization_handler
-from rssynthesis.contents import content_handler
 from typing import List, Optional
-import requests
+
 from html2text import HTML2Text
+from markdown2 import markdown
 from readabilipy import simple_json_from_html_string
 from readability import Document
-from markdown2 import markdown
-from rssynthesis.constants import DATA_DIR
-from logging import getLogger
+from tinydb import Query, TinyDB
+
+from app.constants import DATA_DIR
+from app.contents import content_handler
+from app.models import EntryContent, Feed, FeedEntry
+from app.summarization.engine import summarization_handler
 
 logger = getLogger("uvicorn.error")
 

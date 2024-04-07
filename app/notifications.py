@@ -1,12 +1,13 @@
 from logging import getLogger
-from pydantic import BaseModel
-from typing import Any, Mapping, ClassVar, Type
 from pathlib import Path
-from yaml import load, SafeLoader
+from typing import Any, ClassVar, Mapping, Type
 
-from rssynthesis.notification.matrix import MatrixNotificationHandler
-from rssynthesis.models import NotificationHandler
-from rssynthesis.constants import CONFIG_DIR
+from pydantic import BaseModel
+from yaml import SafeLoader, load
+
+from app.constants import CONFIG_DIR
+from app.models import NotificationHandler
+from app.notification.matrix import MatrixNotificationHandler
 
 logger = getLogger("uvicorn.error")
 

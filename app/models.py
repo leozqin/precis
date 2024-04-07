@@ -1,9 +1,10 @@
-from pydantic import BaseModel
 from abc import ABC, abstractmethod
-from feedparser import parse, FeedParserDict
-from typing import Type, ClassVar
-from json import dumps
 from hashlib import md5
+from json import dumps
+from typing import ClassVar, Type
+
+from feedparser import FeedParserDict, parse
+from pydantic import BaseModel
 
 
 class Feed(BaseModel):
@@ -50,7 +51,6 @@ class EntryContent(BaseModel):
 
 
 class NotificationHandler(ABC):
-
     async def login(self):
         pass
 
@@ -92,7 +92,6 @@ Only output the summary without any additional text. Provide the summary in mark
 
 
 class ContentRetriever(ABC):
-
     @abstractmethod
     async def get_content(self, url: str) -> str:
         pass
