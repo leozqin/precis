@@ -9,7 +9,7 @@ from yaml import SafeLoader, load
 from app.constants import CONFIG_DIR
 from app.db import DB
 from app.models import Feed, FeedEntry
-from app.notifications import notification_handler
+from app.notification.engine import notification_handler
 
 logger = getLogger("uvicorn.error")
 

@@ -1,40 +1,31 @@
 <!DOCTYPE html>
-<html data-theme="synthwave">
+<html data-theme="forest">
 
 <head>
     <link href="./static/output.css" rel="stylesheet">
     <title>Precis - Feeds</title>
 </head>
 
-<body class="prose sm:prose-2xl lg:prose-lg w-11/12 lg:w-3/5 mx-auto max-w-none my-5">
+<body class="w-11/12 xl:w-3/5 mx-auto max-w-none my-5">
     <div>
-        <h1 class="my-10 flex justify-center">
+        <h1 class="my-10 flex justify-center text-6xl lg:text-4xl">
             All Feeds
         </h1>
     </div>
-    <div class="justify-center grid-flow-row grid-cols-1 lg:grid-cols-3 grid gap-4">
+    <div class="justify-center grid-flow-row grid-cols-1 lg:grid-cols-3 grid gap-8 lg:gap-4">
         {% for feed in feeds %}
         <a href="{{ url_for('list_entries_by_feed', feed_id=feed.id) }}" class="no-underline">
-            <div class="card sm:card-normal lg:card-compact w-full bg-neutral shadow-xl outline mb-5">
+            <div class="card card-side card-normal lg:card-compact w-full bg-neutral shadow-xl outline mb-5">
                 <div class="card-body">
-                    <h1 class="card-title">{{ feed.name }}</h1>
-                    <div class="card-actions justify-center lg:justify-end my-5">
-                        <div class="stats shadow bg-accent">
-                            <div class="stat">
-                                <div class="stat-title text-neutral">Feed Type</div>
-                                <div class="stat-value text-neutral">{{ feed.type }}</div>
-                            </div>
-                            <div class="stat">
-                                <div class="stat-title text-neutral">Category</div>
-                                <div class="stat-value text-neutral">{{ feed.category }}</div>
-                            </div>
-                            <div class="stat">
-                                <div class="stat-title text-neutral">Entries</div>
-                                <div class="stat-value text-neutral">{{ feed.entry_count }}</div>
-                            </div>
-                        </div>
-                    </div>
+                    <h1 class="card-title text-5xl lg:text-2xl">{{ feed.name }}</h1>
                 </div>
+                <figure class="mx-2">
+                    <button class="btn btn-accent mx-5 h-10">
+                        <div class="text-4xl lg:text-xl">
+                            {{ feed.entry_count }} Items
+                        </div>
+                    </button>
+                </figure>
             </div>
         </a>
         {% endfor %}

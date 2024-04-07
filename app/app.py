@@ -10,7 +10,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi_utils.tasks import repeat_every
 from tinydb import TinyDB
 
-from app.notifications import notification_handler
+from app.notification.engine import notification_handler
 from app.rss import check_feeds, load_feeds
 from app.ui import get_entry_content, list_entries, list_feeds
 
@@ -48,7 +48,6 @@ app.mount(
     StaticFiles(directory=Path(Path(__file__).parent, "static")),
     name="static",
 )
-
 
 @app.get("/", response_class=HTMLResponse)
 def root(request: Request):

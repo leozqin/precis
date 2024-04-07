@@ -1,9 +1,9 @@
 import requests
 
-from app.models import ContentRetriever
+from app.models import ContentRetrievalHandler
 
 
-class RequestsContentRetriever(ContentRetriever):
+class RequestsContentRetriever(ContentRetrievalHandler):
     async def get_content(self, url: str) -> str:
 
         page = await requests.get(url)

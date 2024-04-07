@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
 from hashlib import md5
 from json import dumps
-from typing import ClassVar, Type
+from typing import Type
 
 from feedparser import FeedParserDict, parse
 from pydantic import BaseModel
 
+# Entity Models
 
 class Feed(BaseModel):
     name: str
@@ -49,6 +50,7 @@ class EntryContent(BaseModel):
     def id(self) -> str:
         return md5(self.url.encode()).hexdigest()
 
+# Handler Models
 
 class NotificationHandler(ABC):
     async def login(self):
@@ -66,13 +68,9 @@ class NotificationHandler(ABC):
 
 
 class SummarizationHandler(BaseModel, ABC):
-    supports_fallback_extractor: ClassVar[bool] = False
 
     @abstractmethod
     def summarize(self, feed: Feed, entry: FeedEntry, mk: str):
-        pass
-
-    def fallback_html_extractor(self, html: str):
         pass
 
     def get_prompt(self, mk: str):
@@ -90,8 +88,7 @@ Your goal is to write a brief but detailed summary of the text given to you.
 Only output the summary without any additional text. Provide the summary in markdown.
     """
 
-
-class ContentRetriever(ABC):
+class ContentRetrievalHandler(ABC):
     @abstractmethod
     async def get_content(self, url: str) -> str:
         pass

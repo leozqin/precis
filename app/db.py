@@ -9,7 +9,7 @@ from readability import Document
 from tinydb import Query, TinyDB
 
 from app.constants import DATA_DIR
-from app.contents import content_handler
+from app.content.engine import content_handler
 from app.models import EntryContent, Feed, FeedEntry
 from app.summarization.engine import summarization_handler
 
