@@ -1,16 +1,15 @@
-from yaml import load, SafeLoader
-from logging import getLogger
 from calendar import timegm
-from typing import List
-from pathlib import Path
-from starlette.concurrency import run_in_threadpool
-
 from datetime import datetime, timezone
+from logging import getLogger
+from pathlib import Path
+from typing import List
 
-from rssynthesis.db import DB
-from rssynthesis.models import Feed, FeedEntry
-from rssynthesis.notifications import notification_handler
-from rssynthesis.constants import CONFIG_DIR
+from yaml import SafeLoader, load
+
+from app.constants import CONFIG_DIR
+from app.db import DB
+from app.models import Feed, FeedEntry
+from app.notifications import notification_handler
 
 logger = getLogger("uvicorn.error")
 

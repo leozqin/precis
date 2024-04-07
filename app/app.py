@@ -1,19 +1,18 @@
-from pathlib import Path
-from fastapi import FastAPI
-from fastapi.templating import Jinja2Templates
-from fastapi_utils.tasks import repeat_every
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
-from fastapi.requests import Request
-from starlette.concurrency import run_in_threadpool
-
 from contextlib import asynccontextmanager
 from logging import getLogger
+from pathlib import Path
+
+from fastapi import FastAPI
+from fastapi.requests import Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi_utils.tasks import repeat_every
 from tinydb import TinyDB
 
-from rssynthesis.rss import check_feeds, load_feeds
-from rssynthesis.ui import list_feeds, list_entries, get_entry_content
-from rssynthesis.notifications import notification_handler
+from app.notifications import notification_handler
+from app.rss import check_feeds, load_feeds
+from app.ui import get_entry_content, list_entries, list_feeds
 
 logger = getLogger("uvicorn.error")
 base_path = Path(__file__).parent
@@ -42,7 +41,7 @@ async def lifespan(app: FastAPI):
     await notification_handler.logout()
 
 
-app = FastAPI(lifespan=lifespan, title="RSSynthesis", openapi_url="/openapi.json")
+app = FastAPI(lifespan=lifespan, title="Precis", openapi_url="/openapi.json")
 
 app.mount(
     "/static",
@@ -84,6 +83,8 @@ async def read(request: Request, feed_entry_id: str, redrive: bool = False):
         "read.html",
         {
             "request": request,
-            "content": await get_entry_content(feed_entry_id=feed_entry_id, redrive=redrive),
+            "content": await get_entry_content(
+                feed_entry_id=feed_entry_id, redrive=redrive
+            ),
         },
     )

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 
 [project]
-name = "rssynthesis"
+name = "precis"
 version = "0.0.11"
 description = "A framework for automating your media diet"
 requires-python = ">=3.11"
@@ -58,7 +58,7 @@ dependencies = [
 # The following would provide a command line executable called `sample`
 # which executes the function `main` from this package when invoked.
 [project.scripts]
-rss = "rssynthesis.cli:cli"
+precis = "app.cli:cli"
 
 
 # This is configuration specific to the `setuptools` build backend.
@@ -67,4 +67,4 @@ rss = "rssynthesis.cli:cli"
 # If there are data files included in your packages that need to be
 # installed, specify them here.
 package-data = {"sample" = ["*.dat"]}
-packages = ["rssynthesis"]
+packages = ["app"]

@@ -1,8 +1,9 @@
-from pydantic import BaseModel, ConfigDict
-from ollama import Client, Message, ChatResponse, Options
-from typing import Mapping, Any, ClassVar
+from typing import Any, ClassVar, Mapping
 
-from rssynthesis.models import SummarizationHandler, Feed, FeedEntry
+from ollama import ChatResponse, Client, Message, Options
+from pydantic import BaseModel, ConfigDict
+
+from app.models import Feed, FeedEntry, SummarizationHandler
 
 
 class OllamaSummarizationHandler(SummarizationHandler, BaseModel):
@@ -36,7 +37,7 @@ class OllamaSummarizationHandler(SummarizationHandler, BaseModel):
 Your goal is to extract the main article body from this web page. Do not include ads, links, images, or navigation.
 Only include the primary content of the page. Convert the article body to markdown. Add whitespace as needed to
 improve readability and separate paragraphs from each other. Look for things like the <article> tag, a number of different
-paragraphs all in a row, or a articleBody json, to identify the main article body. 
+paragraphs all in a row, or a articleBody json, to identify the main article body.
         """
 
         prompt = f"Extract the main article: {html}"

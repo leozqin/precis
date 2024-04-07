@@ -1,16 +1,16 @@
-# rssynthesis
+# Precis
 ## Pre-Requisites
 - Python 3.11 or higher (use pyenv)
 - Node 20 or highey (use nvm)
 
-## To Install
+## Development Instructions
+To install, create a fresh venv and then:
 ```bash
-make install
+make dev
 ```
+Then to develop, in one terminal start tailwind by doing `make tw`. Then, in other start the main app by doing `make run`.
 
 ## To run locally:
-In one term start tailwind by doing `make tw`. Then, in other start the main app by doing `make run`.
-
 If you want to run via docker-compose:
 ```bash
 docker compose up

@@ -1,9 +1,9 @@
-from rssynthesis.models import ContentRetriever
-from playwright.async_api import async_playwright, Route, Playwright
+from playwright.async_api import Playwright, Route, async_playwright
+
+from app.models import ContentRetriever
 
 
 class PlaywrightContentRetriever(ContentRetriever):
-
     @staticmethod
     async def _block_common(route: Route):
         excluded_resource_types = ["stylesheet", "script", "image", "font"]
