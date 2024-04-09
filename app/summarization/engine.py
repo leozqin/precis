@@ -8,6 +8,7 @@ from yaml import SafeLoader, load
 from app.constants import CONFIG_DIR
 from app.models import SummarizationHandler
 from app.summarization.ollama import OllamaSummarizationHandler
+from app.summarization.openai import OpenAISummarizationHandler
 
 logger = getLogger("uvicorn.error")
 
@@ -16,7 +17,10 @@ class SummarizationEngine(BaseModel):
     type: str
     config: Mapping[str, Any] = {}
 
-    handlers: ClassVar = {"ollama": OllamaSummarizationHandler}
+    handlers: ClassVar = {
+        "ollama": OllamaSummarizationHandler,
+        "openai": OpenAISummarizationHandler,
+    }
 
     def get_handler(self) -> Type[SummarizationHandler]:
         logger.info(f"loading summarization handler of type {self.type}")

@@ -46,7 +46,8 @@ dependencies = [
     "markdown2[all]",
     "simplematrixbotlib",
     "ollama",
-    "playwright"
+    "playwright",
+    "openai"
 ]
 
 [project.urls]
