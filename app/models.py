@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 from hashlib import md5
 from json import dumps
-from typing import Type
+from typing import Type, ClassVar
+from enum import Enum
 
 from feedparser import FeedParserDict, parse
 from pydantic import BaseModel
@@ -52,7 +53,9 @@ class EntryContent(BaseModel):
 
 # Handler Models
 
-class NotificationHandler(ABC):
+class NotificationHandler(BaseModel, ABC):
+    id: ClassVar[str] = "generic_notification_handler"
+
     async def login(self):
         pass
 
@@ -68,6 +71,7 @@ class NotificationHandler(ABC):
 
 
 class SummarizationHandler(BaseModel, ABC):
+    id: ClassVar[str] = "generic_summarization_handler"
 
     @abstractmethod
     def summarize(self, feed: Feed, entry: FeedEntry, mk: str):
@@ -88,7 +92,22 @@ Your goal is to write a brief but detailed summary of the text given to you.
 Only output the summary without any additional text. Provide the summary in markdown.
     """
 
-class ContentRetrievalHandler(ABC):
+class ContentRetrievalHandler(BaseModel, ABC):
+    id: ClassVar[str] = "generic_content_retrieval_handler"
     @abstractmethod
     async def get_content(self, url: str) -> str:
         pass
+
+# Settings
+
+class Themes(str, Enum):
+    synthwave = "synthwave"
+    forest = "forest"
+    dark = "dark"
+    night = "night"
+
+class GlobalSettings(BaseModel):
+
+    send_notification: bool = True
+    theme: Themes = Themes.forest
+    refresh_interval: int = 5

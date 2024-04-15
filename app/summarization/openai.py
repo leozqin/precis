@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 from app.models import SummarizationHandler, Feed, FeedEntry
 from pydantic import BaseModel
 from openai import OpenAI
@@ -8,6 +10,8 @@ from os import environ
 class OpenAISummarizationHandler(SummarizationHandler, BaseModel):
     api_key: str = environ.get("OPENAI_API_KEY")
     model: str = "gpt-3.5-turbo"
+
+    id: ClassVar[str] = "openai"
 
     def summarize(self, feed: Feed, entry: FeedEntry, mk: str):
         client = OpenAI(api_key=self.api_key)

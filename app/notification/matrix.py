@@ -1,6 +1,7 @@
 from logging import getLogger
 from os import environ
-from typing import Mapping
+from typing import Mapping, ClassVar
+from pydantic import PrivateAttr, BaseModel
 
 from simplematrixbotlib import Bot, Creds
 
@@ -9,36 +10,40 @@ from app.models import Feed, FeedEntry, NotificationHandler
 logger = getLogger("uvicorn.error")
 
 
-class MatrixNotificationHandler(NotificationHandler):
-    def __init__(
-        self,
-        homeserver: str,
-        username: str,
-        password: str,
-        room_id: str,
-        destinations=Mapping[str, str],
-    ) -> None:
-        self.room_id = room_id
-        self.bot = Bot(
-            creds=Creds(
-                homeserver=homeserver,
-                username=username,
-                password=password,
-            )
-        )
-        self.default_room = room_id
-        self._destinations = destinations
+class MatrixNotificationHandler(NotificationHandler, BaseModel):
+    id: ClassVar[str] = "matrix"
+    homeserver: str
+    room_id: str
+    username: str
+    password: str
+    routing: Mapping[str, str] = {}
 
-    @property
-    def destinations(self) -> Mapping[str, str]:
-        return self._destinations
+    _bot: Bot = PrivateAttr(default=None)
 
     @staticmethod
     def _make_read_link(entry: FeedEntry) -> str:
         base_url = environ["RSS_BASE_URL"]
         return f"{base_url}/read/{entry.id}"
 
+    @property
+    def bot(self):
+        if not self._bot:
+            self._bot = Bot(
+                creds=Creds(
+                    homeserver=self.homeserver,
+                    username=self.username,
+                    password=self.password,
+                )
+            )
+
+        return self._bot
+
+    @property
+    def default_room(self):
+        return self.room_id
+
     async def login(self):
+
         await self.bot.api.login()
 
     async def logout(self) -> None:

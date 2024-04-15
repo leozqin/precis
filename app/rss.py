@@ -4,7 +4,7 @@ from logging import getLogger
 from pathlib import Path
 from typing import List
 
-from yaml import SafeLoader, load
+from ruamel.yaml import YAML
 
 from app.constants import CONFIG_DIR
 from app.db import DB
@@ -18,8 +18,9 @@ db = DB()
 
 def load_feeds() -> None:
     with open(Path(CONFIG_DIR, "feeds.yml").resolve(), "r") as fp:
-        configs = load(fp, Loader=SafeLoader)
-
+        yaml = YAML(typ="safe")
+        configs = yaml.load(fp)
+        
     db.clear_active_feeds()
     for config in configs:
         feed = Feed(**config)

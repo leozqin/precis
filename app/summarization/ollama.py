@@ -1,4 +1,4 @@
-from typing import Any, Mapping
+from typing import Any, Mapping, ClassVar
 
 from ollama import ChatResponse, Client, Message, Options
 from pydantic import BaseModel
@@ -11,6 +11,8 @@ class OllamaSummarizationHandler(SummarizationHandler, BaseModel):
     model: str
     system: str = None
     options: Mapping[str, Any]
+
+    id: ClassVar[str] = "ollama"
 
     def _make_chat_call(self, system: str, prompt: str):
         client = Client(host=self.base_url)

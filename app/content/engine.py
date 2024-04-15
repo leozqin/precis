@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any, ClassVar, Mapping, Type
 
 from pydantic import BaseModel
-from yaml import SafeLoader, load
+from ruamel.yaml import YAML
 
 from app.constants import CONFIG_DIR
 from app.content.playwright import PlaywrightContentRetriever
@@ -31,7 +31,8 @@ def load_content_config() -> ContentRetrievalEngine:
     content_config_path = Path(CONFIG_DIR, "settings.yml").resolve()
 
     with open(content_config_path, "r") as fp:
-        config = load(fp, Loader=SafeLoader)
+        yaml = YAML(typ="safe")
+        config = yaml.load(fp)
 
     return ContentRetrievalEngine(**config.get("content", {}))
 

@@ -1,6 +1,7 @@
 from logging import getLogger
 from time import localtime, strftime
 from typing import List
+from json import dumps
 
 from app.db import DB
 from app.models import EntryContent, Feed, FeedEntry
@@ -89,3 +90,34 @@ async def get_entry_content(feed_entry_id, redrive: bool = False):
             "content": content.content,
             "summary": content.summary,
         }
+
+
+def get_handlers():
+
+    handlers = db.get_handlers()
+
+    return [
+        {
+            "type": k,
+            "handler_type": db.handler_type_map[k],
+            "config": v.dict() if v else None
+        }
+        for k, v in handlers.items()
+    ]
+
+
+def get_handler_config(handler: str):
+
+    try:
+        handler = db.get_handler(id=handler)
+        return {"type": handler.id, "config": dumps(handler.dict(), indent=4)}
+
+    except IndexError:
+        return {"type": handler, "config": None}
+
+
+def get_settings():
+
+    settings = db.get_settings()
+
+    return settings.dict()
