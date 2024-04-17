@@ -1,6 +1,6 @@
 from logging import getLogger
 from pathlib import Path
-from typing import List, Optional, Type, Mapping
+from typing import List, Mapping, Optional, Type
 
 from html2text import HTML2Text
 from markdown2 import markdown
@@ -9,18 +9,18 @@ from readability import Document
 from tinydb import Query, TinyDB
 
 from app.constants import DATA_DIR
-from app.content.engine import content_handler, ContentRetrievalEngine
+from app.content.engine import ContentRetrievalEngine, content_handler
 from app.models import (
+    ContentRetrievalHandler,
     EntryContent,
     Feed,
     FeedEntry,
-    SummarizationHandler,
-    ContentRetrievalHandler,
-    NotificationHandler,
     GlobalSettings,
+    NotificationHandler,
+    SummarizationHandler,
 )
-from app.summarization.engine import summarization_handler, SummarizationEngine
 from app.notification.engine import NotificationEngine
+from app.summarization.engine import SummarizationEngine, summarization_handler
 
 logger = getLogger("uvicorn.error")
 
@@ -250,7 +250,7 @@ class DB:
 
         return handler_obj
 
-    def get_settings(self) -> Type[GlobalSettings]:
+    def get_settings(self) -> GlobalSettings:
         table = self.db.table("settings")
 
         try:

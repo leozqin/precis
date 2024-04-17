@@ -4,7 +4,7 @@ tw:
 
 .PHONY: install
 install:
-	npm install -D tailwindcss @tailwindcss/typography daisyui@latest
+	npm install -D tailwindcss @tailwindcss/typography daisyui@latest @tailwindcss/forms
 	pip install -e .
 	playright install --with-deps chromium
 

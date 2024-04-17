@@ -44,6 +44,11 @@
                                 Return to All Feeds
                             </a>
                         </li>
+                        <li>
+                            <a href="{{ url_for('settings') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
+                            Settings
+                            </a>
+                        </li>
                         {% if content.content %}
                         <li>
                             <a href="{{ url_for('read', feed_entry_id=content.id).include_query_params(redrive=True) }}"
@@ -71,7 +76,7 @@
             <h2>Preview</h2>
             <div>{{ content.preview| safe }}</div>
         </section>
-        
+
         <section class="justify-center flex my-5">
             <a href="{{ content.url }}">
                 <button class="btn btn-accent btn-lg rounded-xl text-4xl lg:text-lg text-nowrap"">

@@ -20,7 +20,7 @@ def load_feeds() -> None:
     with open(Path(CONFIG_DIR, "feeds.yml").resolve(), "r") as fp:
         yaml = YAML(typ="safe")
         configs = yaml.load(fp)
-        
+
     db.clear_active_feeds()
     for config in configs:
         feed = Feed(**config)
@@ -82,8 +82,15 @@ async def add_feed_entry(feed: Feed, entry: FeedEntry) -> None:
 
     db.upsert_feed_entry(feed=feed, entry=entry)
 
+    settings = db.get_settings()
+
     if not feed.preview_only:
         await db.get_entry_content(entry=entry)
 
     if feed.notify:
-        await notification_handler.send_notification(feed=feed, entry=entry)
+        if settings.send_notification:
+            await notification_handler.send_notification(feed=feed, entry=entry)
+        else:
+            logger.info(
+                f"skipping notification for {entry.id} because of global setting"
+            )

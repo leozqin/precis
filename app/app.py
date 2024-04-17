@@ -1,29 +1,29 @@
 from contextlib import asynccontextmanager
+from json import loads
 from logging import getLogger
 from pathlib import Path
 from typing import Annotated
-from json import loads
 
-from fastapi import FastAPI, status, HTTPException, Form
+from fastapi import FastAPI, Form, status
 from fastapi.requests import Request
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi_utils.tasks import repeat_every
 
+from app.db import DB
+from app.handlers import load_handlers
+from app.models import GlobalSettings, Themes
 from app.notification.engine import notification_handler
 from app.rss import check_feeds, load_feeds
-from app.handlers import load_handlers
 from app.ui import (
     get_entry_content,
+    get_handler_config,
+    get_handlers,
+    get_settings,
     list_entries,
     list_feeds,
-    get_handlers,
-    get_handler_config,
-    get_settings,
 )
-from app.db import DB
-from app.models import GlobalSettings, Themes
 
 logger = getLogger("uvicorn.error")
 base_path = Path(__file__).parent
@@ -178,10 +178,10 @@ async def update_handler(
 
 @app.post("/api/update_settings/", status_code=status.HTTP_200_OK)
 async def update_settings(
-    send_notification: Annotated[bool, Form()],
     theme: Annotated[str, Form()],
     refresh_interval: Annotated[int, Form()],
     request: Request,
+    send_notification: Annotated[bool, Form()] = False,
 ):
     db = DB()
     try:
