@@ -1,21 +1,42 @@
 <!DOCTYPE html>
-<html data-theme="forest">
+<html data-theme="{{settings.theme.value}}">
 
 <head>
     <link href="./static/output.css" rel="stylesheet">
-    <title>Precis - Feeds</title>
+    <title>All Feeds - Precis</title>
 </head>
 
-<body class="w-11/12 xl:w-3/5 mx-auto max-w-none my-5">
-    <div>
-        <h1 class="my-10 flex justify-center text-6xl lg:text-4xl">
-            All Feeds
-        </h1>
-    </div>
+<body class="w-screen xl:w-3/5 mx-auto max-w-none">
+    <section class="mx-auto justify-center w-screen lg:w-full mb-10">
+        <div class="navbar bg-accent h-28 lg:h-20">
+            <div class="navbar-start">
+            <h1 class="text-5xl lg:text-3xl text-neutral">
+                All Feeds
+            </h1>
+            </div>
+            <div class="navbar-end">
+            <div class="dropdown dropdown-bottom dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-accent h-16 w-16">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
+                </svg>
+                </div>
+                <ul tabindex="0"
+                class="menu menu-lg dropdown-content mt-12 z-[1] p-2 shadow bg-neutral rounded-box w-screen lg:w-96 outline">
+                <li>
+                    <a href="{{ url_for('settings') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
+                    Settings
+                    </a>
+                </li>
+                </ul>
+            </div>
+            </div>
+        </section>
     <div class="justify-center grid-flow-row grid-cols-1 lg:grid-cols-3 grid gap-8 lg:gap-4">
         {% for feed in feeds %}
         <a href="{{ url_for('list_entries_by_feed', feed_id=feed.id) }}" class="no-underline">
-            <div class="card card-side card-normal lg:card-compact w-full bg-neutral shadow-xl outline mb-5">
+            <div class="card card-side card-normal lg:card-compact w-11/12 mx-auto bg-neutral shadow-xl outline mb-5">
                 <div class="card-body">
                     <h1 class="card-title text-5xl lg:text-2xl">{{ feed.name }}</h1>
                 </div>

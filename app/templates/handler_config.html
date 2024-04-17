@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html data-theme="{{settings.theme.value}}">
+
+<head>
+  <link href="./../../static/output.css" rel="stylesheet">
+  <title>Settings - {{ handler.type }} - Precis</title>
+</head>
+
+<body class="w-screen lg:w-3/5 mx-auto">
+  <section class="mx-auto justify-center w-screen lg:w-full mb-10">
+    <div class="navbar bg-accent h-28 lg:h-20">
+      <div class="navbar-center lg:navbar-start">
+        <h1 class="text-5xl lg:text-3xl text-neutral">
+          Handler Configuration
+        </h1>
+      </div>
+      <div class="navbar-end">
+        <div class="dropdown dropdown-bottom dropdown-end">
+          <div tabindex="0" role="button" class="btn btn-accent h-16 w-16">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
+            </svg>
+          </div>
+          <ul tabindex="0"
+            class="menu menu-lg dropdown-content mt-12 z-[1] p-2 shadow bg-neutral rounded-box w-screen lg:w-96 outline">
+            <li>
+              <a href="{{ url_for('root') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
+                Return to All Feeds
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('settings') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
+                Return to Settings
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+  </section>
+  <section class="h-screen">
+    <h1 class="text-2xl justify-center flex my-5">
+      Configuration - {{ handler.type }}
+    </h1>
+    <form method="post" action="/api/update_handler/">
+      <div class="h-2/3 w-full justify-center flex">
+        <textarea
+          class="textarea textarea-bordered textarea-accent p-5 resize-y w-5/6 lg:w-3/4 h-full text-2xl lg:text-base"
+          placeholder="Type your JSON config here!"
+          required="required"
+          name="config">{% if handler.config %}{{ handler.config }}{% endif %}</textarea>
+      </div>
+      <input type="hidden" name="handler" value="{{ handler.type }}">
+      <div>
+        <button type="submit" class="btn btn-outline w-1/5 mx-auto flex justify-center my-5">
+          Update Configuration
+          {% if update_status %} &#9989 {% endif %}
+          {% if update_exception %} &#10060 {% endif %}
+        </button>
+        {% if update_exception %}
+        <div role="alert" class="alert alert-error">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <span>{{ update_exception }}</span>
+        </div>
+        {% endif %}
+      </div>
+    </form>
+
+  </section>
+</body>
+
+</html>

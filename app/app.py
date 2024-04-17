@@ -1,24 +1,32 @@
 from contextlib import asynccontextmanager
+from json import loads
 from logging import getLogger
 from pathlib import Path
+from typing import Annotated
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Form, status
 from fastapi.requests import Request
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi_utils.tasks import repeat_every
-from tinydb import TinyDB
 
+from app.db import DB
+from app.handlers import load_handlers
+from app.models import GlobalSettings, Themes
 from app.notification.engine import notification_handler
 from app.rss import check_feeds, load_feeds
-from app.ui import get_entry_content, list_entries, list_feeds
+from app.ui import (
+    get_entry_content,
+    get_handler_config,
+    get_handlers,
+    get_settings,
+    list_entries,
+    list_feeds,
+)
 
 logger = getLogger("uvicorn.error")
 base_path = Path(__file__).parent
-
-db_path = Path(base_path, "../", "db.json").resolve()
-db = TinyDB(db_path)
 
 templates = Jinja2Templates(directory=Path(base_path, "templates").resolve())
 
@@ -32,6 +40,7 @@ async def poll_feeds():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     load_feeds()
+    load_handlers()
 
     await notification_handler.login()
     await poll_feeds()
@@ -49,16 +58,19 @@ app.mount(
     name="static",
 )
 
-@app.get('/favicon.ico', include_in_schema=False)
+
+@app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     path = Path(Path(__file__).parent, "static", "icons", "favicon.ico")
     return FileResponse(path)
+
 
 @app.get("/", response_class=HTMLResponse)
 def root(request: Request):
 
     return templates.TemplateResponse(
-        "index.html", {"request": request, "feeds": list_feeds()}
+        "index.html",
+        {"request": request, "settings": get_settings(), "feeds": list_feeds()},
     )
 
 
@@ -67,7 +79,11 @@ def list_entries_by_feed(feed_id: str, request: Request):
 
     return templates.TemplateResponse(
         "entries.html",
-        {"request": request, "entries": list(list_entries(feed_id=feed_id))},
+        {
+            "request": request,
+            "settings": get_settings(),
+            "entries": list(list_entries(feed_id=feed_id)),
+        },
     )
 
 
@@ -76,7 +92,11 @@ def list_all_entries(request: Request):
 
     return templates.TemplateResponse(
         "entries.html",
-        {"request": request, "entries": list(list_entries(feed_id=None))},
+        {
+            "request": request,
+            "settings": get_settings(),
+            "entries": list(list_entries(feed_id=None)),
+        },
     )
 
 
@@ -90,5 +110,107 @@ async def read(request: Request, feed_entry_id: str, redrive: bool = False):
             "content": await get_entry_content(
                 feed_entry_id=feed_entry_id, redrive=redrive
             ),
+            "settings": get_settings(),
         },
     )
+
+
+@app.get("/settings/", response_class=HTMLResponse)
+async def settings(request: Request):
+
+    return templates.TemplateResponse(
+        "settings.html",
+        {
+            "request": request,
+            "themes": Themes._member_names_,
+            "settings": get_settings(),
+            "notification": get_handlers(),
+        },
+    )
+
+
+@app.get("/settings/{handler}", response_class=HTMLResponse)
+async def handler_settings(request: Request, handler: str):
+
+    return templates.TemplateResponse(
+        "handler_config.html",
+        {
+            "request": request,
+            "handler": get_handler_config(handler=handler),
+            "settings": get_settings(),
+        },
+    )
+
+
+@app.post("/api/update_handler/", status_code=status.HTTP_200_OK)
+async def update_handler(
+    handler: Annotated[str, Form()], config: Annotated[str, Form()], request: Request
+):
+    db = DB()
+
+    try:
+
+        config_dict = loads(config)
+        handler_obj = db._make_handler_obj(id=handler, config=config_dict)
+        db.upsert_handler(handler=handler_obj)
+
+        return templates.TemplateResponse(
+            "handler_config.html",
+            {
+                "request": request,
+                "handler": get_handler_config(handler=handler),
+                "update_status": True,
+                "settings": get_settings(),
+            },
+        )
+    except Exception as e:
+
+        return templates.TemplateResponse(
+            "handler_config.html",
+            {
+                "request": request,
+                "handler": get_handler_config(handler=handler),
+                "update_exception": e,
+                "settings": get_settings(),
+            },
+        )
+
+
+@app.post("/api/update_settings/", status_code=status.HTTP_200_OK)
+async def update_settings(
+    theme: Annotated[str, Form()],
+    refresh_interval: Annotated[int, Form()],
+    request: Request,
+    send_notification: Annotated[bool, Form()] = False,
+):
+    db = DB()
+    try:
+        settings = GlobalSettings(
+            send_notification=send_notification,
+            theme=theme,
+            refresh_interval=refresh_interval,
+        )
+
+        db.upsert_settings(settings=settings)
+        return templates.TemplateResponse(
+            "settings.html",
+            {
+                "request": request,
+                "themes": Themes._member_names_,
+                "settings": get_settings(),
+                "notification": get_handlers(),
+                "update_status": True,
+            },
+        )
+    except Exception as e:
+
+        return templates.TemplateResponse(
+            "settings.html",
+            {
+                "request": request,
+                "themes": Themes._member_names_,
+                "settings": get_settings(),
+                "notification": get_handlers(),
+                "update_exception": e,
+            },
+        )

@@ -1,6 +1,6 @@
 from logging import getLogger
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Mapping, Optional, Type
 
 from html2text import HTML2Text
 from markdown2 import markdown
@@ -9,9 +9,18 @@ from readability import Document
 from tinydb import Query, TinyDB
 
 from app.constants import DATA_DIR
-from app.content.engine import content_handler
-from app.models import EntryContent, Feed, FeedEntry
-from app.summarization.engine import summarization_handler
+from app.content.engine import ContentRetrievalEngine, content_handler
+from app.models import (
+    ContentRetrievalHandler,
+    EntryContent,
+    Feed,
+    FeedEntry,
+    GlobalSettings,
+    NotificationHandler,
+    SummarizationHandler,
+)
+from app.notification.engine import NotificationEngine
+from app.summarization.engine import SummarizationEngine, summarization_handler
 
 logger = getLogger("uvicorn.error")
 
@@ -23,6 +32,24 @@ class DB:
 
     db_path = Path(DATA_DIR, "db.json").resolve()
     db = TinyDB(db_path)
+
+    handler_map = {
+        **SummarizationEngine.handlers,
+        **NotificationEngine.handlers,
+        **ContentRetrievalEngine.handlers,
+    }
+
+    engine_map = {
+        "summarization": SummarizationEngine,
+        "notification": NotificationEngine,
+        "content": ContentRetrievalEngine,
+    }
+
+    handler_type_map = {
+        **{k: "summarization" for k in SummarizationEngine.handlers.keys()},
+        **{k: "notification" for k in NotificationEngine.handlers.keys()},
+        **{k: "content" for k in ContentRetrievalEngine.handlers.keys()},
+    }
 
     def clear_active_feeds(self) -> None:
         self.db.drop_table("feeds")
@@ -170,3 +197,75 @@ class DB:
             )
 
             return entry_content
+
+    def upsert_handler(
+        self,
+        handler: Type[
+            SummarizationHandler | NotificationHandler | ContentRetrievalHandler
+        ],
+    ) -> None:
+        table = self.db.table("handler")
+
+        row = {
+            "id": handler.id,
+            "handler": handler.dict(),
+        }
+
+        query = Query().id.matches(handler.id)
+        table.upsert(row, cond=query)
+
+    def _make_handler_obj(self, id: str, config: Mapping):
+
+        return self.engine_map[self.handler_type_map[id]](
+            type=id, config=config
+        ).get_handler()
+
+    def get_handlers(
+        self,
+    ) -> Mapping[
+        str, Type[SummarizationHandler | NotificationHandler | ContentRetrievalHandler]
+    ]:
+        table = self.db.table("handler")
+
+        handlers = {i: None for i in self.handler_map.keys()}
+
+        for cfg in table.all():
+            handlers[cfg["id"]] = self._make_handler_obj(
+                id=cfg["id"], config=cfg["handler"]
+            )
+
+        return handlers
+
+    def get_handler(
+        self, id: str
+    ) -> Type[SummarizationHandler | NotificationHandler | ContentRetrievalHandler]:
+        table = self.db.table("handler")
+
+        query = Query().id.matches(id)
+        handler = table.search(query)[0]
+
+        handler_obj = self._make_handler_obj(
+            id=handler["id"], config=handler["handler"]
+        )
+
+        return handler_obj
+
+    def get_settings(self) -> GlobalSettings:
+        table = self.db.table("settings")
+
+        try:
+            settings = table.all()[0]
+            return GlobalSettings(**settings["settings"])
+        except IndexError:
+            return GlobalSettings()
+
+    def upsert_settings(self, settings: GlobalSettings) -> None:
+        table = self.db.table("settings")
+
+        row = {
+            "id": "settings",
+            "settings": settings.dict(),
+        }
+
+        query = Query().id.matches("settings")
+        table.upsert(row, cond=query)

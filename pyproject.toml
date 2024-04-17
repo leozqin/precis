@@ -32,7 +32,8 @@ dependencies = [
     "pydantic",
     "feedparser",
     "aenum",
-    "pyyaml",
+    "ruamel.yaml",
+    "ruamel.yaml.string",
     "fastapi",
     "uvicorn[standard]",
     "tinydb",
@@ -47,7 +48,8 @@ dependencies = [
     "simplematrixbotlib",
     "ollama",
     "playwright",
-    "openai"
+    "openai",
+    "python-multipart"
 ]
 
 [project.urls]

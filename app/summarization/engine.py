@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any, ClassVar, Mapping, Type
 
 from pydantic import BaseModel
-from yaml import SafeLoader, load
+from ruamel.yaml import YAML
 
 from app.constants import CONFIG_DIR
 from app.models import SummarizationHandler
@@ -11,7 +11,6 @@ from app.summarization.ollama import OllamaSummarizationHandler
 from app.summarization.openai import OpenAISummarizationHandler
 
 logger = getLogger("uvicorn.error")
-
 
 class SummarizationEngine(BaseModel):
     type: str
@@ -27,13 +26,15 @@ class SummarizationEngine(BaseModel):
         return self.handlers[self.type](**self.config)
 
 
-def load_summarization_config() -> SummarizationEngine:
+def load_summarization_config() -> Type[SummarizationHandler]:
     summarization_config_path = Path(CONFIG_DIR, "settings.yml").resolve()
 
     with open(summarization_config_path, "r") as fp:
-        config = load(fp, Loader=SafeLoader)
+        yaml = YAML(typ="safe")
+        config = yaml.load(fp)
 
-    return SummarizationEngine(**config.get("summarization", {}))
+    handler = SummarizationEngine(**config.get("summarization", {})).get_handler()
+    return handler
 
 
-summarization_handler = load_summarization_config().get_handler()
+summarization_handler = load_summarization_config()

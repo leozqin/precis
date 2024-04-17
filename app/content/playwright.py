@@ -4,6 +4,8 @@ from app.models import ContentRetrievalHandler
 
 
 class PlaywrightContentRetriever(ContentRetrievalHandler):
+    id = "playwright"
+
     @staticmethod
     async def _block_common(route: Route):
         excluded_resource_types = ["stylesheet", "script", "image", "font"]
