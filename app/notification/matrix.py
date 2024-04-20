@@ -20,11 +20,6 @@ class MatrixNotificationHandler(NotificationHandler, BaseModel):
 
     _bot: Bot = PrivateAttr(default=None)
 
-    @staticmethod
-    def _make_read_link(entry: FeedEntry) -> str:
-        base_url = environ["RSS_BASE_URL"]
-        return f"{base_url}/read/{entry.id}"
-
     @property
     def bot(self):
         if not self._bot:
@@ -50,10 +45,10 @@ class MatrixNotificationHandler(NotificationHandler, BaseModel):
         await self.bot.api.async_client.logout()
 
     async def send_notification(self, feed: Feed, entry: FeedEntry):
-        msg = f"{feed.name}: [{entry.title}]({self._make_read_link(entry)})"
+        msg = f"{feed.name}: [{entry.title}]({self.make_read_link(entry)})"
 
         if feed.notify_destination:
-            room = self.destinations.get(feed.notify_destination, self.default_room)
+            room = self.routing.get(feed.notify_destination, self.default_room)
             logger.info(
                 "Sending notification to destination "
                 f"{feed.notify_destination} - {room}"

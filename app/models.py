@@ -3,11 +3,13 @@ from hashlib import md5
 from json import dumps
 from typing import Type, ClassVar
 from enum import Enum
+from os import environ
 
 from feedparser import FeedParserDict, parse
 from pydantic import BaseModel
 
 # Entity Models
+
 
 class Feed(BaseModel):
     name: str
@@ -51,10 +53,17 @@ class EntryContent(BaseModel):
     def id(self) -> str:
         return md5(self.url.encode()).hexdigest()
 
+
 # Handler Models
+
 
 class NotificationHandler(BaseModel, ABC):
     id: ClassVar[str] = "generic_notification_handler"
+
+    @staticmethod
+    def make_read_link(entry: FeedEntry) -> str:
+        base_url = environ["RSS_BASE_URL"]
+        return f"{base_url}/read/{entry.id}"
 
     async def login(self):
         pass
@@ -92,19 +101,24 @@ Your goal is to write a brief but detailed summary of the text given to you.
 Only output the summary without any additional text. Provide the summary in markdown.
     """
 
+
 class ContentRetrievalHandler(BaseModel, ABC):
     id: ClassVar[str] = "generic_content_retrieval_handler"
+
     @abstractmethod
     async def get_content(self, url: str) -> str:
         pass
 
+
 # Settings
+
 
 class Themes(str, Enum):
     synthwave = "synthwave"
     forest = "forest"
     dark = "dark"
     night = "night"
+
 
 class GlobalSettings(BaseModel):
 
