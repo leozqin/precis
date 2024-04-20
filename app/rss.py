@@ -7,13 +7,11 @@ from typing import List, Mapping
 from ruamel.yaml import YAML
 
 from app.constants import CONFIG_DIR
-from app.db import DB
+from app.storage.engine import storage_handler as db
 from app.models import Feed, FeedEntry
 from app.notification.engine import notification_handler
 
 logger = getLogger("uvicorn.error")
-
-db = DB()
 
 
 def load_feeds() -> None:

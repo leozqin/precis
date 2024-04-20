@@ -3,12 +3,10 @@ from time import localtime, strftime
 from typing import List
 from json import dumps
 
-from app.db import DB
+from app.storage.engine import storage_handler as db
 from app.models import EntryContent, Feed, FeedEntry
 
 logger = getLogger("uvicorn.error")
-
-db = DB()
 
 
 def _format_time(time: int) -> str:
@@ -100,7 +98,7 @@ def get_handlers():
         {
             "type": k,
             "handler_type": db.handler_type_map[k],
-            "config": v.dict() if v else None
+            "config": v.dict() if v else None,
         }
         for k, v in handlers.items()
     ]
