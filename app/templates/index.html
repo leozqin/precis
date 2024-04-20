@@ -33,10 +33,10 @@
             </div>
             </div>
         </section>
-    <div class="justify-center grid-flow-row grid-cols-1 lg:grid-cols-3 grid gap-8 lg:gap-4">
+    <div class="justify-center grid-flow-row grid-cols-1 md:grid-cols-3 grid gap-8 lg:gap-4">
         {% for feed in feeds %}
         <a href="{{ url_for('list_entries_by_feed', feed_id=feed.id) }}" class="no-underline">
-            <div class="card card-side card-normal lg:card-compact w-11/12 mx-auto bg-neutral shadow-xl outline mb-5">
+            <div class="card card-side card-normal md:card-compact w-11/12 mx-auto bg-neutral shadow-xl outline mb-5">
                 <div class="card-body">
                     <h1 class="card-title text-5xl lg:text-2xl">{{ feed.name }}</h1>
                 </div>

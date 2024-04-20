@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi_utils.tasks import repeat_every
 
-from app.db import DB
+from app.storage.engine import storage_handler as db
 from app.handlers import load_handlers
 from app.models import GlobalSettings, Themes
 from app.notification.engine import notification_handler
@@ -146,12 +146,11 @@ async def handler_settings(request: Request, handler: str):
 async def update_handler(
     handler: Annotated[str, Form()], config: Annotated[str, Form()], request: Request
 ):
-    db = DB()
 
     try:
 
         config_dict = loads(config)
-        handler_obj = db._make_handler_obj(id=handler, config=config_dict)
+        handler_obj = db.reconfigure_handler(id=handler, config=config_dict)
         db.upsert_handler(handler=handler_obj)
 
         return templates.TemplateResponse(
@@ -183,7 +182,6 @@ async def update_settings(
     request: Request,
     send_notification: Annotated[bool, Form()] = False,
 ):
-    db = DB()
     try:
         settings = GlobalSettings(
             send_notification=send_notification,

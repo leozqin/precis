@@ -65,7 +65,7 @@
         </label>
       </div>
       <div>
-        <button type="submit" class="btn btn-outline w-1/2 lg:w-1/5 mx-auto flex justify-center my-5 text-3xl lg:text-xl">
+        <button type="submit" class="btn btn-outline w-1/2 md:w-1/5 mx-auto flex justify-center my-5 text-3xl lg:text-xl">
           Update Configuration
           {% if update_status %} &#9989 {% endif %}
           {% if update_exception %} &#10060 {% endif %}
@@ -89,7 +89,7 @@
     </div>
     <div class="justify-center grid-flow-row grid-cols-1 lg:grid-cols-3 grid gap-10">
       {% for handler in notification%}
-      <div class="card card-normal lg:card-compact w-11/12 lg:w-4/5 shadow-xl bg-neutral mx-auto outline">
+      <div class="card card-normal lg:card-compact w-11/12 md:w-4/5 shadow-xl bg-neutral mx-auto outline">
 
         <a class="no-underline" href="{{ url_for('handler_settings', handler=handler.type)}}">
           <div class="card-body">
