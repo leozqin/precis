@@ -3,16 +3,15 @@ from readability import Document
 from html2text import HTML2Text
 from markdown2 import markdown
 
-from app.content.engine import content_handler
-from app.summarization.engine import summarization_handler
 from app.models import Feed, FeedEntry
+from app.settings import GlobalSettings
 
 
 class ReadingMethodsMixIn:
 
     @staticmethod
-    async def get_entry_html(url: str) -> str:
-        return await content_handler.get_content(url)
+    async def get_entry_html(url: str, settings: GlobalSettings) -> str:
+        return await settings.content_retrieval_handler.get_content(url)
 
     @staticmethod
     def get_main_content(content: str) -> str:
@@ -27,6 +26,12 @@ class ReadingMethodsMixIn:
         return markdown(converter.handle(cleaned_document.summary(html_partial=True)))
 
     @staticmethod
-    def summarize(feed: Feed, entry: FeedEntry, mk: str) -> str:
+    def summarize(
+        feed: Feed, entry: FeedEntry, mk: str, settings: GlobalSettings
+    ) -> str:
 
-        return markdown(summarization_handler.summarize(feed=feed, entry=entry, mk=mk))
+        summary = settings.summarization_handler.summarize(
+            feed=feed, entry=entry, mk=mk
+        )
+
+        return markdown(summary)

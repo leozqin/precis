@@ -9,6 +9,7 @@ from app.constants import CONFIG_DIR
 from app.models import SummarizationHandler
 from app.summarization.ollama import OllamaSummarizationHandler
 from app.summarization.openai import OpenAISummarizationHandler
+from app.summarization.null import NullSummarizationHandler
 
 logger = getLogger("uvicorn.error")
 
@@ -19,6 +20,7 @@ class SummarizationEngine(BaseModel):
     handlers: ClassVar = {
         "ollama": OllamaSummarizationHandler,
         "openai": OpenAISummarizationHandler,
+        "null": NullSummarizationHandler
     }
 
     def get_handler(self) -> Type[SummarizationHandler]:

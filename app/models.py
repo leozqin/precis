@@ -8,6 +8,8 @@ from os import environ
 from feedparser import FeedParserDict, parse
 from pydantic import BaseModel
 
+from app.storage.engine import storage_handler as db
+
 # Entity Models
 
 
@@ -26,8 +28,7 @@ class Feed(BaseModel):
 
     @property
     def id(self) -> str:
-        id = dumps([self.name, self.category, self.type, self.url])
-        return md5(id.encode()).hexdigest()
+        return md5(self.url.encode()).hexdigest()
 
 
 class FeedEntry(BaseModel):
@@ -119,9 +120,14 @@ class Themes(str, Enum):
     dark = "dark"
     night = "night"
 
-
-class GlobalSettings(BaseModel):
+class GlobalSettingsSchema(BaseModel):
 
     send_notification: bool = True
     theme: Themes = Themes.forest
     refresh_interval: int = 5
+
+    notification_handler_key: str = "null"
+    summarization_handler_key: str = "null"
+    content_retrieval_handler_key: str = "playwright"
+
+    finished_onboarding: bool = False

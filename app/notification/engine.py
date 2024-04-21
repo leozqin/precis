@@ -9,6 +9,7 @@ from app.constants import CONFIG_DIR
 from app.models import NotificationHandler
 from app.notification.matrix import MatrixNotificationHandler
 from app.notification.slack import SlackNotificationHandler
+from app.notification.null import NullNotificationHandler
 
 logger = getLogger("uvicorn.error")
 
@@ -17,7 +18,11 @@ class NotificationEngine(BaseModel):
     type: str
     config: Mapping[str, Any] = {}
 
-    handlers: ClassVar = {"matrix": MatrixNotificationHandler, "slack":SlackNotificationHandler}
+    handlers: ClassVar = {
+        "matrix": MatrixNotificationHandler,
+        "slack": SlackNotificationHandler,
+        "null": NullNotificationHandler,
+    }
 
     def get_handler(self) -> Type[NotificationHandler]:
         logger.info(f"loading notification handler of type {self.type}")

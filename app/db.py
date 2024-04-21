@@ -8,10 +8,10 @@ from app.models import (
     EntryContent,
     Feed,
     FeedEntry,
-    GlobalSettings,
     NotificationHandler,
-    SummarizationHandler,
+    SummarizationHandler
 )
+from app.settings import GlobalSettings
 from app.notification.engine import NotificationEngine
 from app.summarization.engine import SummarizationEngine
 from app.reading import ReadingMethodsMixIn
@@ -47,6 +47,10 @@ class StorageHandler(ABC, ReadingMethodsMixIn):
     
     @abstractmethod
     def clear_active_feeds(self) -> None:
+        pass
+
+    @abstractmethod
+    def upsert_feed(self, feed: Feed) -> None:
         pass
     
     @abstractmethod

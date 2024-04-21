@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html data-theme="{{settings.theme.value}}">
+
+<head>
+  {% if update_exception or update_status %}
+  <link href="./../../static/output.css" rel="stylesheet">
+  {% else %}
+  <link href="./../../static/output.css" rel="stylesheet">
+  {% endif %}
+  <title>Feeds - Precis</title>
+</head>
+
+<body class="w-screen lg:w-3/5 mx-auto">
+  <section class="mx-auto justify-center w-screen lg:w-full mb-10">
+    <div class="navbar bg-accent h-28 lg:h-20">
+      <div class="navbar-start">
+        <h1 class="text-5xl lg:text-3xl text-neutral">
+          Settings
+        </h1>
+      </div>
+      <div class="navbar-end">
+        <div class="dropdown dropdown-bottom dropdown-end">
+          <div tabindex="0" role="button" class="btn btn-accent h-16 w-16 justify-end">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
+            </svg>
+          </div>
+          <ul tabindex="0"
+            class="menu menu-lg dropdown-content mt-12 z-[1] p-2 shadow bg-neutral rounded-box w-screen lg:w-96 outline">
+            <li>
+              <a href="{{ url_for('root') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
+                Return to All Feeds
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('settings') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
+              Settings
+              </a>
+          </li>
+          </ul>
+        </div>
+      </div>
+  </section>
+  <div>
+    <h2 class="text-4xl lg:text-2xl my-5 justify-center flex">
+      Feeds
+    </h2>
+  </div>
+  <div>
+    <a href="{{ url_for('new_feed') }}" role="button"
+    class="btn btn-outline w-1/2 lg:w-2/5 mx-auto flex justify-center my-5 text-3xl lg:text-xl">
+    Add New Feed
+  </a>
+  </div>
+  <div class="justify-center grid-flow-row grid-cols-1 xl:grid-cols-2 grid gap-10">
+    {% for feed in feeds%}
+    <div class="card card-normal md:card-compact w-11/12 md:w-4/5 shadow-xl bg-neutral mx-auto outline">
+
+      <a class="no-underline" href="{{ url_for('feed_settings', id=feed.id)}}">
+        <div class="card-body">
+          <h1 class="card-title text-4xl lg:text-2xl">
+            {{ feed.name }}
+          </h1>
+          <div class="card-actions text-xl">
+            <div class="badge badge-secondary rounded">
+              {{ feed.category }}
+            </div>
+            <div class="badge badge-secondary rounded">
+              preview only: {{ feed.preview_only}}
+            </div>
+            <div class="badge badge-secondary rounded">
+              notify: {{ feed.notify }}
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</body>
+
+</html>

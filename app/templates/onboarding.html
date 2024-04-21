@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html data-theme="{{settings.theme.value}}">
+
+<head>
+    <link href="./../static/output.css" rel="stylesheet">
+    <title>Welcome - Precis</title>
+</head>
+
+<body class="w-screen xl:w-3/5 mx-auto max-w-none">
+    <section class="mx-auto justify-center w-screen lg:w-full mb-10">
+        <div class="navbar bg-accent h-28 lg:h-20">
+            <div class="navbar-start">
+                <h1 class="text-5xl lg:text-3xl text-neutral">
+                    Onboarding
+                </h1>
+            </div>
+    </section>
+    <section class="text-2xl lg:text-xl mx-auto w-full md:w-4/5">
+        <h2 class="my-5 text-4xl lg:text-2xl">
+            Welcome to Precis!
+        </h2>
+        <p class="my-5">
+            Precis (properly Précis, pronounced "pray-see") is a extensibility-oriented RSS reader
+            that can use LLMs to summarize and synthesize information from numerous different sources, 
+            with an emphasis on timely delivery of information via notifications.
+        </p>
+        <p class="my-5">
+            In order to use Precis, you'll have to configure it correctly. 
+        </p>
+        <p class="my-5"> 
+            Most functions in Precis are managed by handlers - namely, summarization, content retrieval, 
+            and notification. Press the button below to go to the Settings page to configure handlers. 
+            This step is optional - content retrieval is handled by Playwright out of the box, and we
+            provide default no-op handlers for summarization and notification. However - of course, 
+            you will get more out of Precis if you configure handlers for these features.
+        </p>
+        <a href="{{ url_for('settings') }}" role="button"
+          class="btn btn-outline w-1/2 lg:w-2/5 mx-auto flex justify-center my-10 text-2xl lg:text-lg">
+          Go to Settings
+        </a>
+        <p class="my-5">
+            Once you're finished configuring handlers, you'll need to configure at least one feed to start
+            using Precis. Click the button below to configure a feed.
+        </p>
+        <p class="my-5">
+            Happy reading!
+        </p>
+        <a href="{{ url_for('new_feed').include_query_params(onboarding_flow=True) }}" role="button"
+          class="btn btn-outline w-1/3 lg:w-2/5 mx-auto flex justify-center my-10 text-2xl lg:text-lg">
+          Add a Feed
+        </a>
+    </section>
+</body>
+
+</html>

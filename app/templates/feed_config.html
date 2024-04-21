@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html data-theme="{{settings.theme.value}}">
+
+<head>
+  {% if update_exception or update_status %}
+  <link href="./../../static/output.css" rel="stylesheet">
+  {% else %}
+  <link href="./../../static/output.css" rel="stylesheet">
+  {% endif %}
+  <title>Feed Config - Precis</title>
+</head>
+
+<body class="w-screen lg:w-3/5 mx-auto">
+  <section class="mx-auto justify-center w-screen lg:w-full mb-10">
+    <div class="navbar bg-accent h-28 lg:h-20">
+      <div class="navbar-start">
+        <h1 class="text-5xl lg:text-3xl text-neutral">
+          Feed Configuration
+        </h1>
+      </div>
+      <div class="navbar-end">
+        <div class="dropdown dropdown-bottom dropdown-end">
+          <div tabindex="0" role="button" class="btn btn-accent h-16 w-16 justify-end">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
+            </svg>
+          </div>
+          <ul tabindex="0"
+            class="menu menu-lg dropdown-content mt-12 z-[1] p-2 shadow bg-neutral rounded-box w-screen lg:w-96 outline">
+            <li>
+              <a href="{{ url_for('feeds') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
+                Edit Feed Settings
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('root') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
+                Return to All Feeds
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+  </section>
+  <div>
+    <h2 class="text-4xl lg:text-2xl my-5 justify-center flex">
+      Feed Settings {% if feed.name %} - {{ feed.name }} {% endif %}
+    </h2>
+  </div>
+  <section class="h-screen">
+    <form method="post" action="/api/update_feed/">
+      <div class="form-control w-2/3 mx-auto">
+        <label class="label cursor-pointer gap-2">
+          <span class="label-text text-2xl lg:text-xl">Name</span>
+          <input name="name" type="text" class="input input-bordered w-2/3" value="{{feed.name}}" />
+        </label>
+        <label class="label cursor-pointer gap-2">
+          <span class="label-text text-2xl lg:text-xl">URL</span>
+          <input name="url" type="text" class="input input-bordered w-2/3" {% if feed.url %} value="{{feed.url}}" {%
+            endif %} />
+        </label>
+        <label class="label cursor-pointer gap-2">
+          <span class="label-text text-2xl lg:text-xl">Category</span>
+          <input name="category" type="text" class="input input-bordered w-2/3" {% if feed.url %}
+            value="{{feed.category}}" {% endif %} />
+        </label>
+        <label class="label cursor-pointer gap-2">
+          <span class="label-text text-2xl lg:text-xl">Notification Destination</span>
+          <input name="notify_destination" type="text" class="input input-bordered w-2/3" {% if feed.notify_destination
+            %} value="{{feed.notify_destination}}" {% endif %} placeholder="Leave blank for default destination" />
+        </label>
+        <label class="label cursor-pointer gap-2">
+          <span class="label-text text-2xl lg:text-xl">Send Notifications</span>
+          <input name="notify" type="checkbox" class="toggle" {% if feed.notify %} checked {% endif %} />
+        </label>
+        <label class="label cursor-pointer gap-2">
+          <span class="label-text text-2xl lg:text-xl">Preview Only (No Summary)</span>
+          <input name="preview_only" type="checkbox" class="toggle" {% if feed.preview_only %} checked {% endif %} />
+        </label>
+        <input type="hidden" name="onboarding_flow" value="{{ onboarding_flow }}">
+      </div>
+      <div>
+        <button type="submit"
+          class="btn btn-outline w-1/2 lg:w-2/5 mx-auto flex justify-center my-5 text-3xl lg:text-xl">
+          Update Configuration
+          {% if update_status %} &#9989 {% endif %}
+          {% if update_exception %} &#10060 {% endif %}
+        </button>
+        {% if update_exception %}
+        <div role="alert" class="alert alert-error">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>{{ update_exception }}</span>
+        </div>
+        {% endif %}
+        {% if update_status %}
+        <a href="{{ url_for('list_entries_by_feed', feed_id=feed.id) }}" role="button"
+          class="btn btn-outline w-1/2 lg:w-2/5 mx-auto flex justify-center my-5 text-3xl lg:text-xl">
+          Go to Feed
+        </a>
+        {% endif %}
+      </div>
+    </form>
+</body>
+
+</html>

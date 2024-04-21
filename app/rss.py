@@ -9,7 +9,7 @@ from ruamel.yaml import YAML
 from app.constants import CONFIG_DIR
 from app.storage.engine import storage_handler as db
 from app.models import Feed, FeedEntry
-from app.notification.engine import notification_handler
+from app.settings import GlobalSettings
 
 logger = getLogger("uvicorn.error")
 
@@ -19,14 +19,13 @@ def load_feeds() -> None:
         yaml = YAML(typ="safe")
         configs = yaml.load(fp)
 
-    db.clear_active_feeds()
     for config in configs:
         feed = Feed(**config)
         logger.info(f"Found feed id {feed.id} with contents {feed.dict()}")
 
-        db.insert_feed(feed)
+        db.upsert_feed(feed)
 
-async def _process_feed_entry(entry: Mapping, feed: Feed, start_ts: int):
+async def _process_feed_entry(entry: Mapping, feed: Feed, start_ts: int) -> True:
     published_time = timegm(entry.published_parsed)
     feed_entry = FeedEntry(
         **{
@@ -46,6 +45,7 @@ async def _process_feed_entry(entry: Mapping, feed: Feed, start_ts: int):
         start_ts if start_ts else 0
     ) and not db.feed_entry_exists(feed_entry.id):
         await add_feed_entry(feed=feed, entry=feed_entry)
+        return True
 
 async def _check_feed(feed: Feed):
     now = int(datetime.now(tz=timezone.utc).timestamp())
@@ -66,8 +66,9 @@ async def _check_feed(feed: Feed):
     counter = 0
     start_ts = db.get_feed_start_ts(feed=feed)
     for entry in entries:
-        await _process_feed_entry(entry=entry, feed=feed, start_ts=start_ts)
-        counter += 1
+        processed = await _process_feed_entry(entry=entry, feed=feed, start_ts=start_ts)
+        if processed:
+            counter += 1
 
     db.update_poll_state(feed=feed, now=now)
 
@@ -88,14 +89,14 @@ async def add_feed_entry(feed: Feed, entry: FeedEntry) -> None:
 
     db.upsert_feed_entry(feed=feed, entry=entry)
 
-    settings = db.get_settings()
+    settings: GlobalSettings = db.get_settings()
 
     if not feed.preview_only:
         await db.get_entry_content(entry=entry)
 
     if feed.notify:
         if settings.send_notification:
-            await notification_handler.send_notification(feed=feed, entry=entry)
+            await settings.notification_handler.send_notification(feed=feed, entry=entry)
         else:
             logger.info(
                 f"skipping notification for {entry.id} because of global setting"

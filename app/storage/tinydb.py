@@ -12,9 +12,9 @@ from app.models import (
     SummarizationHandler,
     ContentRetrievalHandler,
     NotificationHandler,
-    EntryContent,
-    GlobalSettings,
+    EntryContent
 )
+from app.settings import GlobalSettings
 
 
 class TinyDBStorageHandler(StorageHandler):
@@ -75,6 +75,17 @@ class TinyDBStorageHandler(StorageHandler):
 
         query = Query().id.matches(feed.id)
         table.upsert({"id": feed.id, "last_polled_at": now}, cond=query)
+
+    def upsert_feed(self, feed: Feed):
+        table = self.db.table("feeds")
+
+        row = {
+            "id": feed.id,
+            "feed": feed.dict(),
+        }
+
+        query = Query().id.matches(feed.id)
+        table.upsert(row, cond=query)
 
     def upsert_feed_entry(self, feed: Feed, entry: FeedEntry):
         table = self.db.table("entries")
@@ -137,8 +148,11 @@ class TinyDBStorageHandler(StorageHandler):
             content = self.get_main_content(content=raw_content)
 
             feed = self.get_feed(entry.feed_id)
+            settings = self.get_settings()
 
-            summary = self.summarize(feed=feed, entry=entry, mk=content)
+            summary = self.summarize(
+                feed=feed, entry=entry, mk=content, settings=settings
+            )
 
             entry_content = EntryContent(
                 url=entry.url,

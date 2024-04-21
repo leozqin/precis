@@ -1,10 +1,12 @@
 from logging import getLogger
 from time import localtime, strftime
-from typing import List
+from typing import List, Mapping, Type
 from json import dumps
+from pydantic import BaseModel
 
 from app.storage.engine import storage_handler as db
 from app.models import EntryContent, Feed, FeedEntry
+from app.settings import GlobalSettings
 
 logger = getLogger("uvicorn.error")
 
@@ -13,17 +15,18 @@ def _format_time(time: int) -> str:
     return strftime("%Y-%m-%d %I:%M %p", localtime(time)).lower()
 
 
-def list_feeds():
+def list_feeds(agg=False):
     feeds = db.get_feeds()
     entries: List[FeedEntry] = [i["entry"] for i in db.get_entries()]
 
-    entry_agg = {}
+    if agg:
+        entry_agg = {}
 
-    for entry in entries:
-        if entry.feed_id in entry_agg:
-            entry_agg[entry.feed_id] += 1
-        else:
-            entry_agg[entry.feed_id] = 1
+        for entry in entries:
+            if entry.feed_id in entry_agg:
+                entry_agg[entry.feed_id] += 1
+            else:
+                entry_agg[entry.feed_id] = 1
 
     return [
         {
@@ -32,7 +35,9 @@ def list_feeds():
             "category": feed.category,
             "type": feed.type,
             "url": feed.url,
-            "entry_count": entry_agg.get(feed.id, 0),
+            "preview_only": feed.preview_only,
+            "notify": feed.notify,
+            "entry_count": entry_agg.get(feed.id, 0) if agg else False,
         }
         for feed in feeds
     ]
@@ -112,10 +117,26 @@ def get_handler_config(handler: str):
 
     except IndexError:
         return {"type": handler, "config": None}
+    
+
+def get_handler_schema(handler: str):
+
+    handler_obj: Type[BaseModel] = db.handler_map.get(handler)
+
+    return dumps(handler_obj.schema(),indent=4)
 
 
-def get_settings():
+async def get_settings():
 
-    settings = db.get_settings()
+    settings: GlobalSettings = db.get_settings()
 
     return settings.dict()
+
+
+async def get_feed_config(id: str) -> Mapping:
+
+    feed: Feed = db.get_feed(id=id)
+
+    logger.info(feed.dict())
+
+    return {"id": feed.id, **feed.dict()}
