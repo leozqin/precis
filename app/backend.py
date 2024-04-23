@@ -1,12 +1,13 @@
+from json import dumps, loads
 from logging import getLogger
 from time import localtime, strftime
 from typing import List, Mapping, Type
-from json import dumps
+
 from pydantic import BaseModel
 
-from app.storage.engine import storage_handler as db
 from app.models import EntryContent, Feed, FeedEntry
 from app.settings import GlobalSettings
+from app.storage.engine import storage_handler as db
 
 logger = getLogger("uvicorn.error")
 
@@ -117,13 +118,13 @@ def get_handler_config(handler: str):
 
     except IndexError:
         return {"type": handler, "config": None}
-    
+
 
 def get_handler_schema(handler: str):
 
     handler_obj: Type[BaseModel] = db.handler_map.get(handler)
 
-    return dumps(handler_obj.schema(),indent=4)
+    return dumps(handler_obj.schema(), indent=4)
 
 
 async def get_settings():
@@ -140,3 +141,26 @@ async def get_feed_config(id: str) -> Mapping:
     logger.info(feed.dict())
 
     return {"id": feed.id, **feed.dict()}
+
+
+async def update_feed(feed: Feed, onboarding_flow: True):
+
+    db.upsert_feed(feed=feed)
+
+    if onboarding_flow:
+        settings = db.get_settings()
+        settings.finished_onboarding = True
+
+        db.upsert_settings(settings=settings)
+
+
+async def update_settings(settings: GlobalSettings):
+
+    db.upsert_settings(settings=settings)
+
+
+async def update_handler(handler: str, config: str):
+
+    config_dict = loads(config)
+    handler_obj = db.reconfigure_handler(id=handler, config=config_dict)
+    db.upsert_handler(handler=handler_obj)

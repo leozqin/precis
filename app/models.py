@@ -1,14 +1,12 @@
 from abc import ABC, abstractmethod
+from enum import Enum
 from hashlib import md5
 from json import dumps
-from typing import Type, ClassVar
-from enum import Enum
 from os import environ
+from typing import ClassVar, Type
 
 from feedparser import FeedParserDict, parse
 from pydantic import BaseModel
-
-from app.storage.engine import storage_handler as db
 
 # Entity Models
 
@@ -119,6 +117,7 @@ class Themes(str, Enum):
     forest = "forest"
     dark = "dark"
     night = "night"
+
 
 class GlobalSettingsSchema(BaseModel):
 

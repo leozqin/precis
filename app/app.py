@@ -11,16 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi_utils.tasks import repeat_every
 
-from app.storage.engine import storage_handler as db
-from app.handlers import load_handlers
-from app.models import Themes, Feed
-from app.settings import GlobalSettings
-from app.notification.engine import notification_handler
-from app.content.engine import ContentRetrievalEngine
-from app.notification.engine import NotificationEngine
-from app.summarization.engine import SummarizationEngine
-from app.rss import check_feeds, load_feeds
-from app.ui import (
+from app.backend import (
     get_entry_content,
     get_feed_config,
     get_handler_config,
@@ -30,6 +21,16 @@ from app.ui import (
     list_entries,
     list_feeds,
 )
+from app.backend import update_feed as bk_update_feed
+from app.backend import update_handler as bk_update_handler
+from app.backend import update_settings as bk_update_settings
+from app.content.engine import ContentRetrievalEngine
+from app.handlers import load_handlers
+from app.models import Feed, Themes
+from app.notification.engine import NotificationEngine, notification_handler
+from app.rss import check_feeds, load_feeds
+from app.settings import GlobalSettings
+from app.summarization.engine import SummarizationEngine
 
 logger = getLogger("uvicorn.error")
 base_path = Path(__file__).parent
@@ -184,10 +185,7 @@ async def update_handler(
 ):
 
     try:
-
-        config_dict = loads(config)
-        handler_obj = db.reconfigure_handler(id=handler, config=config_dict)
-        db.upsert_handler(handler=handler_obj)
+        await bk_update_handler(handler=handler, config=config)
 
         return templates.TemplateResponse(
             "handler_config.html",
@@ -225,7 +223,8 @@ async def update_settings(
             refresh_interval=refresh_interval,
         )
 
-        db.upsert_settings(settings=settings)
+        await bk_update_settings(settings=settings)
+
         return templates.TemplateResponse(
             "settings.html",
             {
@@ -270,15 +269,8 @@ async def update_feed(
             notify_destination=notify_destination,
             preview_only=preview_only,
         )
-        logger.info(feed)
-        logger.info(feed.id)
-        db.upsert_feed(feed=feed)
 
-        if onboarding_flow:
-            settings = db.get_settings()
-            settings.finished_onboarding = True
-
-            db.upsert_settings(settings=settings)
+        await bk_update_feed(feed=feed, onboarding_flow=onboarding_flow)
 
         return RedirectResponse(
             request.url_for("feed_settings", id=feed.id).include_query_params(
