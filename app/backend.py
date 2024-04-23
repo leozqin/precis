@@ -5,162 +5,175 @@ from typing import List, Mapping, Type
 
 from pydantic import BaseModel
 
+from app.context import GlobalSettings, StorageHandler
 from app.models import EntryContent, Feed, FeedEntry
-from app.settings import GlobalSettings
-from app.storage.engine import storage_handler as db
 
 logger = getLogger("uvicorn.error")
 
 
-def _format_time(time: int) -> str:
-    return strftime("%Y-%m-%d %I:%M %p", localtime(time)).lower()
+class PrecisBackend:
+    def __init__(self, db: Type[StorageHandler]):
+        self.db = db
 
+    @staticmethod
+    def _format_time(time: int) -> str:
+        return strftime("%Y-%m-%d %I:%M %p", localtime(time)).lower()
 
-def list_feeds(agg=False):
-    feeds = db.get_feeds()
-    entries: List[FeedEntry] = [i["entry"] for i in db.get_entries()]
+    def list_feeds(self, agg=False):
+        feeds = self.db.get_feeds()
+        entries: List[FeedEntry] = [i["entry"] for i in self.db.get_entries()]
 
-    if agg:
-        entry_agg = {}
+        if agg:
+            entry_agg = {}
+
+            for entry in entries:
+                if entry.feed_id in entry_agg:
+                    entry_agg[entry.feed_id] += 1
+                else:
+                    entry_agg[entry.feed_id] = 1
+
+        return [
+            {
+                "id": feed.id,
+                "name": feed.name,
+                "category": feed.category,
+                "type": feed.type,
+                "url": feed.url,
+                "preview_only": feed.preview_only,
+                "notify": feed.notify,
+                "entry_count": entry_agg.get(feed.id, 0) if agg else False,
+            }
+            for feed in feeds
+        ]
+
+    def list_entries(self, feed_id: None):
+
+        if feed_id:
+            feed = self.db.get_feed(id=feed_id)
+        else:
+            feed = None
+
+        entries = self.db.get_entries(feed)
 
         for entry in entries:
-            if entry.feed_id in entry_agg:
-                entry_agg[entry.feed_id] += 1
-            else:
-                entry_agg[entry.feed_id] = 1
+            feed_entry: FeedEntry = entry["entry"]
 
-    return [
-        {
-            "id": feed.id,
-            "name": feed.name,
-            "category": feed.category,
-            "type": feed.type,
-            "url": feed.url,
-            "preview_only": feed.preview_only,
-            "notify": feed.notify,
-            "entry_count": entry_agg.get(feed.id, 0) if agg else False,
-        }
-        for feed in feeds
-    ]
+            yield {
+                "feed_name": feed.name if feed else "All",
+                "title": feed_entry.title,
+                "url": feed_entry.url,
+                "published_at": self._format_time(feed_entry.published_at),
+                "updated_at": self._format_time(feed_entry.updated_at),
+                "sort_time": feed_entry.published_at,
+                "preview": feed_entry.preview,
+                "id": entry["id"],
+                "feed_id": entry["feed_id"],
+            }
 
+    async def get_entry_content(self, feed_entry_id, redrive: bool = False):
+        entry: FeedEntry = self.db.get_feed_entry(id=feed_entry_id)
+        feed: Feed = self.db.get_feed(entry.feed_id)
 
-def list_entries(feed_id: None):
-
-    if feed_id:
-        feed = db.get_feed(id=feed_id)
-    else:
-        feed = None
-
-    entries = db.get_entries(feed)
-
-    for entry in entries:
-        feed_entry: FeedEntry = entry["entry"]
-
-        yield {
-            "feed_name": feed.name if feed else "All",
-            "title": feed_entry.title,
-            "url": feed_entry.url,
-            "published_at": _format_time(feed_entry.published_at),
-            "updated_at": _format_time(feed_entry.updated_at),
-            "sort_time": feed_entry.published_at,
-            "preview": feed_entry.preview,
-            "id": entry["id"],
-            "feed_id": entry["feed_id"],
+        base = {
+            "id": feed_entry_id,
+            "feed_id": entry.feed_id,
+            "feed_name": feed.name,
+            "title": entry.title,
+            "url": entry.url,
+            "published_at": self._format_time(entry.published_at),
+            "updated_at": self._format_time(entry.updated_at),
+            "byline": ", ".join(entry.authors) if entry.authors else None,
         }
 
+        if feed.preview_only:
+            return {**base, "preview": entry.preview, "content": None, "summary": None}
+        else:
+            content: EntryContent = await self.db.get_entry_content(
+                entry=entry, redrive=redrive
+            )
+            return {
+                **base,
+                "preview": None,
+                "content": content.content,
+                "summary": content.summary,
+            }
 
-async def get_entry_content(feed_entry_id, redrive: bool = False):
-    entry: FeedEntry = db.get_feed_entry(id=feed_entry_id)
-    feed: Feed = db.get_feed(entry.feed_id)
+    def get_handlers(self):
 
-    base = {
-        "id": feed_entry_id,
-        "feed_id": entry.feed_id,
-        "feed_name": feed.name,
-        "title": entry.title,
-        "url": entry.url,
-        "published_at": _format_time(entry.published_at),
-        "updated_at": _format_time(entry.updated_at),
-        "byline": ", ".join(entry.authors) if entry.authors else None,
-    }
+        handlers = self.db.get_handlers()
 
-    if feed.preview_only:
-        return {**base, "preview": entry.preview, "content": None, "summary": None}
-    else:
-        content: EntryContent = await db.get_entry_content(entry=entry, redrive=redrive)
-        return {
-            **base,
-            "preview": None,
-            "content": content.content,
-            "summary": content.summary,
-        }
+        return [
+            {
+                "type": k,
+                "handler_type": self.db.handler_type_map[k],
+                "config": v.dict() if v else None,
+            }
+            for k, v in handlers.items()
+        ]
 
+    def get_handler_config(self, handler: str):
 
-def get_handlers():
+        try:
+            handler = self.db.get_handler(id=handler)
+            return {"type": handler.id, "config": dumps(handler.dict(), indent=4)}
 
-    handlers = db.get_handlers()
+        except IndexError:
+            return {"type": handler, "config": None}
 
-    return [
-        {
-            "type": k,
-            "handler_type": db.handler_type_map[k],
-            "config": v.dict() if v else None,
-        }
-        for k, v in handlers.items()
-    ]
+    def get_handler_schema(self, handler: str):
 
+        handler_obj: Type[BaseModel] = self.db.handler_map.get(handler)
 
-def get_handler_config(handler: str):
+        return dumps(handler_obj.schema(), indent=4)
 
-    try:
-        handler = db.get_handler(id=handler)
-        return {"type": handler.id, "config": dumps(handler.dict(), indent=4)}
+    async def get_settings(self):
 
-    except IndexError:
-        return {"type": handler, "config": None}
+        settings: GlobalSettings = self.db.get_settings()
 
+        return settings.dict()
 
-def get_handler_schema(handler: str):
+    async def get_feed_config(self, id: str) -> Mapping:
 
-    handler_obj: Type[BaseModel] = db.handler_map.get(handler)
+        feed: Feed = self.db.get_feed(id=id)
 
-    return dumps(handler_obj.schema(), indent=4)
+        logger.info(feed.dict())
 
+        return {"id": feed.id, **feed.dict()}
 
-async def get_settings():
+    async def update_feed(self, feed: Feed, onboarding_flow: True):
 
-    settings: GlobalSettings = db.get_settings()
+        self.db.upsert_feed(feed=feed)
 
-    return settings.dict()
+        if onboarding_flow:
+            settings = self.db.get_settings()
+            settings.finished_onboarding = True
 
+            self.db.upsert_settings(settings=settings)
 
-async def get_feed_config(id: str) -> Mapping:
+    async def update_settings(self, settings: GlobalSettings):
 
-    feed: Feed = db.get_feed(id=id)
+        self.db.upsert_settings(settings=settings)
 
-    logger.info(feed.dict())
+    async def update_handler(self, handler: str, config: str):
 
-    return {"id": feed.id, **feed.dict()}
+        config_dict = loads(config)
+        handler_obj = self.db.reconfigure_handler(id=handler, config=config_dict)
+        self.db.upsert_handler(handler=handler_obj)
 
+    @staticmethod
+    async def list_content_handler_choices():
+        from app.content import content_retrieval_handlers
 
-async def update_feed(feed: Feed, onboarding_flow: True):
+        return list(content_retrieval_handlers.keys())
 
-    db.upsert_feed(feed=feed)
+    @staticmethod
+    async def list_summarization_handler_choices():
+        from app.summarization import summarization_handlers
 
-    if onboarding_flow:
-        settings = db.get_settings()
-        settings.finished_onboarding = True
+        return list(summarization_handlers.keys())
 
-        db.upsert_settings(settings=settings)
+    @staticmethod
+    async def list_notification_handler_choices():
+        from app.notification import notification_handlers
 
-
-async def update_settings(settings: GlobalSettings):
-
-    db.upsert_settings(settings=settings)
-
-
-async def update_handler(handler: str, config: str):
-
-    config_dict = loads(config)
-    handler_obj = db.reconfigure_handler(id=handler, config=config_dict)
-    db.upsert_handler(handler=handler_obj)
+        return list(notification_handlers.keys())

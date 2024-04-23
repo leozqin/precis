@@ -1,11 +1,12 @@
 from logging import getLogger
 from os import environ
-from typing import Mapping, ClassVar
-from pydantic import PrivateAttr, BaseModel
+from typing import ClassVar, Mapping
 
+from pydantic import BaseModel, PrivateAttr
 from simplematrixbotlib import Bot, Creds
 
-from app.models import Feed, FeedEntry, NotificationHandler
+from app.handlers import NotificationHandler
+from app.models import Feed, FeedEntry
 
 logger = getLogger("uvicorn.error")
 

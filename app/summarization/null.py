@@ -1,7 +1,8 @@
-from pydantic import BaseModel
 from typing import ClassVar
 
-from app.models import SummarizationHandler, Feed, FeedEntry
+from pydantic import BaseModel
+
+from app.handlers import Feed, FeedEntry, SummarizationHandler
 
 
 class NullSummarizationHandler(SummarizationHandler, BaseModel):

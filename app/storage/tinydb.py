@@ -1,20 +1,19 @@
+from logging import getLogger
 from pathlib import Path
-from typing import Mapping, Optional, List, Type
+from typing import List, Mapping, Optional, Type
 
-from tinydb import TinyDB, Query
+from tinydb import Query, TinyDB
 
-
-from app.db import StorageHandler
 from app.constants import DATA_DIR
-from app.models import (
-    Feed,
-    FeedEntry,
-    SummarizationHandler,
+from app.context import GlobalSettings, StorageHandler
+from app.handlers import (
     ContentRetrievalHandler,
     NotificationHandler,
-    EntryContent
+    SummarizationHandler,
 )
-from app.settings import GlobalSettings
+from app.models import EntryContent, Feed, FeedEntry
+
+logger = getLogger("uvicorn.error")
 
 
 class TinyDBStorageHandler(StorageHandler):
@@ -186,9 +185,7 @@ class TinyDBStorageHandler(StorageHandler):
 
     def _make_handler_obj(self, id: str, config: Mapping):
 
-        return self.engine_map[self.handler_type_map[id]](
-            type=id, config=config
-        ).get_handler()
+        return self.handler_map[id](**config)
 
     def get_handlers(
         self,
@@ -222,12 +219,13 @@ class TinyDBStorageHandler(StorageHandler):
 
     def get_settings(self) -> GlobalSettings:
         table = self.db.table("settings")
+        GlobalSettings.update_forward_refs()
 
         try:
             settings = table.all()[0]
-            return GlobalSettings(**settings["settings"])
+            return GlobalSettings(db=self, **settings["settings"])
         except IndexError:
-            return GlobalSettings()
+            return GlobalSettings(db=self)
 
     def upsert_settings(self, settings: GlobalSettings) -> None:
         table = self.db.table("settings")

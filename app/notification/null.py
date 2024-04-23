@@ -1,7 +1,9 @@
-from pydantic import BaseModel
 from typing import ClassVar
 
-from app.models import NotificationHandler, Feed, FeedEntry
+from pydantic import BaseModel
+
+from app.handlers import NotificationHandler
+from app.models import Feed, FeedEntry
 
 
 class NullNotificationHandler(NotificationHandler, BaseModel):

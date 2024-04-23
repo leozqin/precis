@@ -1,5 +1,4 @@
 from contextlib import asynccontextmanager
-from json import loads
 from logging import getLogger
 from pathlib import Path
 from typing import Annotated
@@ -11,50 +10,34 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi_utils.tasks import repeat_every
 
-from app.backend import (
-    get_entry_content,
-    get_feed_config,
-    get_handler_config,
-    get_handler_schema,
-    get_handlers,
-    get_settings,
-    list_entries,
-    list_feeds,
-)
-from app.backend import update_feed as bk_update_feed
-from app.backend import update_handler as bk_update_handler
-from app.backend import update_settings as bk_update_settings
-from app.content.engine import ContentRetrievalEngine
-from app.handlers import load_handlers
-from app.models import Feed, Themes
-from app.notification.engine import NotificationEngine, notification_handler
-from app.rss import check_feeds, load_feeds
-from app.settings import GlobalSettings
-from app.summarization.engine import SummarizationEngine
+from app.backend import PrecisBackend
+from app.context import GlobalSettings, Themes
+from app.models import Feed
+from app.rss import PrecisRSS
+from app.storage.engine import load_storage_config
 
 logger = getLogger("uvicorn.error")
 base_path = Path(__file__).parent
 
 templates = Jinja2Templates(directory=Path(base_path, "templates").resolve())
 
+storage_handler = load_storage_config()
+
+bk = PrecisBackend(db=storage_handler)
+rss = PrecisRSS(db=storage_handler)
+
 
 @repeat_every(seconds=60 * 5, logger=logger)
 async def poll_feeds():
     logger.info("Checking feeds for updates")
-    await check_feeds()
+    await rss.check_feeds()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    load_feeds()
-    load_handlers()
-
-    await notification_handler.login()
     await poll_feeds()
 
     yield
-
-    await notification_handler.logout()
 
 
 app = FastAPI(lifespan=lifespan, title="Precis", openapi_url="/openapi.json")
@@ -75,7 +58,7 @@ async def favicon():
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
 
-    settings = await get_settings()
+    settings = await bk.get_settings()
 
     if settings.get("finished_onboarding"):
 
@@ -83,8 +66,8 @@ async def root(request: Request):
             "index.html",
             {
                 "request": request,
-                "settings": await get_settings(),
-                "feeds": list_feeds(agg=True),
+                "settings": await bk.get_settings(),
+                "feeds": bk.list_feeds(agg=True),
             },
         )
 
@@ -100,7 +83,7 @@ async def onboarding(request: Request):
         "onboarding.html",
         {
             "request": request,
-            "settings": await get_settings(),
+            "settings": await bk.get_settings(),
         },
     )
 
@@ -112,9 +95,9 @@ async def list_entries_by_feed(feed_id: str, request: Request):
         "entries.html",
         {
             "request": request,
-            "settings": await get_settings(),
-            "entries": list(list_entries(feed_id=feed_id)),
-            "feed": await get_feed_config(id=feed_id),
+            "settings": await bk.get_settings(),
+            "entries": list(bk.list_entries(feed_id=feed_id)),
+            "feed": await bk.get_feed_config(id=feed_id),
         },
     )
 
@@ -126,8 +109,8 @@ async def list_all_entries(request: Request):
         "entries.html",
         {
             "request": request,
-            "settings": await get_settings(),
-            "entries": list(list_entries(feed_id=None)),
+            "settings": await bk.get_settings(),
+            "entries": list(bk.list_entries(feed_id=None)),
             "feed": {},
         },
     )
@@ -140,10 +123,10 @@ async def read(request: Request, feed_entry_id: str, redrive: bool = False):
         "read.html",
         {
             "request": request,
-            "content": await get_entry_content(
+            "content": await bk.get_entry_content(
                 feed_entry_id=feed_entry_id, redrive=redrive
             ),
-            "settings": await get_settings(),
+            "settings": await bk.get_settings(),
         },
     )
 
@@ -156,11 +139,11 @@ async def settings(request: Request):
         {
             "request": request,
             "themes": Themes._member_names_,
-            "content_handler_choices": list(ContentRetrievalEngine.handlers.keys()),
-            "summarization_handler_choices": list(SummarizationEngine.handlers.keys()),
-            "notification_handler_choices": list(NotificationEngine.handlers.keys()),
-            "settings": await get_settings(),
-            "notification": get_handlers(),
+            "content_handler_choices": await bk.list_content_handler_choices(),
+            "summarization_handler_choices": await bk.list_summarization_handler_choices(),
+            "notification_handler_choices": await bk.list_notification_handler_choices(),
+            "settings": await bk.get_settings(),
+            "notification": bk.get_handlers(),
         },
     )
 
@@ -172,9 +155,9 @@ async def handler_settings(request: Request, handler: str):
         "handler_config.html",
         {
             "request": request,
-            "handler": get_handler_config(handler=handler),
-            "schema": get_handler_schema(handler=handler),
-            "settings": await get_settings(),
+            "handler": bk.get_handler_config(handler=handler),
+            "schema": bk.get_handler_schema(handler=handler),
+            "settings": await bk.get_settings(),
         },
     )
 
@@ -185,15 +168,15 @@ async def update_handler(
 ):
 
     try:
-        await bk_update_handler(handler=handler, config=config)
+        await bk.update_handler(handler=handler, config=config)
 
         return templates.TemplateResponse(
             "handler_config.html",
             {
                 "request": request,
-                "handler": get_handler_config(handler=handler),
+                "handler": bk.get_handler_config(handler=handler),
                 "update_status": True,
-                "settings": get_settings(),
+                "settings": bk.get_settings(),
             },
         )
     except Exception as e:
@@ -202,9 +185,9 @@ async def update_handler(
             "handler_config.html",
             {
                 "request": request,
-                "handler": get_handler_config(handler=handler),
+                "handler": bk.get_handler_config(handler=handler),
                 "update_exception": e,
-                "settings": await get_settings(),
+                "settings": await bk.get_settings(),
             },
         )
 
@@ -215,23 +198,29 @@ async def update_settings(
     refresh_interval: Annotated[int, Form()],
     request: Request,
     send_notification: Annotated[bool, Form()] = False,
+    notification: Annotated[str, Form()] = None,
+    content: Annotated[str, Form()] = None,
+    summarization: Annotated[str, Form()] = None,
 ):
     try:
         settings = GlobalSettings(
             send_notification=send_notification,
             theme=theme,
             refresh_interval=refresh_interval,
+            notification_handler_key=notification,
+            summarization_handler_key=summarization,
+            content_retrieval_handler_key=content,
         )
 
-        await bk_update_settings(settings=settings)
+        await bk.update_settings(settings=settings)
 
         return templates.TemplateResponse(
             "settings.html",
             {
                 "request": request,
                 "themes": Themes._member_names_,
-                "settings": await get_settings(),
-                "notification": get_handlers(),
+                "settings": await bk.get_settings(),
+                "notification": bk.get_handlers(),
                 "update_status": True,
             },
         )
@@ -242,8 +231,8 @@ async def update_settings(
             {
                 "request": request,
                 "themes": Themes._member_names_,
-                "settings": await get_settings(),
-                "notification": get_handlers(),
+                "settings": await bk.get_settings(),
+                "notification": bk.get_handlers(),
                 "update_exception": e,
             },
         )
@@ -270,7 +259,7 @@ async def update_feed(
             preview_only=preview_only,
         )
 
-        await bk_update_feed(feed=feed, onboarding_flow=onboarding_flow)
+        await bk.update_feed(feed=feed, onboarding_flow=onboarding_flow)
 
         return RedirectResponse(
             request.url_for("feed_settings", id=feed.id).include_query_params(
@@ -294,8 +283,8 @@ async def feeds(request: Request):
         "feeds.html",
         {
             "request": request,
-            "settings": await get_settings(),
-            "feeds": list_feeds(agg=False),
+            "settings": await bk.get_settings(),
+            "feeds": bk.list_feeds(agg=False),
         },
     )
 
@@ -309,8 +298,8 @@ async def feed_settings(
         "feed_config.html",
         {
             "request": request,
-            "settings": await get_settings(),
-            "feed": await get_feed_config(id=id),
+            "settings": await bk.get_settings(),
+            "feed": await bk.get_feed_config(id=id),
             "update_status": update_status,
             "update_exception": update_exception,
         },
@@ -324,7 +313,7 @@ async def new_feed(request: Request, onboarding_flow: bool = False):
         "feed_config.html",
         {
             "request": request,
-            "settings": await get_settings(),
+            "settings": await bk.get_settings(),
             "feed": {},
             "onboarding_flow": onboarding_flow,
         },
