@@ -1,6 +1,6 @@
 from playwright.async_api import Playwright, Route, async_playwright
 
-from app.models import ContentRetrievalHandler
+from app.handlers import ContentRetrievalHandler
 
 
 class PlaywrightContentRetriever(ContentRetrievalHandler):

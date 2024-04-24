@@ -29,6 +29,11 @@
           <ul tabindex="0"
             class="menu menu-lg dropdown-content mt-12 z-[1] p-2 shadow bg-neutral rounded-box w-screen lg:w-96 outline">
             <li>
+              <a href="{{ url_for('feeds') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
+                Edit Feed Settings
+              </a>
+            </li>
+            <li>
               <a href="{{ url_for('root') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
                 Return to All Feeds
               </a>
@@ -52,20 +57,50 @@
         </label>
         <label class="label flex items-center gap-2 text-2xl lg:text-xl">
           Refresh Interval
-          <input type="number" placeholder="How many minutes?" class="input input-bordered w-full max-w-xs text-2xl lg:text-xl"
-            value="{{ settings.refresh_interval}}" name="refresh_interval">
+          <input type="number" placeholder="How many minutes?"
+            class="input input-bordered w-full max-w-xs text-2xl lg:text-xl" value="{{ settings.refresh_interval}}"
+            name="refresh_interval">
         </label>
         <label class="label flex items-center gap-2 text-2xl lg:text-xl">
-        Theme
-        <select name="theme" class="select select-bordered w-full max-w-xs my-5 text-2xl lg:text-xl">
-          {% for theme in themes %}
-          <option {% if theme==settings.theme %} selected {% endif %} class="text-2xl lg:text-xl">{{ theme }}</option>
-          {% endfor %}
-        </select>
+          Theme
+          <select name="theme" class="select select-bordered w-full max-w-xs my-5 text-2xl lg:text-xl">
+            {% for theme in themes %}
+            <option {% if theme==settings.theme %} selected {% endif %} class="text-2xl lg:text-xl">{{ theme }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="label flex items-center gap-2 text-2xl lg:text-xl">
+          Notification Handler
+          <select name="notification" class="select select-bordered w-full max-w-xs my-5 text-2xl lg:text-xl">
+            {% for choice in notification_handler_choices %}
+            <option {% if choice==settings.notification_handler_key %} selected {% endif %} class="text-2xl lg:text-xl">
+              {{ choice }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="label flex items-center gap-2 text-2xl lg:text-xl">
+          Content Retrieval Handler
+          <select name="content" class="select select-bordered w-full max-w-xs my-5 text-2xl lg:text-xl">
+            {% for choice in content_handler_choices %}
+            <option {% if choice==settings.content_retrieval_handler_key %} selected {% endif %} class="text-2xl lg:text-xl">{{
+              choice }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="label flex items-center gap-2 text-2xl lg:text-xl">
+          Summarization Handler
+          <select name="summarization" class="select select-bordered w-full max-w-xs my-5 text-2xl lg:text-xl">
+            {% for choice in summarization_handler_choices %}
+            <option {% if choice==settings.summarization_handler_key %} selected {% endif %} class="text-2xl lg:text-xl">
+              {{ choice }}
+            </option>
+            {% endfor %}
+          </select>
         </label>
       </div>
       <div>
-        <button type="submit" class="btn btn-outline w-1/2 md:w-1/5 mx-auto flex justify-center my-5 text-3xl lg:text-xl">
+        <button type="submit"
+          class="btn btn-outline w-1/2 md:w-1/5 mx-auto flex justify-center my-5 text-3xl lg:text-xl">
           Update Configuration
           {% if update_status %} &#9989 {% endif %}
           {% if update_exception %} &#10060 {% endif %}

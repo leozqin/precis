@@ -1,9 +1,11 @@
 from logging import getLogger
 from os import environ
 from typing import ClassVar, Mapping
+
 from slack_sdk.web.async_client import AsyncWebClient
 
-from app.models import NotificationHandler, Feed, FeedEntry
+from app.handlers import NotificationHandler
+from app.models import Feed, FeedEntry
 
 logger = getLogger("uvicorn.error")
 

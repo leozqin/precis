@@ -38,6 +38,14 @@
         </div>
       </div>
   </section>
+  <section>
+    <h1 class="text-2xl justify-center flex my-5">
+      Schema
+    </h1>
+    <div class="mockup-code">
+      <pre><code>{{ schema }}</code></pre> 
+    </div>
+  </section>
   <section class="h-screen">
     <h1 class="text-2xl justify-center flex my-5">
       Configuration - {{ handler.type }}
@@ -48,6 +56,7 @@
           class="textarea textarea-bordered textarea-accent p-5 resize-y w-5/6 lg:w-3/4 h-full text-2xl lg:text-base"
           placeholder="Type your JSON config here!"
           required="required"
+          rows="20"
           name="config">{% if handler.config %}{{ handler.config }}{% endif %}</textarea>
       </div>
       <input type="hidden" name="handler" value="{{ handler.type }}">
@@ -65,7 +74,6 @@
         {% endif %}
       </div>
     </form>
-
   </section>
 </body>
 

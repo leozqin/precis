@@ -1,10 +1,11 @@
+from os import environ
 from typing import ClassVar
 
-from app.models import SummarizationHandler, Feed, FeedEntry
-from pydantic import BaseModel
 from openai import OpenAI
+from pydantic import BaseModel
 
-from os import environ
+from app.handlers import SummarizationHandler
+from app.models import Feed, FeedEntry
 
 
 class OpenAISummarizationHandler(SummarizationHandler, BaseModel):
@@ -22,7 +23,7 @@ class OpenAISummarizationHandler(SummarizationHandler, BaseModel):
                 {"role": "user", "content": self.get_prompt(mk=mk)},
             ],
             model=self.model,
-            n=1
+            n=1,
         )
 
         return completion.choices[0].message.content

@@ -1,6 +1,6 @@
 import requests
 
-from app.models import ContentRetrievalHandler
+from app.handlers import ContentRetrievalHandler
 
 
 class RequestsContentRetriever(ContentRetrievalHandler):

@@ -5,14 +5,20 @@ Precis (properly Précis, pronounced "pray-see") is a extensibility-oriented RSS
 The following components of the app are extensible:
 1. Summarization - LLMs including Ollama and OpenAI
 2. Content Retrieval - `requests` or `playwright`
-3. Notification - `matrix` is currently only supported, but it should be possible to implement support for other messaging protocols like `slack` or `mattermost`, push-based services such as `gotify` or `ntfy`, or even a message bus such as `kafka`.
-4. Storage - `tinydb` (soon: `MySQL` - a vector DB storage backend could **very** interesting, though)
+3. Notification - `matrix` or `slack`, but support for other protocols such as `discord` or `mattermost`, or push-based services such as `gotify` or `ntfy`, or even a message bus such as `kafka`.
+4. Storage - `tinydb`
 
 ## Architecture
 Precis is a FastAPI monolith that serves fully static pages styled by Tailwind CSS using DaisyUI components.
 
+## Deployment via Docker-Compose:
+If you want to run via docker-compose:
+```bash
+docker compose up
+```
+
 ## Pre-Requisites
-- Python 3.11 or higher (use pyenv)
+- Python 3.12 or higher (use pyenv)
 - Node 20 or higher (use nvm)
 
 ## Development Instructions
@@ -21,9 +27,3 @@ To install, create a fresh venv and then:
 make dev
 ```
 Then to develop, in one terminal start tailwind by doing `make tw`. Then, in other start the main app by doing `make run`.
-
-## To run locally:
-If you want to run via docker-compose:
-```bash
-docker compose up
-```

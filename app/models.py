@@ -1,14 +1,8 @@
-from abc import ABC, abstractmethod
 from hashlib import md5
-from json import dumps
-from typing import Type, ClassVar
-from enum import Enum
-from os import environ
+from typing import Type
 
 from feedparser import FeedParserDict, parse
 from pydantic import BaseModel
-
-# Entity Models
 
 
 class Feed(BaseModel):
@@ -26,8 +20,7 @@ class Feed(BaseModel):
 
     @property
     def id(self) -> str:
-        id = dumps([self.name, self.category, self.type, self.url])
-        return md5(id.encode()).hexdigest()
+        return md5(self.url.encode()).hexdigest()
 
 
 class FeedEntry(BaseModel):
@@ -52,76 +45,3 @@ class EntryContent(BaseModel):
     @property
     def id(self) -> str:
         return md5(self.url.encode()).hexdigest()
-
-
-# Handler Models
-
-
-class NotificationHandler(BaseModel, ABC):
-    id: ClassVar[str] = "generic_notification_handler"
-
-    @staticmethod
-    def make_read_link(entry: FeedEntry) -> str:
-        base_url = environ["RSS_BASE_URL"]
-        return f"{base_url}/read/{entry.id}"
-
-    async def login(self):
-        pass
-
-    async def logout(self):
-        pass
-
-    @property
-    def destinations(self):
-        pass
-
-    async def send_notification(self, feed: Feed, entry: FeedEntry):
-        pass
-
-
-class SummarizationHandler(BaseModel, ABC):
-    id: ClassVar[str] = "generic_summarization_handler"
-
-    @abstractmethod
-    def summarize(self, feed: Feed, entry: FeedEntry, mk: str):
-        pass
-
-    def get_prompt(self, mk: str):
-        prompt = f"""
-Summarize this article:
-
-{mk}
-"""
-        return prompt
-
-    @property
-    def system_prompt(self):
-        return """
-Your goal is to write a brief but detailed summary of the text given to you.
-Only output the summary without any additional text. Provide the summary in markdown.
-    """
-
-
-class ContentRetrievalHandler(BaseModel, ABC):
-    id: ClassVar[str] = "generic_content_retrieval_handler"
-
-    @abstractmethod
-    async def get_content(self, url: str) -> str:
-        pass
-
-
-# Settings
-
-
-class Themes(str, Enum):
-    synthwave = "synthwave"
-    forest = "forest"
-    dark = "dark"
-    night = "night"
-
-
-class GlobalSettings(BaseModel):
-
-    send_notification: bool = True
-    theme: Themes = Themes.forest
-    refresh_interval: int = 5

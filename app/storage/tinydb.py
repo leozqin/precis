@@ -1,20 +1,19 @@
+from logging import getLogger
 from pathlib import Path
-from typing import Mapping, Optional, List, Type
+from typing import List, Mapping, Optional, Type
 
-from tinydb import TinyDB, Query
+from tinydb import Query, TinyDB
 
-
-from app.db import StorageHandler
 from app.constants import DATA_DIR
-from app.models import (
-    Feed,
-    FeedEntry,
-    SummarizationHandler,
+from app.context import GlobalSettings, StorageHandler
+from app.handlers import (
     ContentRetrievalHandler,
     NotificationHandler,
-    EntryContent,
-    GlobalSettings,
+    SummarizationHandler,
 )
+from app.models import EntryContent, Feed, FeedEntry
+
+logger = getLogger("uvicorn.error")
 
 
 class TinyDBStorageHandler(StorageHandler):
@@ -76,6 +75,17 @@ class TinyDBStorageHandler(StorageHandler):
         query = Query().id.matches(feed.id)
         table.upsert({"id": feed.id, "last_polled_at": now}, cond=query)
 
+    def upsert_feed(self, feed: Feed):
+        table = self.db.table("feeds")
+
+        row = {
+            "id": feed.id,
+            "feed": feed.dict(),
+        }
+
+        query = Query().id.matches(feed.id)
+        table.upsert(row, cond=query)
+
     def upsert_feed_entry(self, feed: Feed, entry: FeedEntry):
         table = self.db.table("entries")
 
@@ -133,12 +143,16 @@ class TinyDBStorageHandler(StorageHandler):
             if redrive:
                 self.logger.info(f"starting redrive for feed entry {entry.id}")
 
-            raw_content = await self.get_entry_html(entry.url)
+            settings = self.get_settings()
+
+            raw_content = await self.get_entry_html(entry.url, settings=settings)
             content = self.get_main_content(content=raw_content)
 
             feed = self.get_feed(entry.feed_id)
 
-            summary = self.summarize(feed=feed, entry=entry, mk=content)
+            summary = self.summarize(
+                feed=feed, entry=entry, mk=content, settings=settings
+            )
 
             entry_content = EntryContent(
                 url=entry.url,
@@ -172,9 +186,7 @@ class TinyDBStorageHandler(StorageHandler):
 
     def _make_handler_obj(self, id: str, config: Mapping):
 
-        return self.engine_map[self.handler_type_map[id]](
-            type=id, config=config
-        ).get_handler()
+        return self.handler_map[id](**config)
 
     def get_handlers(
         self,
@@ -196,7 +208,7 @@ class TinyDBStorageHandler(StorageHandler):
         self, id: str
     ) -> Type[SummarizationHandler | NotificationHandler | ContentRetrievalHandler]:
         table = self.db.table("handler")
-
+        logger.info(f"requested handler {id}")
         query = Query().id.matches(id)
         handler = table.search(query)[0]
 
@@ -208,20 +220,25 @@ class TinyDBStorageHandler(StorageHandler):
 
     def get_settings(self) -> GlobalSettings:
         table = self.db.table("settings")
+        GlobalSettings.update_forward_refs()
 
         try:
             settings = table.all()[0]
-            return GlobalSettings(**settings["settings"])
+            return GlobalSettings(db=self, **settings["settings"])
         except IndexError:
-            return GlobalSettings()
+            return GlobalSettings(db=self)
 
     def upsert_settings(self, settings: GlobalSettings) -> None:
         table = self.db.table("settings")
 
         row = {
             "id": "settings",
-            "settings": settings.dict(),
+            "settings": settings.dict(exclude={"db"}),
         }
 
         query = Query().id.matches("settings")
         table.upsert(row, cond=query)
+
+        self.upsert_handler(settings.notification_handler)
+        self.upsert_handler(settings.summarization_handler)
+        self.upsert_handler(settings.content_retrieval_handler)

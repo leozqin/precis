@@ -1,9 +1,10 @@
-from typing import Any, Mapping, ClassVar
+from typing import Any, ClassVar, Mapping
 
 from ollama import ChatResponse, Client, Message, Options
 from pydantic import BaseModel
 
-from app.models import Feed, FeedEntry, SummarizationHandler
+from app.handlers import SummarizationHandler
+from app.models import Feed, FeedEntry
 
 
 class OllamaSummarizationHandler(SummarizationHandler, BaseModel):
