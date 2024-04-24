@@ -143,11 +143,12 @@ class TinyDBStorageHandler(StorageHandler):
             if redrive:
                 self.logger.info(f"starting redrive for feed entry {entry.id}")
 
-            raw_content = await self.get_entry_html(entry.url)
+            settings = self.get_settings()
+
+            raw_content = await self.get_entry_html(entry.url, settings=settings)
             content = self.get_main_content(content=raw_content)
 
             feed = self.get_feed(entry.feed_id)
-            settings = self.get_settings()
 
             summary = self.summarize(
                 feed=feed, entry=entry, mk=content, settings=settings
@@ -207,7 +208,7 @@ class TinyDBStorageHandler(StorageHandler):
         self, id: str
     ) -> Type[SummarizationHandler | NotificationHandler | ContentRetrievalHandler]:
         table = self.db.table("handler")
-
+        logger.info(f"requested handler {id}")
         query = Query().id.matches(id)
         handler = table.search(query)[0]
 
@@ -232,8 +233,12 @@ class TinyDBStorageHandler(StorageHandler):
 
         row = {
             "id": "settings",
-            "settings": settings.dict(),
+            "settings": settings.dict(exclude={"db"}),
         }
 
         query = Query().id.matches("settings")
         table.upsert(row, cond=query)
+
+        self.upsert_handler(settings.notification_handler)
+        self.upsert_handler(settings.summarization_handler)
+        self.upsert_handler(settings.content_retrieval_handler)

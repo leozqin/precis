@@ -53,15 +53,24 @@ class GlobalSettings(BaseModel):
 
     @property
     def notification_handler(self) -> NotificationHandler:
-        return self.db.get_handler(id=self.notification_handler_key)
+        try:
+            return self.db.get_handler(id=self.notification_handler_key)
+        except IndexError:
+            return self.db.handler_map[self.notification_handler_key]()
 
     @property
     def summarization_handler(self) -> SummarizationHandler:
-        return self.db.get_handler(id=self.summarization_handler_key)
+        try:
+            return self.db.get_handler(id=self.summarization_handler_key)
+        except IndexError:
+            return self.db.handler_map[self.summarization_handler_key]()
 
     @property
     def content_retrieval_handler(self) -> ContentRetrievalHandler:
-        return self.db.get_handler(id=self.content_retrieval_handler_key)
+        try:
+            return self.db.get_handler(id=self.content_retrieval_handler_key)
+        except IndexError:
+            return self.db.handler_map[self.content_retrieval_handler_key]()
 
 
 class StorageHandler(ABC):

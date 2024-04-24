@@ -132,7 +132,9 @@ async def read(request: Request, feed_entry_id: str, redrive: bool = False):
 
 
 @app.get("/settings/", response_class=HTMLResponse)
-async def settings(request: Request):
+async def settings(
+    request: Request, update_status: bool = False, update_exception: str = None
+):
 
     return templates.TemplateResponse(
         "settings.html",
@@ -144,12 +146,19 @@ async def settings(request: Request):
             "notification_handler_choices": await bk.list_notification_handler_choices(),
             "settings": await bk.get_settings(),
             "notification": bk.get_handlers(),
+            "update_status": update_status,
+            "update_exception": update_exception,
         },
     )
 
 
 @app.get("/settings/{handler}", response_class=HTMLResponse)
-async def handler_settings(request: Request, handler: str):
+async def handler_settings(
+    request: Request,
+    handler: str,
+    update_status: bool = False,
+    update_exception: str = None,
+):
 
     return templates.TemplateResponse(
         "handler_config.html",
@@ -158,6 +167,8 @@ async def handler_settings(request: Request, handler: str):
             "handler": bk.get_handler_config(handler=handler),
             "schema": bk.get_handler_schema(handler=handler),
             "settings": await bk.get_settings(),
+            "update_status": update_status,
+            "update_exception": update_exception,
         },
     )
 
@@ -170,25 +181,19 @@ async def update_handler(
     try:
         await bk.update_handler(handler=handler, config=config)
 
-        return templates.TemplateResponse(
-            "handler_config.html",
-            {
-                "request": request,
-                "handler": bk.get_handler_config(handler=handler),
-                "update_status": True,
-                "settings": bk.get_settings(),
-            },
+        return RedirectResponse(
+            request.url_for("handler_settings", handler=handler).include_query_params(
+                update_status=True, handler=handler
+            ),
+            status_code=status.HTTP_303_SEE_OTHER,
         )
     except Exception as e:
 
-        return templates.TemplateResponse(
-            "handler_config.html",
-            {
-                "request": request,
-                "handler": bk.get_handler_config(handler=handler),
-                "update_exception": e,
-                "settings": await bk.get_settings(),
-            },
+        return RedirectResponse(
+            request.url_for("handler_settings", handler=handler).include_query_params(
+                update_exception=e
+            ),
+            status_code=status.HTTP_303_SEE_OTHER,
         )
 
 
@@ -210,31 +215,20 @@ async def update_settings(
             notification_handler_key=notification,
             summarization_handler_key=summarization,
             content_retrieval_handler_key=content,
+            db=storage_handler,
         )
 
         await bk.update_settings(settings=settings)
 
-        return templates.TemplateResponse(
-            "settings.html",
-            {
-                "request": request,
-                "themes": Themes._member_names_,
-                "settings": await bk.get_settings(),
-                "notification": bk.get_handlers(),
-                "update_status": True,
-            },
+        return RedirectResponse(
+            request.url_for("settings").include_query_params(update_status=True),
+            status_code=status.HTTP_303_SEE_OTHER,
         )
     except Exception as e:
 
-        return templates.TemplateResponse(
-            "settings.html",
-            {
-                "request": request,
-                "themes": Themes._member_names_,
-                "settings": await bk.get_settings(),
-                "notification": bk.get_handlers(),
-                "update_exception": e,
-            },
+        return RedirectResponse(
+            request.url_for("settings").include_query_params(update_exception=e),
+            status_code=status.HTTP_303_SEE_OTHER,
         )
 
 
