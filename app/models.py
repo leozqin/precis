@@ -22,6 +22,9 @@ class Feed(BaseModel):
     def id(self) -> str:
         return md5(self.url.encode()).hexdigest()
 
+    def validate(self):
+        return bool(self.rss.entries)
+
 
 class FeedEntry(BaseModel):
     feed_id: str

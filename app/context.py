@@ -206,4 +206,5 @@ class StorageHandler(ABC):
             feed=feed, entry=entry, mk=mk
         )
 
-        return markdown(summary)
+        if summary:
+            return markdown(summary)

@@ -241,7 +241,6 @@ async def update_feed(
     notify_destination: Annotated[str, Form()] = None,
     notify: Annotated[bool, Form()] = False,
     preview_only: Annotated[bool, Form()] = False,
-    onboarding_flow: Annotated[bool, Form()] = False,
 ):
     try:
         feed = Feed(
@@ -253,7 +252,7 @@ async def update_feed(
             preview_only=preview_only,
         )
 
-        await bk.update_feed(feed=feed, onboarding_flow=onboarding_flow)
+        await bk.update_feed(feed=feed)
 
         return RedirectResponse(
             request.url_for("feed_settings", id=feed.id).include_query_params(
@@ -301,14 +300,9 @@ async def feed_settings(
 
 
 @app.get("/feeds/new/", response_class=HTMLResponse)
-async def new_feed(request: Request, onboarding_flow: bool = False):
+async def new_feed(request: Request):
 
     return templates.TemplateResponse(
         "feed_config.html",
-        {
-            "request": request,
-            "settings": await bk.get_settings(),
-            "feed": {},
-            "onboarding_flow": onboarding_flow,
-        },
+        {"request": request, "settings": await bk.get_settings(), "feed": {}},
     )

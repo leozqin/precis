@@ -6,7 +6,7 @@ from app.handlers import Feed, FeedEntry, SummarizationHandler
 
 
 class NullSummarizationHandler(SummarizationHandler, BaseModel):
-    id: ClassVar[str] = "null"
+    id: ClassVar[str] = "null_summarization"
 
     def summarize(self, feed: Feed, entry: FeedEntry, mk: str):
         return None
