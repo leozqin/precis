@@ -8,6 +8,6 @@ class RequestsContentRetriever(ContentRetrievalHandler):
 
     async def get_content(self, url: str) -> str:
 
-        page = await requests.get(url)
+        page = requests.get(url)
 
         return page.text

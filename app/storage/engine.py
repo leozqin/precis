@@ -14,9 +14,12 @@ logger = getLogger("uvicorn.error")
 def load_storage_config() -> Type[StorageHandler]:
     notification_config_path = Path(CONFIG_DIR, "settings.yml").resolve()
 
-    with open(notification_config_path, "r") as fp:
-        yaml = YAML(typ="safe")
-        config = yaml.load(fp)
+    try:
+        with open(notification_config_path, "r") as fp:
+            yaml = YAML(typ="safe")
+            config = yaml.load(fp)
+    except FileNotFoundError:
+        config = {}
 
     config_type = config.get("type", "tinydb")
     handler_type = storage_handlers.get(config_type)

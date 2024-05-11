@@ -6,6 +6,7 @@ from typing import List, Mapping, Type
 from pydantic import BaseModel
 
 from app.context import GlobalSettings, StorageHandler
+from app.errors import InvalidFeedException
 from app.models import EntryContent, Feed, FeedEntry
 
 logger = getLogger("uvicorn.error")
@@ -140,14 +141,17 @@ class PrecisBackend:
 
         return {"id": feed.id, **feed.dict()}
 
-    async def update_feed(self, feed: Feed, onboarding_flow: True):
+    async def update_feed(self, feed: Feed):
+        if not feed.validate():
+            raise InvalidFeedException(
+                f"Feed {feed.name} does not have any entries at url {feed.url}"
+            )
 
         self.db.upsert_feed(feed=feed)
+        settings = self.db.get_settings()
 
-        if onboarding_flow:
-            settings = self.db.get_settings()
+        if not settings.finished_onboarding:
             settings.finished_onboarding = True
-
             self.db.upsert_settings(settings=settings)
 
     async def update_settings(self, settings: GlobalSettings):

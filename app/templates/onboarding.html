@@ -21,17 +21,17 @@
         </h2>
         <p class="my-5">
             Precis (properly Précis, pronounced "pray-see") is a extensibility-oriented RSS reader
-            that can use LLMs to summarize and synthesize information from numerous different sources, 
+            that can use LLMs to summarize and synthesize information from numerous different sources,
             with an emphasis on timely delivery of information via notifications.
         </p>
         <p class="my-5">
-            In order to use Precis, you'll have to configure it correctly. 
+            In order to use Precis, you'll have to configure it correctly.
         </p>
-        <p class="my-5"> 
-            Most functions in Precis are managed by handlers - namely, summarization, content retrieval, 
-            and notification. Press the button below to go to the Settings page to configure handlers. 
+        <p class="my-5">
+            Most functions in Precis are managed by handlers - namely, summarization, content retrieval,
+            and notification. Press the button below to go to the Settings page to configure handlers.
             This step is optional - content retrieval is handled by Playwright out of the box, and we
-            provide default no-op handlers for summarization and notification. However - of course, 
+            provide default no-op handlers for summarization and notification. However - of course,
             you will get more out of Precis if you configure handlers for these features.
         </p>
         <a href="{{ url_for('settings') }}" role="button"
@@ -45,7 +45,7 @@
         <p class="my-5">
             Happy reading!
         </p>
-        <a href="{{ url_for('new_feed').include_query_params(onboarding_flow=True) }}" role="button"
+        <a href="{{ url_for('new_feed') }}" role="button"
           class="btn btn-outline w-1/3 lg:w-2/5 mx-auto flex justify-center my-10 text-2xl lg:text-lg">
           Add a Feed
         </a>
