@@ -71,11 +71,15 @@
         </label>
         <label class="label cursor-pointer gap-2">
           <span class="label-text text-2xl lg:text-xl">Send Notifications</span>
-          <input name="notify" type="checkbox" class="toggle" {% if feed.notify %} checked {% endif %} />
+          <input name="notify" type="checkbox" class="toggle" {% if feed.notify != False %} checked {% endif %} />
         </label>
         <label class="label cursor-pointer gap-2">
           <span class="label-text text-2xl lg:text-xl">Preview Only (No Summary)</span>
           <input name="preview_only" type="checkbox" class="toggle" {% if feed.preview_only %} checked {% endif %} />
+        </label>
+        <label class="label cursor-pointer gap-2">
+          <span class="label-text text-2xl lg:text-xl">Refresh Enabled</span>
+          <input name="refresh_enabled" type="checkbox" class="toggle" {% if feed.refresh_enabled != False %} checked {% endif %} />
         </label>
       </div>
       <div>

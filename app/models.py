@@ -13,6 +13,7 @@ class Feed(BaseModel):
     notify_destination: str = None
     notify: bool = True
     preview_only: bool = False
+    refresh_enabled: bool = True
 
     @property
     def rss(self) -> Type[FeedParserDict]:
