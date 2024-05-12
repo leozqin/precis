@@ -138,8 +138,6 @@ class PrecisBackend:
 
         feed: Feed = self.db.get_feed(id=id)
 
-        logger.info(feed.dict())
-
         return {"id": feed.id, **feed.dict()}
 
     async def update_feed(self, feed: Feed):

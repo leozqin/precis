@@ -25,6 +25,11 @@
           <ul tabindex="0"
             class="menu menu-lg dropdown-content mt-12 z-[1] p-2 shadow bg-neutral rounded-box w-screen lg:w-96 outline">
             <li>
+              <a href="{{ url_for('refresh_feed', feed_id=feed.id) }}" class="text-4xl lg:text-xl text-nowrap no-underline">
+                Refresh This Feed
+              </a>
+            </li>
+            <li>
               <a href="{{ url_for('settings') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
                 Settings
               </a>
@@ -37,7 +42,19 @@
           </ul>
         </div>
       </div>
+    </div>
   </section>
+  {% if refresh_requested %}
+  <section class="w-3/4 lg:w-2/5 mx-auto gap-5 my-5">
+    <div role="alert" class="alert alert-info text-2xl lg:text-xl">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      <span>A refresh of this feed has been requested!</span>
+    </div>
+  </section>
+  {% endif %}
   <div class="justify-center grid-flow-row grid-cols-1 grid gap-10">
     {% for entry in entries|sort(attribute='sort_time', reverse = True) %}
     <div class="card card-normal lg:card-compact w-11/12 lg:w-4/5 shadow-xl bg-neutral mx-auto outline">
