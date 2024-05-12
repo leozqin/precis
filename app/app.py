@@ -89,7 +89,9 @@ async def onboarding(request: Request):
 
 
 @app.get("/list-entries/{feed_id}", response_class=HTMLResponse)
-async def list_entries_by_feed(feed_id: str, request: Request):
+async def list_entries_by_feed(
+    feed_id: str, request: Request, refresh_requested: bool = False
+):
 
     return templates.TemplateResponse(
         "entries.html",
@@ -98,6 +100,7 @@ async def list_entries_by_feed(feed_id: str, request: Request):
             "settings": await bk.get_settings(),
             "entries": list(bk.list_entries(feed_id=feed_id)),
             "feed": await bk.get_feed_config(id=feed_id),
+            "refresh_requested": refresh_requested,
         },
     )
 
@@ -195,6 +198,19 @@ async def update_handler(
             ),
             status_code=status.HTTP_303_SEE_OTHER,
         )
+
+
+@app.get("/api/refresh_feed/{feed_id}", status_code=status.HTTP_200_OK)
+async def refresh_feed(feed_id: str, request: Request):
+
+    await rss.check_feed_by_id(id=feed_id)
+
+    return RedirectResponse(
+        request.url_for("list_entries_by_feed", feed_id=feed_id).include_query_params(
+            refresh_requested=True
+        ),
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
 
 
 @app.post("/api/update_settings/", status_code=status.HTTP_200_OK)

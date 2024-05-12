@@ -91,6 +91,14 @@ class PrecisRSS:
             if feed.refresh_enabled:
                 await self._check_feed(feed=feed)
 
+    async def check_feed_by_id(self, id: str) -> List:
+
+        feed = self.db.get_feed(id=id)
+
+        logger.info(f"Manual refresh requested for feed {feed.name}")
+
+        await self._check_feed(feed=feed)
+
     async def add_feed_entry(self, feed: Feed, entry: FeedEntry) -> None:
 
         logger.info(f"Upserting entry from {feed.name}: {entry.title} - id {entry.id}")
