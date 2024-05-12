@@ -60,5 +60,6 @@ Summarize this article:
     def system_prompt(self):
         return """
 Your goal is to write a brief but detailed summary of the text given to you.
-Only output the summary without any additional text. Provide the summary in markdown.
+Only output the summary without any headings or sections.
+Provide the summary in markdown.
     """

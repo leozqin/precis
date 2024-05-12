@@ -42,6 +42,7 @@ class PrecisBackend:
                 "url": feed.url,
                 "preview_only": feed.preview_only,
                 "notify": feed.notify,
+                "refresh_enabled": feed.refresh_enabled,
                 "entry_count": entry_agg.get(feed.id, 0) if agg else False,
             }
             for feed in feeds
@@ -143,8 +144,12 @@ class PrecisBackend:
 
     async def update_feed(self, feed: Feed):
         if not feed.validate():
+            logger.info("feed is invalid!")
             raise InvalidFeedException(
-                f"Feed {feed.name} does not have any entries at url {feed.url}"
+                (
+                    f"Feed {feed.name} does not have any entries at url {feed.url}. "
+                    "Press back to return to the feed you configured"
+                )
             )
 
         self.db.upsert_feed(feed=feed)

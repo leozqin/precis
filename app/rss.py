@@ -87,7 +87,9 @@ class PrecisRSS:
         logger.info(f"Checking feeds starting at time {now}")
 
         for feed in self.db.get_feeds():
-            await self._check_feed(feed=feed)
+            feed: Feed
+            if feed.refresh_enabled:
+                await self._check_feed(feed=feed)
 
     async def add_feed_entry(self, feed: Feed, entry: FeedEntry) -> None:
 

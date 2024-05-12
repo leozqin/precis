@@ -241,6 +241,7 @@ async def update_feed(
     notify_destination: Annotated[str, Form()] = None,
     notify: Annotated[bool, Form()] = False,
     preview_only: Annotated[bool, Form()] = False,
+    refresh_enabled: Annotated[bool, Form()] = False,
 ):
     try:
         feed = Feed(
@@ -250,6 +251,7 @@ async def update_feed(
             notify=notify,
             notify_destination=notify_destination,
             preview_only=preview_only,
+            refresh_enabled=refresh_enabled,
         )
 
         await bk.update_feed(feed=feed)
@@ -261,12 +263,18 @@ async def update_feed(
             status_code=status.HTTP_303_SEE_OTHER,
         )
     except Exception as e:
-        return RedirectResponse(
-            request.url_for("feed_settings", id=feed.id).include_query_params(
-                update_exception=e
-            ),
-            status_code=status.HTTP_303_SEE_OTHER,
-        )
+        if feed.validate():
+            return RedirectResponse(
+                request.url_for("feed_settings", id=feed.id).include_query_params(
+                    update_exception=e
+                ),
+                status_code=status.HTTP_303_SEE_OTHER,
+            )
+        else:
+            return RedirectResponse(
+                request.url_for("new_feed").include_query_params(update_exception=e),
+                status_code=status.HTTP_303_SEE_OTHER,
+            )
 
 
 @app.get("/feeds/", response_class=HTMLResponse)
@@ -300,9 +308,14 @@ async def feed_settings(
 
 
 @app.get("/feeds/new/", response_class=HTMLResponse)
-async def new_feed(request: Request):
+async def new_feed(request: Request, update_exception: str = None):
 
     return templates.TemplateResponse(
         "feed_config.html",
-        {"request": request, "settings": await bk.get_settings(), "feed": {}},
+        {
+            "request": request,
+            "settings": await bk.get_settings(),
+            "feed": {},
+            "update_exception": update_exception,
+        },
     )
