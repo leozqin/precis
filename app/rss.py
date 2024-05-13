@@ -63,8 +63,9 @@ class PrecisRSS:
         else:
             # if we have no history, take the first 5
             entries = feed.rss.entries[0:5]
-
-            earliest_init_entry = min([timegm(i.published_parsed) for i in entries])
+            earliest_init_entry = min(
+                [timegm(i.published_parsed) for i in entries] + [now]
+            )
             self.db.set_feed_start_ts(feed=feed, start_ts=earliest_init_entry)
 
         logger.info("Starting feed entry retrieval")
