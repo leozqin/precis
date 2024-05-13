@@ -161,9 +161,9 @@ cython_debug/
 #.idea/
 
 # system stuff
-*.yml
 *.json
 session.txt
 .envrc
+configs/*.yml
 
 node_modules
