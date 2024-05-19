@@ -165,5 +165,6 @@ cython_debug/
 session.txt
 .envrc
 configs/*.yml
+*.mdb
 
 node_modules

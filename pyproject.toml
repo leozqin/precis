@@ -51,7 +51,8 @@ dependencies = [
     "playwright",
     "openai",
     "python-multipart",
-    "typing_inspect"
+    "typing_inspect",
+    "lmdb"
 ]
 
 [project.urls]
