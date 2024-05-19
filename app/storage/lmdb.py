@@ -1,11 +1,12 @@
 from collections.abc import Buffer
 from enum import Enum
-from json import dumps, loads
+from json import JSONDecodeError, dumps, loads
 from logging import getLogger
 from pathlib import Path
-from typing import List, Mapping, Type
+from typing import Any, List, Mapping, Type
 
 from lmdb import Environment, Transaction
+from pydantic import BaseModel
 
 from app.constants import DATA_DIR
 from app.context import GlobalSettings, StorageHandler
@@ -46,16 +47,25 @@ class LMDBStorageHandler(StorageHandler):
 
         str_val = bytes(val).decode()
 
-        logger.debug(f"attemping json load of {str_val}")
-
-        value = loads(bytes(val).decode())
-
-        logger.debug(f"deserialized value: {value}")
+        try:
+            logger.debug(f"attempting json load of {str_val}")
+            value = loads(bytes(val).decode())
+            logger.debug(f"deserialized value: {value}")
+        except JSONDecodeError:
+            value = str_val
 
         return value
 
     @staticmethod
-    def _serialize(val: str):
+    def _serialize(val: Any):
+
+        if isinstance(val, BaseModel):
+            logger.debug("detected subclass of basemodel")
+            val = val.json()
+
+        if isinstance(val, (list, dict)):
+            logger.debug("detected json-serializable")
+            val = dumps(val)
 
         logger.debug(f"serializing value: {val}")
         value = str(val).encode()
@@ -76,12 +86,12 @@ class LMDBStorageHandler(StorageHandler):
 
         db = self._db(Named.feed)
         with self.db.begin(write=True, db=db) as txn:
-            txn.replace(self._serialize(feed.id), self._serialize(feed.json()))
+            txn.replace(self._serialize(feed.id), self._serialize(feed))
 
     def insert_feed(self, feed: Feed) -> None:
 
         with self.db.begin(write=True, db=self._db(Named.feed)) as txn:
-            txn.put(self._serialize(feed.id), self._serialize(feed.json()))
+            txn.put(self._serialize(feed.id), self._serialize(feed))
 
     def get_feed(self, id: str) -> Feed:
         with self.db.begin(db=self._db(Named.feed)) as txn:
@@ -120,12 +130,12 @@ class LMDBStorageHandler(StorageHandler):
     def update_poll_state(self, feed: Feed, now: int) -> None:
 
         with self.db.begin(db=self._db(Named.poll), write=True) as txn:
-            txn.replace(self._serialize(feed.id), now.to_bytes())
+            txn.replace(self._serialize(feed.id), self._serialize(now))
 
     def upsert_feed_entry(self, feed: Feed, entry: FeedEntry) -> None:
 
         with self.db.begin(db=self._db(Named.entry), write=True) as txn:
-            txn.replace(self._serialize(entry.id), self._serialize(entry.json()))
+            txn.replace(self._serialize(entry.id), self._serialize(entry))
 
         with self.db.begin(db=self._db(Named.si_feed_entry), write=True) as txn:
             value = txn.get(self._serialize(feed.id))
@@ -142,7 +152,9 @@ class LMDBStorageHandler(StorageHandler):
 
         if feed:
             with self.db.begin(db=self._db(Named.si_feed_entry)) as txn:
-                entry_ids = self._deserialize(txn.get(self._serialize(feed.id)))
+                _entries = txn.get(self._serialize(feed.id))
+                if _entries:
+                    entry_ids = self._deserialize(_entries)
 
             with self.db.begin(db=self._db(Named.entry)) as txn:
                 cur = txn.cursor()
@@ -154,7 +166,6 @@ class LMDBStorageHandler(StorageHandler):
 
         out = []
         for entry in entries:
-
             k, v = entry
             feed_entry = FeedEntry(**self._deserialize(v))
             out.append(
@@ -164,6 +175,8 @@ class LMDBStorageHandler(StorageHandler):
                     "id": self._deserialize(k),
                 }
             )
+
+        return out
 
     def get_feed_entry(self, id: str) -> FeedEntry:
 
@@ -188,7 +201,8 @@ class LMDBStorageHandler(StorageHandler):
             exists = cur.set_key(self._serialize(entry.id))
 
         if exists and not redrive:
-            content = txn.get(self._serialize(entry.id))
+            with self.db.begin(db=self._db(Named.entry_content)) as txn:
+                content = txn.get(self._serialize(entry.id))
             return EntryContent(**self._deserialize(content))
 
         else:
@@ -215,7 +229,7 @@ class LMDBStorageHandler(StorageHandler):
             with self.db.begin(db=self._db(Named.entry_content), write=True) as txn:
                 txn.replace(
                     self._serialize(entry_content.id),
-                    self._serialize(entry_content.json()),
+                    self._serialize(entry_content),
                 )
 
             return entry_content
@@ -255,11 +269,14 @@ class LMDBStorageHandler(StorageHandler):
         with self.db.begin(db=self._db(Named.handler)) as txn:
             cfg = txn.get(self._serialize(id))
 
-        handler_obj = self._make_handler_obj(
-            id=id, config=self._deserialize(cfg) if cfg else {}
-        )
+        if cfg:
+            handler_obj = self._make_handler_obj(
+                id=id, config=self._deserialize(cfg) if cfg else {}
+            )
 
-        return handler_obj
+            return handler_obj
+        else:
+            raise IndexError
 
     def get_settings(self) -> GlobalSettings:
 
