@@ -1,4 +1,3 @@
-from collections.abc import Buffer
 from enum import Enum
 from json import JSONDecodeError, dumps, loads
 from logging import getLogger
@@ -43,7 +42,7 @@ class LMDBStorageHandler(StorageHandler):
         )
 
     @staticmethod
-    def _deserialize(val: Buffer):
+    def _deserialize(val: Any):
 
         str_val = bytes(val).decode()
 
@@ -149,6 +148,7 @@ class LMDBStorageHandler(StorageHandler):
             txn.replace(self._serialize(feed.id), self._serialize(entries))
 
     def get_entries(self, feed: Feed = None) -> Mapping[str, FeedEntry | str]:
+        entries = []
 
         if feed:
             with self.db.begin(db=self._db(Named.si_feed_entry)) as txn:
@@ -156,16 +156,16 @@ class LMDBStorageHandler(StorageHandler):
                 if _entries:
                     entry_ids = self._deserialize(_entries)
 
-            with self.db.begin(db=self._db(Named.entry)) as txn:
-                cur = txn.cursor()
-                entries = cur.getmulti([self._serialize(i) for i in entry_ids])
+                with self.db.begin(db=self._db(Named.entry)) as txn:
+                    cur = txn.cursor()
+                    entries = cur.getmulti([self._serialize(i) for i in entry_ids])
         else:
             with self.db.begin(db=self._db(Named.entry)) as txn:
                 cur = txn.cursor()
                 entries = list(cur.iternext())
 
         out = []
-        for entry in entries:
+        for entry in entries if entries else []:
             k, v = entry
             feed_entry = FeedEntry(**self._deserialize(v))
             out.append(
@@ -237,7 +237,6 @@ class LMDBStorageHandler(StorageHandler):
     def upsert_handler(self, handler: type[HandlerBase]) -> None:
 
         with self.db.begin(self._db(Named.handler), write=True) as txn:
-            logger.info(f"handler id: {handler.id}")
 
             txn.replace(
                 self._serialize(handler.id),
@@ -289,9 +288,6 @@ class LMDBStorageHandler(StorageHandler):
             return GlobalSettings(db=self)
 
     def upsert_settings(self, settings: GlobalSettings) -> None:
-
-        logger.info(self._serialize(settings.json(exclude={"db"}, exclude_none=True)))
-        logger.info("settings".encode())
 
         with self.db.begin(db=self._db(Named.settings), write=True) as txn:
             txn.replace(

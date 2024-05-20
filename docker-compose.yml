@@ -1,12 +1,21 @@
 services:
   rss:
     environment:
+      # make sure these match with where you're mounting volumes
       - CONFIG_DIR=/config
       - DATA_DIR=/data
-      - RSS_BASE_URL=http://localhost:8000
+      - RSS_BASE_URL=${RSS_BASE_URL-http://localhost:8000}
+      - PRECIS_STORAGE_HANDLER=${PRECIS_STORAGE_HANDLER-tinydb}
+
+      # these variables depend on the handler(s) you want to use
+      # you can also configure these through the UI if you want
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - SLACK_API_TOKEN=${SLACK_API_TOKEN}
     build:
       context: .
       dockerfile: Dockerfile
+    # replace build with this if you want to pull from registry
+    # image: ghcr.io/leozqin/precis:latest
     ports:
       - 8000:80
     volumes:
