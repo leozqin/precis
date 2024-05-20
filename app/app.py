@@ -105,20 +105,6 @@ async def list_entries_by_feed(
     )
 
 
-@app.get("/list-entries/", response_class=HTMLResponse)
-async def list_all_entries(request: Request):
-
-    return templates.TemplateResponse(
-        "entries.html",
-        {
-            "request": request,
-            "settings": await bk.get_settings(),
-            "entries": list(bk.list_entries(feed_id=None)),
-            "feed": {},
-        },
-    )
-
-
 @app.get("/read/{feed_entry_id}", response_class=HTMLResponse)
 async def read(request: Request, feed_entry_id: str, redrive: bool = False):
 
@@ -233,6 +219,8 @@ async def update_settings(
             content_retrieval_handler_key=content,
             db=storage_handler,
         )
+
+        logger.info(settings)
 
         await bk.update_settings(settings=settings)
 

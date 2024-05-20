@@ -22,7 +22,8 @@ class PrecisBackend:
 
     def list_feeds(self, agg=False):
         feeds = self.db.get_feeds()
-        entries: List[FeedEntry] = [i["entry"] for i in self.db.get_entries()]
+        entry_list = self.db.get_entries() or []
+        entries: List[FeedEntry] = [i["entry"] for i in entry_list]
 
         if agg:
             entry_agg = {}

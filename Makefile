@@ -6,11 +6,11 @@ tw:
 install:
 	npm install -D tailwindcss @tailwindcss/typography daisyui@latest @tailwindcss/forms
 	pip install -e .
-	playright install --with-deps chromium
+	playwright install --with-deps chromium
 
 .PHONY: run
 run:
-	uvicorn app.app:app --reload
+	uvicorn app.app:app --reload --log-level debug
 
 .PHONY: dev
 dev:

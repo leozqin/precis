@@ -139,7 +139,7 @@ class StorageHandler(ABC):
         pass
 
     @abstractmethod
-    def get_entries(self, feed: Feed = None) -> Mapping[str, FeedEntry | str]:
+    def get_entries(self, feed: Feed) -> Mapping[str, FeedEntry | str]:
         pass
 
     @abstractmethod
