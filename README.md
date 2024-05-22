@@ -12,6 +12,8 @@ The Summarization and Notification handlers also support a `null` handler that d
 
 Precis also supports themes.
 
+For an extended overview of why this project exists, see [my blog](https://www.leozqin.me/posts/precis-an-ai-enabled-rss-reader/)
+
 ## Architecture
 Precis is a FastAPI monolith that serves fully static pages styled by Tailwind CSS using DaisyUI components. It uses some query-parameter and redirect chicanery to fake interactivity. We'll probably add actual interactivity at some point.
 
