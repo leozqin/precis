@@ -153,6 +153,7 @@ class LMDBStorageHandler(StorageHandler):
         if feed:
             with self.db.begin(db=self._db(Named.si_feed_entry)) as txn:
                 _entries = txn.get(self._serialize(feed.id))
+                entry_ids = []
                 if _entries:
                     entry_ids = self._deserialize(_entries)
 

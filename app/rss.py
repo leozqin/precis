@@ -2,11 +2,13 @@ from calendar import timegm
 from datetime import datetime, timezone
 from logging import getLogger
 from pathlib import Path
+from tempfile import SpooledTemporaryFile
 from typing import List, Mapping, Type
 
+from opml import OpmlDocument, OpmlOutline
 from ruamel.yaml import YAML
 
-from app.constants import CONFIG_DIR
+from app.constants import CONFIG_DIR, DATA_DIR
 from app.context import GlobalSettings, StorageHandler
 from app.models import Feed, FeedEntry
 
@@ -124,3 +126,43 @@ class PrecisRSS:
     @staticmethod
     async def get_entry_html(url: str, settings: GlobalSettings) -> str:
         return await settings.content_retrieval_handler.get_content(url)
+
+    async def feeds_to_opml(self) -> OpmlDocument:
+        feeds = self.db.get_feeds()
+
+        opml = OpmlDocument(
+            title="Precis RSS Backup",
+            date_created=datetime.now(),
+            date_modified=datetime.now(),
+        )
+
+        for feed in feeds:
+            feed: Feed
+            opml.add_rss(text=feed.name, xml_url=feed.url, categories=[feed.category])
+
+        str_now = datetime.now().strftime("%Y%m%d%H%M%S")
+        file_name = f"precis_{str_now}.opml"
+        out_path = Path(DATA_DIR, file_name).resolve()
+
+        logger.info(f"writing opml to {out_path}")
+        opml.dump(fp=out_path)
+
+        return out_path, file_name
+
+    async def opml_to_feeds(self, file: SpooledTemporaryFile):
+
+        opml = OpmlDocument.load(fp=file)
+
+        feeds = []
+
+        for entry in opml.outlines:
+            entry: OpmlOutline
+
+            feed = Feed(
+                name=entry.text, url=entry.xml_url, category=entry.categories[0] or None
+            )
+
+            feeds.append(feed)
+
+        for feed in feeds:
+            self.db.upsert_feed(feed=feed)

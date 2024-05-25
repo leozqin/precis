@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "precis"
-version = "0.2.0"
+version = "0.2.1"
 description = "A framework for automating your media diet"
 requires-python = ">=3.11"
 license = {file = "LICENSE"}
@@ -52,7 +52,8 @@ dependencies = [
     "openai",
     "python-multipart",
     "typing_inspect",
-    "lmdb"
+    "lmdb",
+    "pyopml"
 ]
 
 [project.urls]

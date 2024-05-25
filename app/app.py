@@ -3,7 +3,7 @@ from logging import getLogger
 from pathlib import Path
 from typing import Annotated
 
-from fastapi import FastAPI, Form, status
+from fastapi import FastAPI, Form, UploadFile, status
 from fastapi.requests import Request
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -281,8 +281,36 @@ async def update_feed(
             )
 
 
+@app.get("/api/export_opml/", status_code=status.HTTP_200_OK)
+async def export_opml(request: Request):
+
+    write_path, file_name = await rss.feeds_to_opml()
+
+    return FileResponse(path=write_path, filename=file_name)
+
+
+@app.post("/api/import_opml/", status_code=status.HTTP_200_OK)
+async def import_opml(request: Request, file: UploadFile):
+
+    try:
+        await rss.opml_to_feeds(file=file.file)
+
+        return RedirectResponse(
+            request.url_for("feeds").include_query_params(update_status=True),
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
+    except Exception as e:
+
+        return RedirectResponse(
+            request.url_for("feeds").include_query_params(update_exception=e),
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
+
+
 @app.get("/feeds/", response_class=HTMLResponse)
-async def feeds(request: Request):
+async def feeds(
+    request: Request, update_status: bool = False, update_exception: str = None
+):
 
     return templates.TemplateResponse(
         "feeds.html",
@@ -290,6 +318,8 @@ async def feeds(request: Request):
             "request": request,
             "settings": await bk.get_settings(),
             "feeds": bk.list_feeds(agg=False),
+            "update_status": update_status,
+            "update_exception": update_exception,
         },
     )
 

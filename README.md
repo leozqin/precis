@@ -35,6 +35,12 @@ make dev
 ```
 Then to develop, in one terminal start tailwind by doing `make tw`. Then, in other start the main app by doing `make run`.
 
+## OPML Import/Export
+Precis supports exporting your current set of feeds as OPML, as well as importing feeds from other OPML files. A couple caveats:
+1. When importing an OPML file, if the feed already exists then it will be upserted. Any properties that differ from the OPML file will change to match.
+2. When importing an OPML file, Precis will take the first category as the category of the feed. You may always change the category at a later time.
+3. When importing and exporting, we the map the feed name, feed url, and category to the outline item `text`, `xml_url`, and `categories[0]` attributes, respectively. Please ensure that your input file uses the same conventions.
+
 ## UI Tour
 After initial onboarding, you'll be brought to the feeds page.
 ![The feeds page](assets/feeds.png)
