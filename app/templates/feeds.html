@@ -35,12 +35,13 @@
             </li>
             <li>
               <a href="{{ url_for('settings') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
-              Settings
+                Settings
               </a>
-          </li>
+            </li>
           </ul>
         </div>
       </div>
+    </div>
   </section>
   <div>
     <h2 class="text-4xl lg:text-2xl my-5 justify-center flex">
@@ -49,9 +50,13 @@
   </div>
   <div>
     <a href="{{ url_for('new_feed') }}" role="button"
-    class="btn btn-outline w-1/2 lg:w-2/5 mx-auto flex justify-center my-5 text-3xl lg:text-xl">
-    Add New Feed
-  </a>
+      class="btn btn-outline w-1/2 lg:w-2/5 mx-auto flex justify-center my-5 text-3xl lg:text-xl">
+      Add New Feed
+    </a>
+    <a href="{{ url_for('export_opml') }}" role="button"
+      class="btn btn-outline w-1/2 lg:w-2/5 mx-auto flex justify-center my-5 text-3xl lg:text-xl">
+      Export to OPML
+    </a>
   </div>
   <div class="justify-center grid-flow-row grid-cols-1 xl:grid-cols-2 grid gap-10">
     {% for feed in feeds%}
@@ -81,6 +86,32 @@
     </div>
     {% endfor %}
   </div>
+  <section class="py-10">
+    <h2 class="text-4xl lg:text-2xl my-5 justify-center flex">
+      Import Feeds from OPML
+    </h2>
+    <form id="opml_import" method="post" action="/api/import_opml" enctype="multipart/form-data">
+      <input type="file" name="file"
+        class="file-input file-input-bordered file-input-primary w-1/2 lg:w-2/5 mx-auto flex justify-center my-5 text-3xl lg:text-xl" />
+    </form>
+    <div class="w-1/2 lg:w-2/5 justify-center my-5 mx-auto">
+      <button type="submit" form="opml_import"
+        class="btn btn-outline w-full mx-auto flex justify-center my-5 text-3xl lg:text-xl">
+        Import OPML
+        {% if update_status %} &#9989 {% endif %}
+        {% if update_exception %} &#10060 {% endif %}
+      </button>
+      {% if update_exception %}
+      <div role="alert" class="alert alert-error">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>{{ update_exception }}</span>
+      </div>
+      {% endif %}
+    </div>
+  </section>
 </body>
 
 </html>

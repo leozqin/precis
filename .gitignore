@@ -166,5 +166,6 @@ session.txt
 .envrc
 configs/*.yml
 *.mdb
+*.opml
 
 node_modules

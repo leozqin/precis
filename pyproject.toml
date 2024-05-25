@@ -52,7 +52,8 @@ dependencies = [
     "openai",
     "python-multipart",
     "typing_inspect",
-    "lmdb"
+    "lmdb",
+    "pyopml"
 ]
 
 [project.urls]
