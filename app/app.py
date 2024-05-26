@@ -12,7 +12,8 @@ from fastapi_utils.tasks import repeat_every
 
 from app.backend import PrecisBackend
 from app.context import GlobalSettings, Themes
-from app.models import Feed
+from app.logging import HealthCheckFilter
+from app.models import Feed, HealthCheck
 from app.rss import PrecisRSS
 from app.storage.engine import load_storage_config
 
@@ -25,6 +26,9 @@ storage_handler = load_storage_config()
 
 bk = PrecisBackend(db=storage_handler)
 rss = PrecisRSS(db=storage_handler)
+
+logger.addFilter(HealthCheckFilter())
+getLogger("uvicorn.access").addFilter(HealthCheckFilter())
 
 p_settings: GlobalSettings = storage_handler.get_settings()
 
@@ -48,6 +52,12 @@ app.mount(
     "/static",
     StaticFiles(directory=Path(Path(__file__).parent, "static")),
     name="static",
+)
+
+app.mount(
+    "/assets",
+    StaticFiles(directory=Path(Path(__file__).parent, "../assets")),
+    name="assets",
 )
 
 
@@ -76,6 +86,21 @@ async def root(request: Request):
     else:
 
         return RedirectResponse("/onboarding/")
+
+
+@app.get("/about", response_class=HTMLResponse)
+async def about(request: Request):
+
+    return templates.TemplateResponse(
+        "about.html",
+        {"request": request, "settings": await bk.get_settings(), **bk.about()},
+    )
+
+
+@app.get("/health", response_model=HealthCheck)
+async def health_check(request: Request) -> HealthCheck:
+
+    return bk.health_check()
 
 
 @app.get("/onboarding/", response_class=HTMLResponse)

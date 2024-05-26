@@ -11,6 +11,10 @@ services:
       # you can also configure these through the UI if you want
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - SLACK_API_TOKEN=${SLACK_API_TOKEN}
+
+      # other variables that are unlikely to change
+      - GITHUB_LINK=${GITHUB_LINK-https://github.com/leozqin/precis}
+      - PRECIS_INTERNAL_PORT=${PRECIS_INTERNAL_PORT-80}
     build:
       context: .
       dockerfile: Dockerfile

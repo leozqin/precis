@@ -166,3 +166,8 @@ class PrecisRSS:
 
         for feed in feeds:
             self.db.upsert_feed(feed=feed)
+
+        settings: GlobalSettings = self.db.get_settings()
+        if not settings.finished_onboarding:
+            settings.finished_onboarding = True
+            self.db.upsert_settings(settings=settings)

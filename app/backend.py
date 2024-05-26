@@ -1,3 +1,4 @@
+from importlib.metadata import version
 from json import dumps, loads
 from logging import getLogger
 from time import localtime, strftime
@@ -5,9 +6,10 @@ from typing import List, Mapping, Type
 
 from pydantic import BaseModel
 
+from app.constants import GITHUB_LINK, IS_DOCKER
 from app.context import GlobalSettings, StorageHandler
 from app.errors import InvalidFeedException
-from app.models import EntryContent, Feed, FeedEntry
+from app.models import EntryContent, Feed, FeedEntry, HealthCheck
 
 logger = getLogger("uvicorn.error")
 
@@ -19,6 +21,19 @@ class PrecisBackend:
     @staticmethod
     def _format_time(time: int) -> str:
         return strftime("%Y-%m-%d %I:%M %p", localtime(time)).lower()
+
+    def health_check(self):
+
+        return HealthCheck()
+
+    def about(self):
+
+        return {
+            "version": version("precis"),
+            "docker": IS_DOCKER,
+            "storage_handler": type(self.db).__name__,
+            "github": GITHUB_LINK,
+        }
 
     def list_feeds(self, agg=False):
         feeds = self.db.get_feeds()
