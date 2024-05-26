@@ -30,8 +30,10 @@ rss = PrecisRSS(db=storage_handler)
 logger.addFilter(HealthCheckFilter())
 getLogger("uvicorn.access").addFilter(HealthCheckFilter())
 
+p_settings: GlobalSettings = storage_handler.get_settings()
 
-@repeat_every(seconds=60 * 5, logger=logger)
+
+@repeat_every(seconds=60 * p_settings.refresh_interval, logger=logger)
 async def poll_feeds():
     logger.info("Checking feeds for updates")
     await rss.check_feeds()
