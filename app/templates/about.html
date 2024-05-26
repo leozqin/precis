@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html data-theme="{{settings.theme.value}}">
+
+<head>
+  {% if update_exception or update_status %}
+  <link href="./../../static/output.css" rel="stylesheet">
+  {% else %}
+  <link href="./../../static/output.css" rel="stylesheet">
+  {% endif %}
+  <title>Precis - About</title>
+</head>
+
+<body class="w-screen lg:w-3/5 mx-auto">
+  <section class="mx-auto justify-center w-screen lg:w-full mb-10">
+    <div class="navbar bg-accent h-28 lg:h-20">
+      <div class="navbar-start">
+        <h1 class="text-5xl lg:text-3xl text-neutral">
+          About
+        </h1>
+      </div>
+      <div class="navbar-end">
+        <div class="dropdown dropdown-bottom dropdown-end">
+          <div tabindex="0" role="button" class="btn btn-accent h-16 w-16 justify-end">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
+            </svg>
+          </div>
+          <ul tabindex="0"
+            class="menu menu-lg dropdown-content mt-12 z-[1] p-2 shadow bg-neutral rounded-box w-screen lg:w-96 outline">
+            <li>
+              <a href="{{ url_for('feeds') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
+                Edit Feed Settings
+              </a>
+            </li>
+            <li>
+                <a href="{{ url_for('settings') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
+                  Edit Global Settings
+                </a>
+              </li>
+            <li>
+              <a href="{{ url_for('root') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
+                Return to All Feeds
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+  </section>
+  <section class="w-5/6 md:w-1/2 justify-center mx-auto">
+    <img src="../../assets/logo-with-name-light.svg" />
+    <div class="py-5 text-2xl m3:text-xl">
+        <h3>
+            Version: {{ version }}
+        </h3>
+        <h3>
+            Running on: {% if docker %}Docker{% else %}Python{% endif %}
+        </h3>
+        <h3>
+            Storage Handler: {{ storage_handler }}
+        </h3>
+        <h3>
+            GitHub: <a class="link" href="{{ github }}">{{ github }}</a>
+        </h3>
+    </div>
+
+  </section>
+
+</body>
+
+</html>
