@@ -100,60 +100,113 @@ class StorageHandler(ABC):
 
     @abstractmethod
     def clear_active_feeds(self) -> None:
+        """
+        Remove all feeds from the database
+        """
         pass
 
     @abstractmethod
     def upsert_feed(self, feed: Feed) -> None:
+        """
+        Given a feed, update the feed if it already exists
+        in the database, else create a new one.
+        """
         pass
 
     @abstractmethod
     def insert_feed(self, feed: Feed) -> None:
+        """
+        Given a feed, insert it into the database, throwing an
+        exception if it already exists
+        """
         pass
 
     @abstractmethod
     def get_feed(self, id: str) -> Feed:
+        """
+        Given an ID, retrieve the Feed having that ID, throwing
+        an exception if no Feed having that ID exists
+        """
         pass
 
     @abstractmethod
     def get_feeds(self) -> List[Feed]:
+        """
+        Retrieve a list of all the active Feeds in the database
+        """
         pass
 
     @abstractmethod
     def get_poll_state(self, feed: Feed) -> Optional[int]:
+        """
+        Given a feed, retrieve the poll state for that feed, if
+        one exists
+        """
         pass
 
     @abstractmethod
     def set_feed_start_ts(self, feed: Feed, start_ts: int) -> None:
+        """
+        Given a feed and a start ts, set the start ts for that feed
+        """
         pass
 
     @abstractmethod
     def get_feed_start_ts(self, feed: Feed) -> int:
+        """
+        Given a feed, get the start ts for that feed
+        """
         pass
 
     @abstractmethod
     def update_poll_state(self, feed: Feed, now: int) -> None:
+        """
+        Given a feed and the current time, update the poll state
+        for that feed to the current time
+        """
         pass
 
     @abstractmethod
     def upsert_feed_entry(self, feed: Feed, entry: FeedEntry) -> None:
+        """
+        Given a feed and a feed entry, update the feed entry to the
+        given state, else create one if one does not exist
+        """
         pass
 
     @abstractmethod
     def get_entries(self, feed: Feed) -> Mapping[str, FeedEntry | str]:
+        """
+        Given a feed, retrieve the entries for that feed and return a mapping
+        of the feed entry ID to the feed entry object
+        """
         pass
 
     @abstractmethod
     def get_feed_entry(self, id: str) -> FeedEntry:
+        """
+        Given an ID, retrieve the feed entry having that id.
+        """
         pass
 
     @abstractmethod
     def feed_entry_exists(self, id: str) -> bool:
+        """
+        Given an ID, return True if a feed entry with that ID exists
+        """
         pass
 
     @abstractmethod
     async def get_entry_content(
         self, entry: FeedEntry, redrive: bool = False
     ) -> EntryContent:
+        """
+        Given a feed entry, return the EntryContent object for that entry
+        if one exists. If the redrive argument is true or if none exists,
+        create a new one using the URL of the feed entry. Use the get_main_content
+        static method for the class to clean the content as needed. Use the
+        summarize static method for the class to build the summary.
+        """
         pass
 
     @abstractmethod
@@ -161,24 +214,44 @@ class StorageHandler(ABC):
         self,
         handler: Type[HandlerBase],
     ) -> None:
+        """
+        Given a handler object, update that object in the database if it exists
+        else insert a new one.
+        """
         pass
 
     @abstractmethod
     def get_handlers(
         self,
     ) -> Mapping[str, Type[HandlerBase]]:
+        """
+        Return a mapping between the handler name and the handler object
+        in the database, returning None for the handler if it doesn't exist.
+        Enumerate handler IDs by using self.handler_map.keys()
+        """
         pass
 
     @abstractmethod
     def get_handler(self, id: str) -> Type[HandlerBase]:
+        """
+        Given an ID, return the handler corresponding to that ID.
+        """
         pass
 
     @abstractmethod
     def get_settings(self) -> GlobalSettings:
+        """
+        Retrive the global settings, if they exist. If not, instantiate
+        a default global settings object and return that.
+        """
         pass
 
     @abstractmethod
     def upsert_settings(self, settings: GlobalSettings) -> None:
+        """
+        Given a global settings object, use it to update the global settings in
+        the database, or create one to match if it doesn't exist.
+        """
         pass
 
     @staticmethod

@@ -12,6 +12,7 @@ from fastapi_utils.tasks import repeat_every
 
 from app.backend import PrecisBackend
 from app.context import GlobalSettings, Themes
+from app.logging import HealthCheckFilter
 from app.models import Feed, HealthCheck
 from app.rss import PrecisRSS
 from app.storage.engine import load_storage_config
@@ -25,6 +26,9 @@ storage_handler = load_storage_config()
 
 bk = PrecisBackend(db=storage_handler)
 rss = PrecisRSS(db=storage_handler)
+
+logger.addFilter(HealthCheckFilter())
+getLogger("uvicorn.access").addFilter(HealthCheckFilter())
 
 
 @repeat_every(seconds=60 * 5, logger=logger)
