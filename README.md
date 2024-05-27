@@ -36,10 +36,36 @@ make dev
 Then to develop, in one terminal start tailwind by doing `make tw`. Then, in other start the main app by doing `make run`.
 
 ## OPML Import/Export
-Precis supports exporting your current set of feeds as OPML, as well as importing feeds from other OPML files. A couple caveats:
+Precis supports exporting your current set of feeds as OPML, as well as importing feeds from other OPML files. You can find options on the `/feeds/` page, or use the CLI as described below.
+
+A couple caveats:
 1. When importing an OPML file, if the feed already exists then it will be upserted. Any properties that differ from the OPML file will change to match.
 2. When importing an OPML file, Precis will take the first category as the category of the feed. You may always change the category at a later time.
 3. When importing and exporting, we the map the feed name, feed url, and category to the outline item `text`, `xml_url`, and `categories[0]` attributes, respectively. Please ensure that your input file uses the same conventions.
+
+## Backups
+Precis supports exporting and importing point-in-time backups of the entire application state. You can find these options on the `/about/` page, or use the CLI as described below. One of the design goals of this functionality is supporting the ability to combine two different Precis instances, so the default behavior of the import functionality is to upsert.
+
+Users should be careful about potentially importing the same backup twice, and importing backups that have overlapping content may cause unexpected behavior.
+
+Finally - the backups will contain any API keys or other secrets that you've configured Precis to use, so they should themselves be treated as secrets.
+
+## CLI
+Precis includes a CLI tool that can be used to manage the application. Currently, it supports exporting and importing JSON backups and OPML files.
+
+```bash
+❯ precis --help
+Usage: precis [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  backup       Write a json-format backup of the current Precis state to...
+  export-opml  Write a opml-format list of the feeds configured in Precis...
+  import-opml  Import an opml-formatted feed list into Precis
+  restore      Restore a json-format backup of the Precis state
+```
 
 ## UI Tour
 After initial onboarding, you'll be brought to the feeds page.

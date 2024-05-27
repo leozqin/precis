@@ -53,7 +53,8 @@ dependencies = [
     "python-multipart",
     "typing_inspect",
     "lmdb",
-    "pyopml"
+    "pyopml",
+    "asyncclick"
 ]
 
 [project.urls]

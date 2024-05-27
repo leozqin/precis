@@ -241,4 +241,4 @@ class PrecisRSS:
         for contents in content.values():
             for i in contents.values():
                 content_obj = EntryContent(**i)
-                self.db.upsert_entry_content(content=content_obj)
+                await self.db.upsert_entry_content(content=content_obj)
