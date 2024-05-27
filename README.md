@@ -1,4 +1,4 @@
-![The Precis logo... for now](assets/logo-with-name-light.svg)
+![The Precis logo... for now](app/assets/logo-with-name-light.svg)
 --
 Precis (properly Précis, pronounced "pray-see") is a extensibility-oriented RSS reader that can use LLMs to summarize and synthesize information from numerous different sources, with an emphasis on timely delivery of information via notifications.
 
@@ -96,16 +96,16 @@ Commands:
 
 ## UI Tour
 After initial onboarding, you'll be brought to the feeds page.
-![The feeds page](assets/feeds.png)
+![The feeds page](app/assets/feeds.png)
 
 You can then view the feed entries for each feed.
-![The feed entries page](assets/feed_entries.png)
+![The feed entries page](app/assets/feed_entries.png)
 
 When you read a feed entry you'll get the full text of the article, as well a summary if you have a summarization handler configured.
-![The read page](assets/read.png)
+![The read page](app/assets/read.png)
 
 Global settings can be configured in the UI
-![The settings page](assets/settings.png)
+![The settings page](app/assets/settings.png)
 
 Configuring individual handlers is as simple as following an JSON Schema spec. (At some point we'll make a real UI)
-![The handler config page](assets/handler_config.png)
+![The handler config page](app/assets/handler_config.png)

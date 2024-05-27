@@ -6,7 +6,6 @@ ENV IS_DOCKER=True
 RUN apt-get -y update; apt-get -y install curl
 
 COPY app ./app/
-COPY assets ./assets/
 COPY pyproject.toml .
 
 RUN pip install .

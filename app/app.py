@@ -56,7 +56,7 @@ app.mount(
 
 app.mount(
     "/assets",
-    StaticFiles(directory=Path(Path(__file__).parent, "../assets")),
+    StaticFiles(directory=Path(Path(__file__).parent, "assets")),
     name="assets",
 )
 
