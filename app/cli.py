@@ -57,3 +57,27 @@ async def import_opml(file_path: PathLike):
     """
     with open(Path(file_path).resolve(), "r") as fp:
         await rss.opml_to_feeds(fp)
+
+
+@cli.command()
+def load_feeds():
+    """
+    Load feeds from a YML-formatted feeds.yml file in the config dir
+    """
+    rss.load_feeds()
+
+
+@cli.command()
+def load_settings():
+    """
+    Load settings from a YML-formatted settings.yml file in the config dir
+    """
+    rss.load_settings()
+
+
+@cli.command()
+def load_handlers():
+    """
+    Load handlers from a YML-formatted handlers.yml file in the config dir
+    """
+    rss.load_handlers()

@@ -1,0 +1,22 @@
+openai:
+  api_key: abc_123_openai_api_key
+  model: gpt-3.5-turbo
+ollama:
+  base_url: http://my-ollama-server/
+  model: llama
+  system: You are a robot that summarizes rss feed entries
+  options:
+    temperature: 0
+slack:
+  token: abc_123_slack_bot_token_goes_here
+  channel_name: rss
+  routing:
+    news: special-news-channel-slack
+matrix:
+  homeserver: http://my-matrix-server/
+  room_id: 123abc
+  username: foo
+  password: bar
+  routing:
+    favorite_blogs: 123abc
+    other_blogs: 456def
