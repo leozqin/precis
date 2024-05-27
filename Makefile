@@ -20,3 +20,7 @@ dev:
 .PHONY: build
 build:
 	docker compose up --build
+
+.PHONY: clean
+clean:
+	rm *.mdb db.json

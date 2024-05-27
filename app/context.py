@@ -95,7 +95,7 @@ class StorageHandler(ABC):
         **{k: "content" for k in content_retrieval_handlers.keys()},
     }
 
-    def reconfigure_handler(self, id: str, config: Mapping):
+    def reconfigure_handler(self, id: str, config: Mapping) -> Type[HandlerBase]:
         return self.handler_map[id](**config)
 
     @abstractmethod
@@ -175,10 +175,11 @@ class StorageHandler(ABC):
         pass
 
     @abstractmethod
-    def get_entries(self, feed: Feed) -> Mapping[str, FeedEntry | str]:
+    def get_entries(self, feed: Feed) -> List[Mapping[str, str]]:
         """
-        Given a feed, retrieve the entries for that feed and return a mapping
-        of the feed entry ID to the feed entry object
+        Given a feed, retrieve the entries for that feed and return a list of
+        dicts, where each dict has key entry = FeedEntry object, feed_id = the
+        id of the feed for which the entry exists, and id = the entry ID.
         """
         pass
 
@@ -203,11 +204,18 @@ class StorageHandler(ABC):
         """
         Given a feed entry, return the EntryContent object for that entry
         if one exists. If the redrive argument is true or if none exists,
-        create a new one using the URL of the feed entry. Use the get_main_content
+        create a new one using the URL of the feed entry and add it to the
+        database using upsert_entry_content. Use the get_main_content
         static method for the class to clean the content as needed. Use the
         summarize static method for the class to build the summary.
         """
         pass
+
+    @abstractmethod
+    async def upsert_entry_content(self, content: EntryContent):
+        """
+        Given an EntryContent object, insert it into the database.
+        """
 
     @abstractmethod
     def upsert_handler(

@@ -160,13 +160,18 @@ class TinyDBStorageHandler(StorageHandler):
                 summary=summary if summary else None,
             )
 
-            query = Query().id.matches(entry.id)
-            table.upsert(
-                {"id": entry_content.id, "entry_contents": entry_content.dict()},
-                cond=query,
-            )
+            await self.upsert_entry_content(content=entry_content)
 
             return entry_content
+
+    async def upsert_entry_content(self, content: EntryContent):
+        table = self.db.table("entry_contents")
+        query = Query().id.matches(content.id)
+
+        table.upsert(
+            {"id": content.id, "entry_contents": content.dict()},
+            cond=query,
+        )
 
     def upsert_handler(
         self,

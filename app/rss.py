@@ -1,5 +1,6 @@
 from calendar import timegm
 from datetime import datetime, timezone
+from json import dump, load
 from logging import getLogger
 from pathlib import Path
 from tempfile import SpooledTemporaryFile
@@ -10,7 +11,7 @@ from ruamel.yaml import YAML
 
 from app.constants import CONFIG_DIR, DATA_DIR
 from app.context import GlobalSettings, StorageHandler
-from app.models import Feed, FeedEntry
+from app.models import EntryContent, Feed, FeedEntry
 
 logger = getLogger("uvicorn.error")
 
@@ -171,3 +172,73 @@ class PrecisRSS:
         if not settings.finished_onboarding:
             settings.finished_onboarding = True
             self.db.upsert_settings(settings=settings)
+
+    async def backup(self):
+
+        feeds = self.db.get_feeds()
+        settings: GlobalSettings = self.db.get_settings()
+        handlers = self.db.get_handlers()
+
+        backup = {
+            "settings": settings.dict(exclude={"db"}),
+            "handlers": {k: v.dict() for k, v in handlers.items() if v},
+            "feeds": [i.dict() for i in feeds],
+            "feed_entries": {},
+            "entry_content": {},
+            "poll_state": {},
+        }
+
+        for feed in feeds:
+            feed: Feed
+            backup["poll_state"][feed.id] = self.db.get_poll_state(feed)
+            entries = [i["entry"] for i in self.db.get_entries(feed)]
+            entry_content = {i.id: await self.db.get_entry_content(i) for i in entries}
+            backup["feed_entries"][feed.id] = [i.dict() for i in entries]
+            backup["entry_content"][feed.id] = {
+                k: v.dict() for k, v in entry_content.items()
+            }
+
+        str_now = datetime.now().strftime("%Y%m%d%H%M%S")
+        file_name = f"precis_backup_{str_now}.json"
+        out_path = Path(DATA_DIR, file_name).resolve()
+
+        logger.info(f"writing backup to {out_path}")
+
+        with open(out_path, "w+") as fp:
+            dump(backup, fp)
+
+        return out_path, file_name
+
+    async def restore(self, file: SpooledTemporaryFile):
+
+        bk = load(file)
+
+        settings = GlobalSettings(db=self.db, **bk.get("settings", {}))
+        settings.finished_onboarding = True
+
+        handlers = [
+            self.db.reconfigure_handler(id=k, config=v)
+            for k, v in bk.get("handlers", {}).items()
+        ]
+        feeds = [Feed(**i) for i in bk.get("feeds", [])]
+
+        for handler in handlers:
+            self.db.upsert_handler(handler=handler)
+
+        self.db.upsert_settings(settings)
+
+        for feed in feeds:
+            self.db.upsert_feed(feed)
+
+        feed_entries: dict = bk.get("feed_entries", {})
+        for feed, entries in feed_entries.items():
+            feed_obj = self.db.get_feed(id=feed)
+            for entry in entries:
+                entry_obj = FeedEntry(**entry)
+                self.db.upsert_feed_entry(feed=feed_obj, entry=entry_obj)
+
+        content: dict = bk.get("entry_content", {})
+        for contents in content.values():
+            for i in contents.values():
+                content_obj = EntryContent(**i)
+                self.db.upsert_entry_content(content=content_obj)
