@@ -89,11 +89,19 @@ async def root(request: Request):
 
 
 @app.get("/about", response_class=HTMLResponse)
-async def about(request: Request):
+async def about(
+    request: Request, update_status: bool = False, update_exception: str = None
+):
 
     return templates.TemplateResponse(
         "about.html",
-        {"request": request, "settings": await bk.get_settings(), **bk.about()},
+        {
+            "request": request,
+            "settings": await bk.get_settings(),
+            "update_status": update_status,
+            "update_exception": update_exception,
+            **bk.about(),
+        },
     )
 
 
@@ -314,6 +322,31 @@ async def export_opml(request: Request):
     write_path, file_name = await rss.feeds_to_opml()
 
     return FileResponse(path=write_path, filename=file_name)
+
+
+@app.get("/api/backup/", status_code=status.HTTP_200_OK)
+async def backup(request: Request):
+
+    write_path, file_name = await rss.backup()
+
+    return FileResponse(path=write_path, filename=file_name)
+
+
+@app.post("/api/restore/", status_code=status.HTTP_200_OK)
+async def restore(request: Request, file: UploadFile):
+
+    try:
+        await rss.restore(file=file.file)
+
+        return RedirectResponse(
+            request.url_for("about").include_query_params(update_status=True),
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
+    except Exception as e:
+        return RedirectResponse(
+            request.url_for("about").include_query_params(update_exception=e),
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
 
 
 @app.post("/api/import_opml/", status_code=status.HTTP_200_OK)

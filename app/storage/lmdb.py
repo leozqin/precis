@@ -227,13 +227,17 @@ class LMDBStorageHandler(StorageHandler):
                 summary=summary if summary else None,
             )
 
-            with self.db.begin(db=self._db(Named.entry_content), write=True) as txn:
-                txn.replace(
-                    self._serialize(entry_content.id),
-                    self._serialize(entry_content),
-                )
+            await self.upsert_entry_content(entry_content)
 
             return entry_content
+
+    async def upsert_entry_content(self, content: EntryContent):
+
+        with self.db.begin(db=self._db(Named.entry_content), write=True) as txn:
+            txn.replace(
+                self._serialize(content.id),
+                self._serialize(content),
+            )
 
     def upsert_handler(self, handler: type[HandlerBase]) -> None:
 

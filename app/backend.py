@@ -1,6 +1,7 @@
 from importlib.metadata import version
 from json import dumps, loads
 from logging import getLogger
+from sys import version as py_version
 from time import localtime, strftime
 from typing import List, Mapping, Type
 
@@ -30,6 +31,8 @@ class PrecisBackend:
 
         return {
             "version": version("precis"),
+            "python_version": py_version,
+            "fastapi_version": version("fastapi"),
             "docker": IS_DOCKER,
             "storage_handler": type(self.db).__name__,
             "github": GITHUB_LINK,

@@ -34,10 +34,10 @@
               </a>
             </li>
             <li>
-                <a href="{{ url_for('settings') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
-                  Edit Global Settings
-                </a>
-              </li>
+              <a href="{{ url_for('settings') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
+                Edit Global Settings
+              </a>
+            </li>
             <li>
               <a href="{{ url_for('root') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
                 Return to All Feeds
@@ -47,23 +47,74 @@
         </div>
       </div>
   </section>
-  <section class="w-5/6 md:w-1/2 justify-center mx-auto">
-    <img src="../../assets/logo-with-name-light.svg" />
+  <section class="w-5/6 md:w-2/3 justify-center mx-auto">
+    <img src="../../assets/logo-with-name-light.svg" class="justify-center mx-auto"/>
     <div class="py-5 text-2xl m3:text-xl">
-        <h3>
-            Version: {{ version }}
-        </h3>
-        <h3>
-            Running on: {% if docker %}Docker{% else %}Python{% endif %}
-        </h3>
-        <h3>
-            Storage Handler: {{ storage_handler }}
-        </h3>
-        <h3>
-            GitHub: <a class="link" href="{{ github }}">{{ github }}</a>
-        </h3>
+      <h3 class="py-1">
+        Version: {{ version }}
+      </h3>
+      <h3 class="py-1">
+        Running on: {% if docker %}Docker{% else %}Python{% endif %}
+      </h3>
+      <h3 class="py-1">
+        Python Version: {{ python_version }}
+      </h3>
+      <h3 class="py-1">
+        FastAPI Version: {{ fastapi_version }}
+      </h3>
+      <h3 class="py-1">
+        Storage Handler: {{ storage_handler }}
+      </h3>
+      <h3 class="py-1">
+        Active Theme: {{settings.theme.value}}
+      </h3>
+      <h3 class="py-1">
+        GitHub: <a class="link" href="{{ github }}">{{ github }}</a>
+      </h3>
     </div>
-
+  </section>
+  <div class="divider"></div>
+  <section class="w-5/6 md:w-3/5 justify-center mx-auto">
+    <div>
+      <h2 class="text-4xl lg:text-2xl my-5 justify-center flex">
+        Create Backup
+      </h2>
+      <p class="text-2xl lg:text-xl my-5 justify-center flex">
+        A backup is a json file that contains a point-in-time snapshot of all of the data in your instance of Precis.
+        This includes API credentials, if you've configured them, so treat this file as you would a secret!
+        Backups can be restored across storage handlers.
+      </p>
+      <a href="{{ url_for('backup') }}" role="button"
+        class="btn btn-outline w-1/2 lg:w-2/5 mx-auto flex justify-center my-5 text-3xl lg:text-xl">
+        Backup
+      </a>
+    </div>
+  </section>
+  <section class="py-10">
+    <h2 class="text-4xl lg:text-2xl my-5 justify-center flex">
+      Restore from Backup
+    </h2>
+    <form id="opml_import" method="post" action="/api/restore" enctype="multipart/form-data">
+      <input type="file" name="file"
+        class="file-input file-input-bordered file-input-primary w-1/2 lg:w-2/5 mx-auto flex justify-center my-5 text-3xl lg:text-xl" />
+    </form>
+    <div class="w-1/2 lg:w-2/5 justify-center my-5 mx-auto">
+      <button type="submit" form="opml_import"
+        class="btn btn-outline w-full mx-auto flex justify-center my-5 text-3xl lg:text-xl">
+        Restore
+        {% if update_status %} &#9989 {% endif %}
+        {% if update_exception %} &#10060 {% endif %}
+      </button>
+      {% if update_exception %}
+      <div role="alert" class="alert alert-error">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>{{ update_exception }}</span>
+      </div>
+      {% endif %}
+    </div>
   </section>
 
 </body>
