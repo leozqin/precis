@@ -31,6 +31,23 @@ class PrecisRSS:
 
             self.db.upsert_feed(feed)
 
+    def load_settings(self) -> None:
+        with open(Path(CONFIG_DIR, "settings.yml").resolve(), "r") as fp:
+            yaml = YAML(typ="safe")
+            configs = yaml.load(fp)
+
+        settings = GlobalSettings(**configs, db=self.db)
+
+        self.db.upsert_settings(settings)
+
+    def load_handlers(self) -> None:
+        with open(Path(CONFIG_DIR, "handlers.yml").resolve(), "r") as fp:
+            yaml = YAML(typ="safe")
+            configs: dict = yaml.load(fp)
+
+        for k, v in configs.items():
+            self.db.reconfigure_handler(id=k, config=v)
+
     async def _process_feed_entry(
         self, entry: Mapping, feed: Feed, start_ts: int
     ) -> True:
@@ -241,4 +258,4 @@ class PrecisRSS:
         for contents in content.values():
             for i in contents.values():
                 content_obj = EntryContent(**i)
-                self.db.upsert_entry_content(content=content_obj)
+                await self.db.upsert_entry_content(content=content_obj)

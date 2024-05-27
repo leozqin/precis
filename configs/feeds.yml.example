@@ -1,0 +1,8 @@
+- name: My favorite feed
+  category: fun
+  url: https://my-favorite-feed.com/index.xml
+- name: My second favorite feed
+  category: not_fun
+  notify: false
+  notify_destination: news
+  url: https://my-second-favorite-feed.net/feed.atom
