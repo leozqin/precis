@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "precis"
-version = "0.2.4"
+version = "0.2.5"
 description = "A framework for automating your media diet"
 requires-python = ">=3.11"
 license = {file = "LICENSE"}
@@ -73,7 +73,7 @@ precis = "app.cli:cli"
 # This is configuration specific to the `setuptools` build backend.
 # If you are using a different build backend, you will need to change this.
 [tool.setuptools]
-# If there are data files included in your packages that need to be
-# installed, specify them here.
-package-data = {"sample" = ["*.dat"]}
-packages = ["app"]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
