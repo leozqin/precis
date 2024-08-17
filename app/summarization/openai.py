@@ -10,7 +10,7 @@ from app.models import Feed, FeedEntry
 
 class OpenAISummarizationHandler(SummarizationHandler, BaseModel):
     api_key: str = environ.get("OPENAI_API_KEY")
-    model: str = "gpt-3.5-turbo"
+    model: str = "gpt-4o-mini"
 
     id: ClassVar[str] = "openai"
 

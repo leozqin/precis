@@ -35,6 +35,7 @@ class GlobalSettings(BaseModel):
     send_notification: bool = True
     theme: Themes = Themes.forest
     refresh_interval: int = 5
+    reading_speed: int = 238
 
     notification_handler_key: str = "null_notification"
     summarization_handler_key: str = "null_summarization"
