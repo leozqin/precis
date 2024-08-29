@@ -55,7 +55,8 @@ dependencies = [
     "lmdb",
     "pyopml",
     "asyncclick",
-    "textstat"
+    "textstat",
+    "jira"
 ]
 
 [project.urls]
