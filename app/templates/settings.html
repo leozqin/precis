@@ -14,7 +14,7 @@
   <section class="mx-auto justify-center w-screen lg:w-full mb-10">
     <div class="navbar bg-accent h-28 lg:h-20">
       <div class="navbar-start">
-        <h1 class="text-5xl lg:text-3xl text-neutral">
+        <h1 class="text-5xl lg:text-3xl text-accent-content">
           Settings
         </h1>
       </div>
@@ -58,6 +58,11 @@
         <label class="label cursor-pointer gap-2">
           <span class="label-text text-2xl lg:text-xl">Send Notifications</span>
           <input name="send_notification" type="checkbox" class="toggle" {% if settings.send_notification %} checked {%
+            endif %} />
+        </label>
+        <label class="label cursor-pointer gap-2">
+          <span class="label-text text-2xl lg:text-xl">Finished Onboarding</span>
+          <input name="finished_onboarding" type="checkbox" class="toggle" {% if settings.finished_onboarding %} checked {%
             endif %} />
         </label>
         <label class="label flex items-center gap-2 text-2xl lg:text-xl">
@@ -104,6 +109,12 @@
             {% endfor %}
           </select>
         </label>
+        <label class="label flex items-center gap-2 text-2xl lg:text-xl">
+          Reading Speed (WPM)
+          <input type="number" placeholder="How many words per minute?"
+            class="input input-bordered w-full max-w-xs text-2xl lg:text-xl" value="{{ settings.reading_speed}}"
+            name="reading_speed">
+        </label>
       </div>
       <div class=" w-1/2 md:w-1/5 mx-auto flex justify-center my-5">
         <div class="tooltip" data-tip="If you changed refresh interval you'll need to restart app to take effect">
@@ -133,7 +144,7 @@
     </div>
     <div class="justify-center grid-flow-row grid-cols-1 lg:grid-cols-3 grid gap-10">
       {% for handler in notification%}
-      <div class="card card-normal lg:card-compact w-11/12 md:w-4/5 shadow-xl bg-neutral mx-auto outline">
+      <div class="card card-normal lg:card-compact w-11/12 md:w-4/5 shadow-xl bg-base-300 mx-auto outline">
 
         <a class="no-underline" href="{{ url_for('handler_settings', handler=handler.type)}}">
           <div class="card-body">

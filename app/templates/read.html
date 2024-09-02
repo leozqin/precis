@@ -12,7 +12,7 @@
         <div class="navbar bg-accent h-28 lg:h-20">
             <div class="navbar-start">
                 <a href="{{ url_for('list_entries_by_feed', feed_id=content.feed_id) }}"
-                    class="btn btn-ghost text-5xl lg:text-3xl text-neutral">
+                    class="btn btn-ghost text-5xl lg:text-3xl text-accent-content">
                     {{ content.feed_name}}
                 </a>
             </div>
@@ -74,6 +74,9 @@
         <div class="text-3xl lg:xl my-5">Published: {{ content.published_at }}</div>
         <div class="text-3xl lg:xl my-5">Updated: {{ content.updated_at }}</div>
         {% endif %}
+        <div class="text-2xl lg:xl my-5">Reading Time: {{ content.reading_time }} minute(s)</div>
+        <div class="text-2xl lg:xl my-5">Word Count: {{ content.word_count }} words</div>
+        <div class="text-2xl lg:xl my-5">Complexity: Grade {{ content.reading_level }}</div>
     </section>
     <section class="w-11/12 lg:w-3/5 mx-auto">
         {% if content.preview %}

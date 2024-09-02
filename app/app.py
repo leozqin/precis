@@ -243,6 +243,8 @@ async def update_settings(
     notification: Annotated[str, Form()] = None,
     content: Annotated[str, Form()] = None,
     summarization: Annotated[str, Form()] = None,
+    reading_speed: Annotated[int, Form()] = None,
+    finished_onboarding: Annotated[bool, Form()] = False,
 ):
     try:
         settings = GlobalSettings(
@@ -252,6 +254,8 @@ async def update_settings(
             notification_handler_key=notification,
             summarization_handler_key=summarization,
             content_retrieval_handler_key=content,
+            reading_speed=reading_speed,
+            finished_onboarding=finished_onboarding,
             db=storage_handler,
         )
 

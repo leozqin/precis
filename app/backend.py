@@ -6,6 +6,7 @@ from time import localtime, strftime
 from typing import List, Mapping, Type
 
 from pydantic import BaseModel
+from textstat import textstat as txt
 
 from app.constants import GITHUB_LINK, IS_DOCKER
 from app.context import GlobalSettings, StorageHandler
@@ -94,6 +95,7 @@ class PrecisBackend:
     async def get_entry_content(self, feed_entry_id, redrive: bool = False):
         entry: FeedEntry = self.db.get_feed_entry(id=feed_entry_id)
         feed: Feed = self.db.get_feed(entry.feed_id)
+        settings: GlobalSettings = self.db.get_settings()
 
         base = {
             "id": feed_entry_id,
@@ -112,11 +114,17 @@ class PrecisBackend:
             content: EntryContent = await self.db.get_entry_content(
                 entry=entry, redrive=redrive
             )
+            word_count = txt.lexicon_count(content.content)
             return {
                 **base,
                 "preview": None,
                 "content": content.content,
                 "summary": content.summary,
+                "word_count": word_count,
+                "reading_level": int(
+                    txt.text_standard(content.content, float_output=True)
+                ),
+                "reading_time": int(word_count / settings.reading_speed),
             }
 
     def get_handlers(self):

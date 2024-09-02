@@ -24,10 +24,19 @@ from app.summarization import summarization_handlers
 
 
 class Themes(str, Enum):
-    synthwave = "synthwave"
-    forest = "forest"
+    black = "black"
+    coffee = "coffee"
     dark = "dark"
+    fantasy = "fantasy"
+    forest = "forest"
+    lemonade = "lemonade"
+    lofi = "lofi"
+    luxury = "luxury"
     night = "night"
+    nord = "nord"
+    pastel = "pastel"
+    synthwave = "synthwave"
+    winter = "winter"
 
 
 class GlobalSettings(BaseModel):
@@ -35,6 +44,7 @@ class GlobalSettings(BaseModel):
     send_notification: bool = True
     theme: Themes = Themes.forest
     refresh_interval: int = 5
+    reading_speed: int = 238
 
     notification_handler_key: str = "null_notification"
     summarization_handler_key: str = "null_summarization"
