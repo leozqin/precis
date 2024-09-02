@@ -11,6 +11,10 @@ services:
       # you can also configure these through the UI if you want
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - SLACK_API_TOKEN=${SLACK_API_TOKEN}
+      - JIRA_API_TOKEN=${JIRA_API_TOKEN}
+      - JIRA_EMAIL=${JIRA_EMAIL}
+      - NTFY_BASE_URL=${NTFY_BASE_URL}
+      - NTFY_TOPIC=${NTFY_TOPIC}
 
       # other variables that are unlikely to change
       - GITHUB_LINK=${GITHUB_LINK-https://github.com/leozqin/precis}

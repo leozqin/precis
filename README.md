@@ -5,7 +5,7 @@ Precis (properly Précis, pronounced "pray-see") is a extensibility-oriented RSS
 The following components of the app are extensible:
 1. Summarization - LLMs including Ollama and OpenAI
 2. Content Retrieval - `requests` or `playwright`
-3. Notification - currently - `matrix` or `slack`, but support for other protocols such as `discord` or `mattermost`, or push-based services such as `gotify` or `ntfy`, or even a message bus such as `kafka` would be possible
+3. Notification - `matrix`, `slack`, `jira`, and `ntfy`
 4. Storage - At this time, we support two reasonable embedded DBs - `tinydb` or `lmdb` - defaults to `tinydb`. You can add support for your database of choice if you can implement about 20 shared transactions.
 
 The Summarization and Notification handlers also support a `null` handler that does nothing. Good for testing or if you don't care about notifications and summaries. The null handler is the default.
