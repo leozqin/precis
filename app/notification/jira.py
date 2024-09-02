@@ -46,7 +46,7 @@ class JiraNotificationHandler(NotificationHandler):
             )
         else:
             project = self.project
-            logger.info(f"Sending notification to default channel {project}")
+            logger.info(f"Sending notification to default project {project}")
 
         description = {
             "type": "doc",

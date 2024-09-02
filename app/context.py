@@ -24,10 +24,19 @@ from app.summarization import summarization_handlers
 
 
 class Themes(str, Enum):
-    synthwave = "synthwave"
-    forest = "forest"
+    black = "black"
+    coffee = "coffee"
     dark = "dark"
+    fantasy = "fantasy"
+    forest = "forest"
+    lemonade = "lemonade"
+    lofi = "lofi"
+    luxury = "luxury"
     night = "night"
+    nord = "nord"
+    pastel = "pastel"
+    synthwave = "synthwave"
+    winter = "winter"
 
 
 class GlobalSettings(BaseModel):
