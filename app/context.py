@@ -278,15 +278,17 @@ class StorageHandler(ABC):
 
     @staticmethod
     def get_main_content(content: str) -> str:
-        md = simple_json_from_html_string(html=content)
+        md = simple_json_from_html_string(html=content, use_readability=True)
 
         cleaned_document = Document(input=md["content"])
 
-        converter = HTML2Text()
-        converter.ignore_images = True
-        converter.ignore_links = True
+        # converter = HTML2Text()
+        # converter.ignore_images = True
+        # converter.ignore_links = True
 
-        return markdown(converter.handle(cleaned_document.summary(html_partial=True)))
+        # return markdown(converter.handle(cleaned_document.summary(html_partial=True)))
+
+        return cleaned_document.summary(html_partial=True)
 
     @staticmethod
     def summarize(

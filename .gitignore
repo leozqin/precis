@@ -169,3 +169,4 @@ configs/*.yml
 *.opml
 
 node_modules
+app/static/output.css
