@@ -7,3 +7,12 @@
     max-height: 640px;
     margin: auto;
 }
+
+.prose figure {
+    p {
+        margin: auto;
+        width: 60%;
+        text-align: center;
+        margin-top: 1em;
+    }
+}
