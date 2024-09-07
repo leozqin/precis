@@ -147,9 +147,7 @@ class LMDBStorageHandler(StorageHandler):
 
             txn.replace(self._serialize(feed.id), self._serialize(entries))
 
-    def get_entries(
-        self, feed: Feed = None, after: int = 0
-    ) -> Mapping[str, FeedEntry | str]:
+    def get_entries(self, feed: Feed = None) -> Mapping[str, FeedEntry | str]:
         entries = []
 
         if feed:
@@ -171,14 +169,13 @@ class LMDBStorageHandler(StorageHandler):
         for entry in entries if entries else []:
             k, v = entry
             feed_entry = FeedEntry(**self._deserialize(v))
-            if feed_entry.published_at > after:
-                out.append(
-                    {
-                        "entry": feed_entry,
-                        "feed_id": feed_entry.feed_id,
-                        "id": self._deserialize(k),
-                    }
-                )
+            out.append(
+                {
+                    "entry": feed_entry,
+                    "feed_id": feed_entry.feed_id,
+                    "id": self._deserialize(k),
+                }
+            )
 
         return out
 

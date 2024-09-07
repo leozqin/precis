@@ -98,7 +98,7 @@ class TinyDBStorageHandler(StorageHandler):
         query = Query().id.matches(entry.id)
         table.upsert(row, cond=query)
 
-    def get_entries(self, feed: Feed = None, after: int = 0):
+    def get_entries(self, feed: Feed = None):
         table = self.db.table("entries")
 
         if feed:
@@ -110,7 +110,6 @@ class TinyDBStorageHandler(StorageHandler):
         return [
             {"entry": FeedEntry(**i["entry"]), "feed_id": i["feed_id"], "id": i["id"]}
             for i in entries
-            if i["entry"]["published_at"] > after
         ]
 
     def get_feed_entry(self, id: str):

@@ -140,21 +140,6 @@ async def list_entries_by_feed(
     )
 
 
-@app.get("/recent/", response_class=HTMLResponse)
-async def list_recent_feed_entries(request: Request, refresh_requested: bool = False):
-
-    return templates.TemplateResponse(
-        "entries.html",
-        {
-            "request": request,
-            "settings": await bk.get_settings(),
-            "entries": list(bk.list_entries(feed_id=None, recent=True)),
-            "refresh_requested": refresh_requested,
-            "recent": True,
-        },
-    )
-
-
 @app.get("/read/{feed_entry_id}", response_class=HTMLResponse)
 async def read(request: Request, feed_entry_id: str, redrive: bool = False):
 
@@ -260,7 +245,6 @@ async def update_settings(
     summarization: Annotated[str, Form()] = None,
     reading_speed: Annotated[int, Form()] = None,
     finished_onboarding: Annotated[bool, Form()] = False,
-    recent_hours: Annotated[int, Form()] = None,
 ):
     try:
         settings = GlobalSettings(
@@ -272,7 +256,6 @@ async def update_settings(
             content_retrieval_handler_key=content,
             reading_speed=reading_speed,
             finished_onboarding=finished_onboarding,
-            recent_hours=recent_hours,
             db=storage_handler,
         )
 
