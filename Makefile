@@ -9,9 +9,9 @@ install:
 	playwright install --with-deps chromium
 
 .PHONY: install-ci
-install:
+install-ci:
 	npm install -D tailwindcss @tailwindcss/typography daisyui@latest @tailwindcss/forms
-	pip install pyproject.toml
+	uv pip install pyproject.toml
 	playwright install --with-deps chromium
 
 .PHONY: run
