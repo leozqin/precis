@@ -20,7 +20,7 @@ run:
 
 .PHONY: run-ci
 run-ci:
-	uvicorn app.app:app
+	uvicorn app.app:app &
 
 .PHONY: dev
 dev:

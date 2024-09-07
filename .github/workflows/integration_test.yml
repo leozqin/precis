@@ -15,8 +15,9 @@ jobs:
     permissions:
       contents: read
     env:
-      PRECIS_STORAGE: ${{ inputs.storage_handler }}
+      PRECIS_STORAGE_HANDLER: ${{ inputs.storage_handler }}
       CONFIG_DIR: tests/integration/config/
+      RSS_BASE_URL: http://localhost:8000
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -29,5 +30,5 @@ jobs:
         run: |
           source .venv/bin/activate
           precis load-feeds
-          make run-ci 2>& 1 > /dev/null
+          make run-ci
           make test
