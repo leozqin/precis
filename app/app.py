@@ -1,7 +1,8 @@
 from contextlib import asynccontextmanager
+from itertools import chain
 from logging import getLogger
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Mapping, Sequence
 
 from fastapi import FastAPI, Form, UploadFile, status
 from fastapi.requests import Request
@@ -434,3 +435,38 @@ async def new_feed(request: Request, update_exception: str = None):
             "update_exception": update_exception,
         },
     )
+
+
+# Utility APIs - mostly used to orchestrate tests, but available for whatever
+
+
+@app.get("/util/list-feeds", status_code=status.HTTP_200_OK)
+async def list_feeds(request: Request) -> Sequence[Mapping]:
+
+    return bk.list_feeds()
+
+
+@app.get("/util/list-feed-entries", status_code=status.HTTP_200_OK)
+async def list_feed_entries(request: Request) -> Sequence[Mapping]:
+
+    all_feeds = bk.list_feeds()
+
+    entries = [list(bk.list_entries(feed["id"])) for feed in all_feeds]
+
+    return list(chain.from_iterable(entries))
+
+
+@app.get("/util/list-handlers", status_code=status.HTTP_200_OK)
+async def list_handlers(request: Request) -> Sequence[Mapping]:
+
+    handlers = bk.get_handlers()
+
+    # config might have secrets so we only return if its configured
+    return [
+        {
+            "name": handler["type"],
+            "type": handler["handler_type"],
+            "configured": True if handler.get("config") else False,
+        }
+        for handler in handlers
+    ]

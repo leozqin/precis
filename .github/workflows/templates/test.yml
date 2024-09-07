@@ -1,0 +1,31 @@
+on:
+  workflow_call:
+      inputs:
+        storage_handler:
+          required: true
+          type: string
+
+env:
+  IMAGE_NAME: precis
+#
+jobs:
+  # This pushes the image to GitHub Packages.
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      PRECIS_STORAGE: ${{ inputs.storage_handler }}
+      CONFIG_DIR: tests/integration/config/
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install
+        run: |
+          pip install uv && uv venv
+          make install
+      - name: test
+        run: |
+          precis load-feeds
+          make dev 2>& 1 > /dev/null
+          make test

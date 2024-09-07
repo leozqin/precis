@@ -24,3 +24,8 @@ build:
 .PHONY: clean
 clean:
 	rm *.mdb db.json
+
+.PHONY: test
+test:
+	go test tests/integration/web_static_test.go -v
+	go test tests/integration/web_dynamic_test.go -v
