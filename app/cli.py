@@ -1,9 +1,13 @@
+from logging import INFO, getLogger
 from os import PathLike
 from pathlib import Path
 
 import asyncclick as click
 
 from app.app import rss
+
+logger = getLogger("cli")
+logger.setLevel(INFO)
 
 
 @click.group
@@ -64,6 +68,7 @@ def load_feeds():
     """
     Load feeds from a YML-formatted feeds.yml file in the config dir
     """
+    logger.info("Precis CLI requested to check feeds")
     rss.load_feeds()
 
 
@@ -72,6 +77,7 @@ async def check_feeds():
     """
     Check for new entries in the configured feeds
     """
+    logger.info("Precis CLI requested to check feeds")
     await rss.check_feeds()
 
 
