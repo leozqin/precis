@@ -5,11 +5,11 @@ on:
       - main
 
 jobs:
-  test-tinydb:
-    uses: ./.github/workflows/templates/test.yml
+  integration-test-tinydb:
+    uses: ./.github/workflows/integration_test.yml
     with:
       storage_handler: tinydb
-  test-lmdb:
-    uses: ./.github/workflows/templates/test.yml
+  integration-test-lmdb:
+    uses: ./.github/workflows/integration_test.yml
     with:
       storage_handler: lmdb

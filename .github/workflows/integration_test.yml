@@ -10,7 +10,7 @@ env:
 #
 jobs:
   # This pushes the image to GitHub Packages.
-  test:
+  integration_test:
     runs-on: ubuntu-latest
     permissions:
       contents: read
