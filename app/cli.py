@@ -68,6 +68,14 @@ def load_feeds():
 
 
 @cli.command()
+async def check_feeds():
+    """
+    Check for new entries in the configured feeds
+    """
+    await rss.check_feeds()
+
+
+@cli.command()
 def load_settings():
     """
     Load settings from a YML-formatted settings.yml file in the config dir
