@@ -11,7 +11,7 @@ install:
 .PHONY: install-ci
 install-ci:
 	npm install -D tailwindcss @tailwindcss/typography daisyui@latest @tailwindcss/forms
-	uv pip install pyproject.toml
+	uv pip install .
 	playwright install --with-deps chromium
 
 .PHONY: run

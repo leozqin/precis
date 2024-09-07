@@ -20,14 +20,13 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
-      - run: ls -ltrah
       - name: install
         run: |
           pip install uv && uv venv
+          source .venv/bin/activate
           make install-ci
       - name: test
         run: |
-          source .venv/bin/activate
           precis load-feeds
           make dev 2>& 1 > /dev/null
           make test
