@@ -5,11 +5,9 @@ from enum import Enum
 from logging import getLogger
 from typing import Any, List, Mapping, Optional, Type
 
-from html2text import HTML2Text
 from markdown2 import markdown
 from pydantic import BaseModel, validator
 from readabilipy import simple_json_from_html_string
-from readability import Document
 
 from app.content import content_retrieval_handlers
 from app.handlers import (
@@ -278,15 +276,9 @@ class StorageHandler(ABC):
 
     @staticmethod
     def get_main_content(content: str) -> str:
-        md = simple_json_from_html_string(html=content)
+        md = simple_json_from_html_string(html=content, use_readability=True)
 
-        cleaned_document = Document(input=md["content"])
-
-        converter = HTML2Text()
-        converter.ignore_images = True
-        converter.ignore_links = True
-
-        return markdown(converter.handle(cleaned_document.summary(html_partial=True)))
+        return md["plain_content"]
 
     @staticmethod
     def summarize(

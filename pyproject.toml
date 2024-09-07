@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "precis"
-version = "0.2.7"
+version = "0.2.8"
 description = "A framework for automating your media diet"
 requires-python = ">=3.11"
 license = {file = "LICENSE"}
@@ -39,11 +39,8 @@ dependencies = [
     "tinydb",
     "fastapi-utils==0.2.1",
     "jinja2",
-    "html2text",
-    "lxml_html_clean",
     "requests",
     "readabilipy",
-    "readability-lxml",
     "markdown2[all]",
     "simplematrixbotlib",
     "slack_sdk",
