@@ -18,6 +18,10 @@ install-ci:
 run:
 	uvicorn app.app:app --reload --log-level debug
 
+.PHONY: run-ci
+run-ci:
+	uvicorn app.app:app
+
 .PHONY: dev
 dev:
 	make install
