@@ -2,7 +2,7 @@ from importlib.metadata import version
 from json import dumps, loads
 from logging import getLogger
 from sys import version as py_version
-from time import localtime, strftime
+from time import localtime, strftime, time
 from typing import List, Mapping, Type
 
 from pydantic import BaseModel
@@ -68,20 +68,28 @@ class PrecisBackend:
             for feed in feeds
         ]
 
-    def list_entries(self, feed_id: None):
+    def list_entries(self, feed_id: None, recent: bool = False):
 
         if feed_id:
             feed = self.db.get_feed(id=feed_id)
         else:
             feed = None
 
-        entries = self.db.get_entries(feed)
+        settings: GlobalSettings = self.db.get_settings()
+        start_time = time() - (settings.recent_hours * 3600)
+
+        if recent:
+            entries = self.db.get_entries(feed, after=start_time)
+        else:
+            entries = self.db.get_entries(feed=feed)
 
         for entry in entries:
             feed_entry: FeedEntry = entry["entry"]
+            if not feed:
+                local_feed: Feed = self.db.get_feed(entry["feed_id"])
 
             yield {
-                "feed_name": feed.name if feed else "All",
+                "feed_name": feed.name if feed else local_feed.name,
                 "title": feed_entry.title,
                 "url": feed_entry.url,
                 "published_at": self._format_time(feed_entry.published_at),

@@ -29,6 +29,11 @@
           <ul tabindex="0"
             class="menu menu-lg dropdown-content mt-12 z-[1] p-2 shadow bg-neutral rounded-box w-screen lg:w-96 outline">
             <li>
+              <a href="{{ url_for('list_recent_feed_entries') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
+                Recent Feed Entries
+              </a>
+            </li>
+            <li>
               <a href="{{ url_for('root') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
                 Return to All Feeds
               </a>

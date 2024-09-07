@@ -11,7 +11,7 @@
     <div class="navbar bg-accent h-28 lg:h-20">
       <div class="navbar-center lg:navbar-start">
         <h1 class="text-5xl lg:text-3xl text-accent-content">
-          Feed Entries {% if feed.name %} - {{ feed.name }} {% endif %}
+          Feed Entries {% if recent %} - Recent {% elif feed.name %} - {{ feed.name }} {% endif %}
         </h1>
       </div>
       <div class="navbar-end">
@@ -24,9 +24,17 @@
           </div>
           <ul tabindex="0"
             class="menu menu-lg dropdown-content mt-12 z-[1] p-2 shadow bg-neutral rounded-box w-screen lg:w-96 outline">
+            {% if not recent %}
             <li>
-              <a href="{{ url_for('refresh_feed', feed_id=feed.id) }}" class="text-4xl lg:text-xl text-nowrap no-underline">
+              <a href="{{ url_for('refresh_feed', feed_id=feed.id) }}"
+                class="text-4xl lg:text-xl text-nowrap no-underline">
                 Refresh This Feed
+              </a>
+            </li>
+            {% endif %}
+            <li>
+              <a href="{{ url_for('list_recent_feed_entries') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
+                Recent Feed Entries
               </a>
             </li>
             <li>
