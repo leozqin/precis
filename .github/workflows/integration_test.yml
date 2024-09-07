@@ -16,7 +16,7 @@ jobs:
       contents: read
     env:
       PRECIS_STORAGE_HANDLER: ${{ inputs.storage_handler }}
-      CONFIG_DIR: tests/integration/config/
+      CONFIG_DIR: ${{ github.workspace }}/tests/integration/config
       RSS_BASE_URL: http://localhost:8000
     steps:
       - name: checkout
@@ -29,7 +29,7 @@ jobs:
       - name: test
         run: |
           source .venv/bin/activate
+          make run-ci
           precis load-feeds
           precis check-feeds
-          make run-ci
           make test
