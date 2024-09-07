@@ -26,6 +26,7 @@ jobs:
           make install-ci
       - name: test
         run: |
+          source .venv/bin/activate
           precis load-feeds
           make dev 2>& 1 > /dev/null
           make test
