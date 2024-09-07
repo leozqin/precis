@@ -47,6 +47,7 @@ class GlobalSettings(BaseModel):
     notification_handler_key: str = "null_notification"
     summarization_handler_key: str = "null_summarization"
     content_retrieval_handler_key: str = "playwright"
+    recent_hours: int = 36
 
     finished_onboarding: bool = False
 
@@ -183,11 +184,13 @@ class StorageHandler(ABC):
         pass
 
     @abstractmethod
-    def get_entries(self, feed: Feed) -> List[Mapping[str, str]]:
+    def get_entries(self, feed: Feed = None, after: int = 0) -> List[Mapping[str, str]]:
         """
         Given a feed, retrieve the entries for that feed and return a list of
         dicts, where each dict has key entry = FeedEntry object, feed_id = the
-        id of the feed for which the entry exists, and id = the entry ID.
+        id of the feed for which the entry exists, and id = the entry ID. If no
+        feed is specified return entries for all feeds. Optionally, only return
+        entries after a certain epoch timestamp.
         """
         pass
 
