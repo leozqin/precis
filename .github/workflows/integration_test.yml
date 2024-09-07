@@ -23,7 +23,7 @@ jobs:
       - name: install
         run: |
           pip install uv && uv venv
-          make install
+          make install-ci
       - name: test
         run: |
           precis load-feeds

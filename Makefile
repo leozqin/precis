@@ -8,6 +8,12 @@ install:
 	pip install -e .
 	playwright install --with-deps chromium
 
+.PHONY: install-ci
+install:
+	npm install -D tailwindcss @tailwindcss/typography daisyui@latest @tailwindcss/forms
+	pip install pyproject.toml
+	playwright install --with-deps chromium
+
 .PHONY: run
 run:
 	uvicorn app.app:app --reload --log-level debug
