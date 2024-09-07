@@ -20,13 +20,12 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
+      - run: ls -ltrah
       - name: install
-        working-directory: ${{ github.workspace }}/precis
         run: |
           pip install uv && uv venv
           make install-ci
       - name: test
-        working-directory: ${{ github.workspace }}/precis
         run: |
           source .venv/bin/activate
           precis load-feeds
