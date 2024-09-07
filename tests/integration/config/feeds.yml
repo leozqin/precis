@@ -1,0 +1,6 @@
+- name: Leo's Blog
+  category: blogs
+  url: https://www.leozqin.me/index.xml
+- name: The Verge
+  category: tech
+  url: https://www.theverge.com/rss/index.xml

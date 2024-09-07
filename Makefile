@@ -8,9 +8,19 @@ install:
 	pip install -e .
 	playwright install --with-deps chromium
 
+.PHONY: install-ci
+install-ci:
+	npm install -D tailwindcss @tailwindcss/typography daisyui@latest @tailwindcss/forms
+	uv pip install .
+	playwright install --with-deps chromium
+
 .PHONY: run
 run:
 	uvicorn app.app:app --reload --log-level debug
+
+.PHONY: run-ci
+run-ci:
+	uvicorn app.app:app &
 
 .PHONY: dev
 dev:
@@ -24,3 +34,8 @@ build:
 .PHONY: clean
 clean:
 	rm *.mdb db.json
+
+.PHONY: test
+test:
+	go test tests/integration/web_static_test.go -v
+	go test tests/integration/web_dynamic_test.go -v

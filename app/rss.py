@@ -21,7 +21,9 @@ class PrecisRSS:
         self.db = db
 
     def load_feeds(self) -> None:
-        with open(Path(CONFIG_DIR, "feeds.yml").resolve(), "r") as fp:
+        feeds_path = Path(CONFIG_DIR, "feeds.yml").resolve()
+        logger.info("Loading feeds from config", extra={"path": feeds_path})
+        with open(feeds_path, "r") as fp:
             yaml = YAML(typ="safe")
             configs = yaml.load(fp)
 

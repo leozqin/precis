@@ -1,0 +1,37 @@
+name: Integration Test
+on:
+  workflow_call:
+      inputs:
+        storage_handler:
+          required: true
+          type: string
+
+env:
+  IMAGE_NAME: precis
+#
+jobs:
+  # This pushes the image to GitHub Packages.
+  integration_test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      PRECIS_STORAGE_HANDLER: ${{ inputs.storage_handler }}
+      CONFIG_DIR: ${{ github.workspace }}/tests/integration/config
+      DATA_DIR: ${{ github.workspace }}
+      RSS_BASE_URL: http://localhost:8000
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install
+        run: |
+          pip install uv && uv venv
+          source .venv/bin/activate
+          make install-ci
+      - name: test
+        run: |
+          source .venv/bin/activate
+          precis load-feeds
+          precis check-feeds
+          make run-ci
+          make test

@@ -1,0 +1,15 @@
+name: Test
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  integration-test-tinydb:
+    uses: ./.github/workflows/integration_test.yml
+    with:
+      storage_handler: tinydb
+  integration-test-lmdb:
+    uses: ./.github/workflows/integration_test.yml
+    with:
+      storage_handler: lmdb
