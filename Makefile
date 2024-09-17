@@ -37,5 +37,4 @@ clean:
 
 .PHONY: test
 test:
-	go test tests/integration/web_static_test.go -v
-	go test tests/integration/web_dynamic_test.go -v
+	go test tests/integration/*.go -v

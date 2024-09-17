@@ -7,27 +7,8 @@ package precis_test
 import (
 	"encoding/json"
 	"net/http"
-	"os"
 	"testing"
 )
-
-var baseURL = os.Getenv("RSS_BASE_URL")
-
-type Feed struct {
-	Id   string `json:"id,omitempty"`
-	Name string `json:"name,omitempty"`
-}
-
-type FeedEntry struct {
-	Id    string `json:"id,omitempty"`
-	Title string `json:"title,omitempty"`
-}
-
-type Handler struct {
-	Name       string `json:"name,omitempty"`
-	Type       string `json:"type,omitempty"`
-	Configured bool   `json:"configured,omitempty"`
-}
 
 func TestFeedPage(t *testing.T) {
 	req, err := http.Get(baseURL + "/util/list-feeds")
