@@ -96,3 +96,71 @@ func TestSettings(t *testing.T) {
 	assert.Contains(t, settings.SummarizationHandlerChoices, s.SummarizationHandlerKey)
 	assert.Contains(t, settings.ContentHandlerChoices, s.ContentRetrievalHandlerKey)
 }
+
+func TestOnboarding(t *testing.T) {
+	req, err := http.NewRequest("GET", baseURL+"/onboarding/", nil)
+	req.Header.Set("accept", "application/json")
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		t.Errorf("Onboarding page returned status code %d, expected %d", res.StatusCode, http.StatusOK)
+	}
+
+	var onboarding OnboardingResponse
+
+	if err := json.NewDecoder(res.Body).Decode(&onboarding); err != nil {
+		t.Fatal(err)
+	}
+
+	defer res.Body.Close()
+
+	assert.NotEmpty(t, onboarding.Settings)
+}
+
+func TestHandlerSettings(t *testing.T) {
+	req, err := http.Get(baseURL + "/util/list-handlers")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var handlers []Handler
+
+	if err := json.NewDecoder(req.Body).Decode(&handlers); err != nil {
+		t.Fatal(err)
+	}
+
+	for _, handler := range handlers {
+		req, err := http.NewRequest("GET", baseURL+"/settings/"+handler.Name, nil)
+		req.Header.Set("accept", "application/json")
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		res, err := client.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		var requestedHandler HandlerSettingsResponse
+
+		if err := json.NewDecoder(res.Body).Decode(&requestedHandler); err != nil {
+			t.Fatal(err)
+		}
+
+		defer res.Body.Close()
+
+		assert.NotEmpty(t, requestedHandler.Settings)
+		assert.NotEmpty(t, requestedHandler.Schema)
+		assert.Equal(t, requestedHandler.Handler.Type, handler.Name)
+	}
+
+}

@@ -55,3 +55,20 @@ type SettingsResponse struct {
 
 	Settings Settings `json:"settings,omitempty"`
 }
+
+type OnboardingResponse struct {
+	Settings Settings `json:"settings"`
+}
+
+type HandlerConfig struct {
+	Type   string `json:"type,omitempty"`
+	Config string `json:"config,omitempty"`
+}
+
+type HandlerSettingsResponse struct {
+	Handler         HandlerConfig `json:"handler,omitempty"`
+	Schema          string        `json:"schema,omitempty"`
+	Settings        Settings      `json:"settings,omitempty"`
+	UpdateStatus    bool          `json:"update_status,omitempty"`
+	UpdateException string        `json:"update_exception,omitempty"`
+}
