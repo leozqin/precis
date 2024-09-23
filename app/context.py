@@ -6,7 +6,7 @@ from logging import getLogger
 from typing import Any, List, Mapping, Optional, Type
 
 from markdown2 import markdown
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, Field, validator
 from readabilipy import simple_json_from_html_string
 
 from app.content import content_retrieval_handlers
@@ -51,7 +51,7 @@ class GlobalSettings(BaseModel):
 
     finished_onboarding: bool = False
 
-    db: Any
+    db: Any = Field(exclude=True)
 
     @validator("db")
     def validate_db(cls, val):

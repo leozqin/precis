@@ -43,11 +43,19 @@ Feel free to edit the [docker-compose.yml](docker-compose.yml) as needed to fit 
 - Node 20 or higher (use nvm)
 
 ## Development Instructions
-To install, create a fresh venv and then:
+### Application
+To install the RSS application, create a fresh venv and then:
 ```bash
 make dev
 ```
 Then to develop, in one terminal start tailwind by doing `make tw`. Then, in other start the main app by doing `make run`.
+
+### Integration Tests
+Precis has integration tests that are written in Go. They are automated to run during the pull request pipeline, but they also be run locally.
+
+First, install the version of Go specified in `go.mod`. I recommend to use a Golang version manager such as `gvm` or `g`.
+
+Then, start the application using `make run`. Finally, run the integration tests with `make test`.
 
 # Features
 ## OPML Import/Export
