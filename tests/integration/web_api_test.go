@@ -164,3 +164,47 @@ func TestHandlerSettings(t *testing.T) {
 	}
 
 }
+
+func TestReadEntry(t *testing.T) {
+	req, err := http.Get(baseURL + "/util/list-feed-entries")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var entries []FeedEntry
+
+	if err := json.NewDecoder(req.Body).Decode(&entries); err != nil {
+		t.Fatal(err)
+	}
+
+	for _, entry := range entries {
+		req, err := http.NewRequest("GET", baseURL+"/read/"+entry.Id, nil)
+		req.Header.Set("accept", "application/json")
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		res, err := client.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		var feedEntry ReadFeedEntryResponse
+
+		if err := json.NewDecoder(res.Body).Decode(&feedEntry); err != nil {
+			t.Fatal(err)
+		}
+
+		defer res.Body.Close()
+
+		requestedEntry := feedEntry.Content
+
+		assert.Equal(t, entry.Id, requestedEntry.Id)
+		assert.NotEmpty(t, requestedEntry.FeedID)
+		assert.NotEmpty(t, requestedEntry.FeedName)
+		assert.NotEmpty(t, requestedEntry.Title)
+		assert.NotEmpty(t, requestedEntry.URL)
+	}
+
+}

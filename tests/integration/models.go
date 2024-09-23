@@ -11,8 +11,20 @@ type Feed struct {
 }
 
 type FeedEntry struct {
-	Id    string `json:"id,omitempty"`
-	Title string `json:"title,omitempty"`
+	Id           string `json:"id,omitempty"`
+	FeedID       string `json:"feed_id,omitempty"`
+	FeedName     string `json:"feed_name,omitempty"`
+	Title        string `json:"title,omitempty"`
+	URL          string `json:"url,omitempty"`
+	PublishedAt  string `json:"published_at,omitempty"`
+	UpdatedAt    string `json:"updated_at,omitempty"`
+	Byline       string `json:"byline,omitempty"`
+	Preview      string `json:"preview,omitempty"`
+	Content      string `json:"content,omitempty"`
+	Summary      string `json:"summary,omitempty"`
+	WordCount    int    `json:"word_count,omitempty"`
+	ReadingLevel int    `json:"reading_level,omitempty"`
+	ReadingTime  int    `json:"reading_time,omitempty"`
 }
 
 type Handler struct {
@@ -71,4 +83,9 @@ type HandlerSettingsResponse struct {
 	Settings        Settings      `json:"settings,omitempty"`
 	UpdateStatus    bool          `json:"update_status,omitempty"`
 	UpdateException string        `json:"update_exception,omitempty"`
+}
+
+type ReadFeedEntryResponse struct {
+	Content  FeedEntry
+	Settings Settings
 }
