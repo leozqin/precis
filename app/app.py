@@ -268,6 +268,17 @@ async def refresh_feed(feed_id: str, request: Request):
     )
 
 
+@app.get("/api/delete_feed/{feed_id}", status_code=status.HTTP_200_OK)
+async def delete_feed(feed_id: str, request: Request):
+
+    await bk.delete_feed(feed_id=feed_id)
+
+    return RedirectResponse(
+        request.url_for("feeds"),
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
 @app.post("/api/update_settings/", status_code=status.HTTP_200_OK)
 async def update_settings(
     theme: Annotated[str, Form()],

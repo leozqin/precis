@@ -81,7 +81,7 @@
         </label>
         <label class="label cursor-pointer gap-2">
           <span class="label-text text-2xl lg:text-xl">Send Notifications</span>
-          <input name="notify" type="checkbox" class="toggle" {% if feed.notify != False %} checked {% endif %} />
+          <input name="notify" type="checkbox" class="toggle" {% if feed.notify !=False %} checked {% endif %} />
         </label>
         <label class="label cursor-pointer gap-2">
           <span class="label-text text-2xl lg:text-xl">Preview Only (No Summary)</span>
@@ -89,7 +89,8 @@
         </label>
         <label class="label cursor-pointer gap-2">
           <span class="label-text text-2xl lg:text-xl">Refresh Enabled</span>
-          <input name="refresh_enabled" type="checkbox" class="toggle" {% if feed.refresh_enabled != False %} checked {% endif %} />
+          <input name="refresh_enabled" type="checkbox" class="toggle" {% if feed.refresh_enabled !=False %} checked {%
+            endif %} />
         </label>
       </div>
       <div>
@@ -99,6 +100,14 @@
           {% if update_status %} &#9989 {% endif %}
           {% if update_exception %} &#10060 {% endif %}
         </button>
+        {% if feed.url %}
+        <a href="{{ url_for('delete_feed', feed_id=feed.id) }}">
+          <button type="button"
+            class="btn btn-outline w-1/2 lg:w-2/5 mx-auto flex justify-center my-5 text-3xl lg:text-xl">
+            Delete Feed
+          </button>
+        </a>
+        {% endif %}
         {% if update_exception %}
         <div role="alert" class="alert alert-error">
           <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"

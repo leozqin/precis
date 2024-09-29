@@ -184,7 +184,9 @@ class StorageHandler(ABC):
         pass
 
     @abstractmethod
-    def get_entries(self, feed: Feed = None, after: int = 0) -> List[Mapping[str, str]]:
+    def get_entries(
+        self, feed: Feed = None, after: int = 0
+    ) -> List[Mapping[str, FeedEntry]]:
         """
         Given a feed, retrieve the entries for that feed and return a list of
         dicts, where each dict has key entry = FeedEntry object, feed_id = the
@@ -270,6 +272,20 @@ class StorageHandler(ABC):
         """
         Given a global settings object, use it to update the global settings in
         the database, or create one to match if it doesn't exist.
+        """
+        pass
+
+    @abstractmethod
+    def delete_feed(self, feed: Feed) -> None:
+        """
+        Given a feed, delete the feed from the database.
+        """
+        pass
+
+    @abstractmethod
+    def delete_feed_entry(self, feed_entry: FeedEntry) -> None:
+        """
+        Given a feed entry, delete the entry from the database.
         """
         pass
 

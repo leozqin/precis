@@ -306,3 +306,33 @@ class LMDBStorageHandler(StorageHandler):
         self.upsert_handler(settings.notification_handler)
         self.upsert_handler(settings.summarization_handler)
         self.upsert_handler(settings.content_retrieval_handler)
+
+    def delete_feed(self, feed: Feed) -> None:
+
+        with self.db.begin(db=self._db(Named.feed), write=True) as txn:
+            txn.delete(self._serialize(feed.id))
+
+        with self.db.begin(db=self._db(Named.si_feed_entry), write=True) as txn:
+            txn.delete(self._serialize(feed.id))
+
+        with self.db.begin(db=self._db(Named.poll), write=True) as txn:
+            txn.delete(self._serialize(feed.id))
+
+        with self.db.begin(db=self._db(Named.feed_start), write=True) as txn:
+            txn.delete(self._serialize(feed.id))
+
+    def delete_feed_entry(self, feed_entry: FeedEntry) -> None:
+
+        with self.db.begin(db=self._db(Named.entry_content), write=True) as txn:
+            txn.delete(self._serialize(feed_entry.id))
+
+        with self.db.begin(db=self._db(Named.entry), write=True) as txn:
+            txn.delete(self._serialize(feed_entry.id))
+
+        with self.db.begin(db=self._db(Named.si_feed_entry), write=True) as txn:
+            value = txn.get(self._serialize(feed_entry.feed_id))
+
+            entries: List[str] = self._deserialize(value)
+            entries.remove(feed_entry.id)
+
+            txn.replace(self._serialize(feed_entry.feed_id), self._serialize(entries))

@@ -248,3 +248,22 @@ class TinyDBStorageHandler(StorageHandler):
         self.upsert_handler(settings.notification_handler)
         self.upsert_handler(settings.summarization_handler)
         self.upsert_handler(settings.content_retrieval_handler)
+
+    def delete_feed(self, feed: Feed) -> None:
+        feeds = self.db.table("feeds")
+        query = Query().id.matches(feed.id)
+        feeds.remove(query)
+
+        feed_start = self.db.table("feed_start")
+        feed_start.remove(query)
+
+        poll = self.db.table("poll")
+        poll.remove(query)
+
+    def delete_feed_entry(self, feed_entry: FeedEntry) -> None:
+        entry_contents = self.db.table("entry_contents")
+        query = Query().id.matches(feed_entry.id)
+        entry_contents.remove(query)
+
+        entries = self.db.table("entries")
+        entries.remove(query)
