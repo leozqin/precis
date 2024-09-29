@@ -202,6 +202,17 @@ class PrecisBackend:
         handler_obj = self.db.reconfigure_handler(id=handler, config=config_dict)
         self.db.upsert_handler(handler=handler_obj)
 
+    async def delete_feed(self, feed_id: str):
+
+        feed = self.db.get_feed(id=feed_id)
+
+        entries = self.db.get_entries(feed=feed)
+        for entry_dict in entries:
+            entry: FeedEntry = entry_dict.get("entry")
+            self.db.delete_feed_entry(feed_entry=entry)
+
+        self.db.delete_feed(feed=feed)
+
     @staticmethod
     async def list_content_handler_choices():
         from app.content import content_retrieval_handlers
