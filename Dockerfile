@@ -15,6 +15,13 @@ RUN uv pip install .
 
 FROM nikolaik/python-nodejs:python3.11-nodejs22-slim as web
 
+LABEL org.opencontainers.image.title="Precis"
+LABEL org.opencontainers.image.authors="leozqin@gmail.com"
+LABEL org.opencontainers.image.source="https://github.com/leozqin/precis"
+LABEL org.opencontainers.image.url="https://github.com/leozqin/precis"
+LABEL org.opencontainers.image.description="An extensible self-hosted AI-enabled RSS reader with a focus on notifications and support for theming"
+LABEL org.opencontainers.image.licenses=MIT
+
 WORKDIR /app
 ENV IS_DOCKER=True
 
