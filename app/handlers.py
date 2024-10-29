@@ -41,14 +41,14 @@ class NotificationHandler(HandlerBase):
         pass
 
 
-class SummarizationHandler(HandlerBase):
-    id: ClassVar[str] = "generic_summarization_handler"
+class LLMHandler(HandlerBase):
+    id: ClassVar[str] = "generic_llm_handler"
 
     @abstractmethod
     def summarize(self, feed: Feed, entry: FeedEntry, mk: str):
         pass
 
-    def get_prompt(self, mk: str):
+    def get_summarization_prompt(self, mk: str):
         prompt = f"""
 Summarize this article:
 
@@ -57,7 +57,7 @@ Summarize this article:
         return prompt
 
     @property
-    def system_prompt(self):
+    def summarization_system_prompt(self):
         return """
 Your goal is to write a brief but detailed summary of the text given to you.
 Only output the summary without any headings or sections.

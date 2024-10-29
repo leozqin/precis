@@ -13,12 +13,12 @@ from app.content import content_retrieval_handlers
 from app.handlers import (
     ContentRetrievalHandler,
     HandlerBase,
+    LLMHandler,
     NotificationHandler,
-    SummarizationHandler,
 )
+from app.llm import llm_handlers
 from app.models import *
 from app.notification import notification_handlers
-from app.summarization import summarization_handlers
 
 
 class Themes(str, Enum):
@@ -45,7 +45,7 @@ class GlobalSettings(BaseModel):
     reading_speed: int = 238
 
     notification_handler_key: str = "null_notification"
-    summarization_handler_key: str = "null_summarization"
+    llm_handler_key: str = "null_llm"
     content_retrieval_handler_key: str = "playwright"
     recent_hours: int = 36
 
@@ -68,11 +68,11 @@ class GlobalSettings(BaseModel):
             return self.db.handler_map[self.notification_handler_key]()
 
     @property
-    def summarization_handler(self) -> SummarizationHandler:
+    def llm_handler(self) -> LLMHandler:
         try:
-            return self.db.get_handler(id=self.summarization_handler_key)
+            return self.db.get_handler(id=self.llm_handler_key)
         except IndexError:
-            return self.db.handler_map[self.summarization_handler_key]()
+            return self.db.handler_map[self.llm_handler_key]()
 
     @property
     def content_retrieval_handler(self) -> ContentRetrievalHandler:
@@ -87,19 +87,19 @@ class StorageHandler(ABC):
     logger = getLogger("uvicorn.error")
 
     handler_map = {
-        **summarization_handlers,
+        **llm_handlers,
         **notification_handlers,
         **content_retrieval_handlers,
     }
 
     engine_map = {
-        "summarization": summarization_handlers,
+        "llm": llm_handlers,
         "notification": notification_handlers,
         "content": content_retrieval_handlers,
     }
 
     handler_type_map = {
-        **{k: "summarization" for k in summarization_handlers.keys()},
+        **{k: "llm" for k in llm_handlers.keys()},
         **{k: "notification" for k in notification_handlers.keys()},
         **{k: "content" for k in content_retrieval_handlers.keys()},
     }
@@ -304,9 +304,7 @@ class StorageHandler(ABC):
         feed: Feed, entry: FeedEntry, mk: str, settings: GlobalSettings
     ) -> str:
 
-        summary = settings.summarization_handler.summarize(
-            feed=feed, entry=entry, mk=mk
-        )
+        summary = settings.llm_handler.summarize(feed=feed, entry=entry, mk=mk)
 
         if summary:
             return markdown(summary)

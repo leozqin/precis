@@ -4,11 +4,11 @@ from typing import ClassVar
 from openai import OpenAI
 from pydantic import BaseModel
 
-from app.handlers import SummarizationHandler
+from app.handlers import LLMHandler
 from app.models import Feed, FeedEntry
 
 
-class OpenAISummarizationHandler(SummarizationHandler, BaseModel):
+class OpenAILLMHandler(LLMHandler, BaseModel):
     api_key: str = environ.get("OPENAI_API_KEY")
     model: str = "gpt-4o-mini"
 

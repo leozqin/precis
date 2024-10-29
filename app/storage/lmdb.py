@@ -304,7 +304,7 @@ class LMDBStorageHandler(StorageHandler):
             )
 
         self.upsert_handler(settings.notification_handler)
-        self.upsert_handler(settings.summarization_handler)
+        self.upsert_handler(settings.llm_handler)
         self.upsert_handler(settings.content_retrieval_handler)
 
     def delete_feed(self, feed: Feed) -> None:
