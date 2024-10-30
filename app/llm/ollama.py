@@ -29,6 +29,8 @@ class OllamaLLMHandler(LLMHandler, BaseModel):
         return chat["message"]["content"]
 
     def summarize(self, feed: Feed, entry: FeedEntry, mk: str):
-        system = self.system if self.system else self.system_prompt
+        system = self.system if self.system else self.summarization_system_prompt
 
-        return self._make_chat_call(system=system, prompt=self.get_prompt(mk))
+        return self._make_chat_call(
+            system=system, prompt=self.get_summarization_prompt(mk)
+        )

@@ -19,8 +19,8 @@ class OpenAILLMHandler(LLMHandler, BaseModel):
 
         completion = client.chat.completions.create(
             messages=[
-                {"role": "system", "content": self.system_prompt},
-                {"role": "user", "content": self.get_prompt(mk=mk)},
+                {"role": "system", "content": self.summarization_system_prompt},
+                {"role": "user", "content": self.get_summarization_prompt(mk=mk)},
             ],
             model=self.model,
             n=1,
