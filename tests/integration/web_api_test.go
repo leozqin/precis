@@ -77,7 +77,7 @@ func TestSettings(t *testing.T) {
 
 	assert.NotEmpty(t, settings.Themes)
 	assert.NotEmpty(t, settings.ContentHandlerChoices)
-	assert.NotEmpty(t, settings.SummarizationHandlerChoices)
+	assert.NotEmpty(t, settings.LLMHandlerChoices)
 	assert.NotEmpty(t, settings.NotificationHandlerChoices)
 	assert.Equal(t, false, settings.UpdateStatus)
 	assert.Empty(t, settings.UpdateException)
@@ -93,7 +93,7 @@ func TestSettings(t *testing.T) {
 	assert.IsType(t, true, s.FinishedOnboarding)
 
 	assert.Contains(t, settings.NotificationHandlerChoices, s.NotificationHandlerKey)
-	assert.Contains(t, settings.SummarizationHandlerChoices, s.SummarizationHandlerKey)
+	assert.Contains(t, settings.LLMHandlerChoices, s.LLMHandlerKey)
 	assert.Contains(t, settings.ContentHandlerChoices, s.ContentRetrievalHandlerKey)
 }
 

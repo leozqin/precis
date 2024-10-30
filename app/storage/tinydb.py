@@ -6,11 +6,7 @@ from tinydb import Query, TinyDB
 
 from app.constants import DATA_DIR
 from app.context import GlobalSettings, StorageHandler
-from app.handlers import (
-    ContentRetrievalHandler,
-    NotificationHandler,
-    SummarizationHandler,
-)
+from app.handlers import ContentRetrievalHandler, LLMHandler, NotificationHandler
 from app.models import EntryContent, Feed, FeedEntry
 
 logger = getLogger("uvicorn.error")
@@ -176,9 +172,7 @@ class TinyDBStorageHandler(StorageHandler):
 
     def upsert_handler(
         self,
-        handler: Type[
-            SummarizationHandler | NotificationHandler | ContentRetrievalHandler
-        ],
+        handler: Type[LLMHandler | NotificationHandler | ContentRetrievalHandler],
     ) -> None:
         table = self.db.table("handler")
 
@@ -196,9 +190,7 @@ class TinyDBStorageHandler(StorageHandler):
 
     def get_handlers(
         self,
-    ) -> Mapping[
-        str, Type[SummarizationHandler | NotificationHandler | ContentRetrievalHandler]
-    ]:
+    ) -> Mapping[str, Type[LLMHandler | NotificationHandler | ContentRetrievalHandler]]:
         table = self.db.table("handler")
 
         handlers = {i: None for i in self.handler_map.keys()}
@@ -212,7 +204,7 @@ class TinyDBStorageHandler(StorageHandler):
 
     def get_handler(
         self, id: str
-    ) -> Type[SummarizationHandler | NotificationHandler | ContentRetrievalHandler]:
+    ) -> Type[LLMHandler | NotificationHandler | ContentRetrievalHandler]:
         table = self.db.table("handler")
         logger.info(f"requested handler {id}")
         query = Query().id.matches(id)
@@ -246,7 +238,7 @@ class TinyDBStorageHandler(StorageHandler):
         table.upsert(row, cond=query)
 
         self.upsert_handler(settings.notification_handler)
-        self.upsert_handler(settings.summarization_handler)
+        self.upsert_handler(settings.llm_handler)
         self.upsert_handler(settings.content_retrieval_handler)
 
     def delete_feed(self, feed: Feed) -> None:

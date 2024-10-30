@@ -104,10 +104,10 @@
           </select>
         </label>
         <label class="label flex items-center gap-2 text-2xl lg:text-xl">
-          Summarization Handler
-          <select name="summarization" class="select select-bordered w-full max-w-xs my-5 text-2xl lg:text-xl">
-            {% for choice in summarization_handler_choices %}
-            <option {% if choice==settings.summarization_handler_key %} selected {% endif %}
+          LLM Handler
+          <select name="llm" class="select select-bordered w-full max-w-xs my-5 text-2xl lg:text-xl">
+            {% for choice in llm_handler_choices %}
+            <option {% if choice==settings.llm_handler_key %} selected {% endif %}
               class="text-2xl lg:text-xl">
               {{ choice }}
             </option>

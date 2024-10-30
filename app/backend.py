@@ -220,10 +220,10 @@ class PrecisBackend:
         return list(content_retrieval_handlers.keys())
 
     @staticmethod
-    async def list_summarization_handler_choices():
-        from app.summarization import summarization_handlers
+    async def list_llm_handler_choices():
+        from app.llm import llm_handlers
 
-        return list(summarization_handlers.keys())
+        return list(llm_handlers.keys())
 
     @staticmethod
     async def list_notification_handler_choices():

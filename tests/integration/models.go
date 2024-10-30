@@ -39,7 +39,7 @@ type Settings struct {
 	RefreshInterval            int    `json:"refresh_interval,omitempty"`
 	ReadingSpeed               int    `json:"reading_speed,omitempty"`
 	NotificationHandlerKey     string `json:"notification_handler_key,omitempty"`
-	SummarizationHandlerKey    string `json:"summarization_handler_key,omitempty"`
+	LLMHandlerKey              string `json:"llm_handler_key,omitempty"`
 	ContentRetrievalHandlerKey string `json:"content_retrieval_handler_key,omitempty"`
 	RecentHours                int    `json:"recent_hours,omitempty"`
 	FinishedOnboarding         bool   `json:"finished_onboarding,omitempty"`
@@ -58,12 +58,12 @@ type AboutResponse struct {
 }
 
 type SettingsResponse struct {
-	Themes                      []string `json:"themes,omitempty"`
-	ContentHandlerChoices       []string `json:"content_handler_choices,omitempty"`
-	SummarizationHandlerChoices []string `json:"summarization_handler_choices,omitempty"`
-	NotificationHandlerChoices  []string `json:"notification_handler_choices,omitempty"`
-	UpdateStatus                bool     `json:"update_status,omitempty"`
-	UpdateException             string   `json:"update_exception,omitempty"`
+	Themes                     []string `json:"themes,omitempty"`
+	ContentHandlerChoices      []string `json:"content_handler_choices,omitempty"`
+	LLMHandlerChoices          []string `json:"llm_handler_choices,omitempty"`
+	NotificationHandlerChoices []string `json:"notification_handler_choices,omitempty"`
+	UpdateStatus               bool     `json:"update_status,omitempty"`
+	UpdateException            string   `json:"update_exception,omitempty"`
 
 	Settings Settings `json:"settings,omitempty"`
 }

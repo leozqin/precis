@@ -3,12 +3,12 @@
 Precis (properly Précis, pronounced "pray-see") is a extensibility-oriented RSS reader that can use LLMs to summarize and synthesize information from numerous different sources, with an emphasis on timely delivery of information via notifications.
 
 The following components of the app are extensible:
-1. Summarization - LLMs including Ollama and OpenAI
+1. LLMs - LLMs including Ollama and OpenAI, used for functions such as summarization
 2. Content Retrieval - `requests` or `playwright`
 3. Notification - `matrix`, `slack`, `jira`, and `ntfy`
 4. Storage - At this time, we support two reasonable embedded DBs - `tinydb` or `lmdb` - defaults to `tinydb`. You can add support for your database of choice if you can implement about 20 shared transactions.
 
-The Summarization and Notification handlers also support a `null` handler that does nothing. Good for testing or if you don't care about notifications and summaries. The null handler is the default.
+The LLM and Notification handlers also support a `null` handler that does nothing. Good for testing or if you don't care about notifications and summaries. The null handler is the default.
 
 Precis also supports themes.
 
@@ -110,7 +110,7 @@ After initial onboarding, you'll be brought to the feeds page.
 You can then view the feed entries for each feed.
 ![The feed entries page](app/assets/feed_entries.png)
 
-When you read a feed entry you'll get the full text of the article, as well a summary if you have a summarization handler configured.
+When you read a feed entry you'll get the full text of the article, as well as a summary if you have a LLM handler configured.
 ![The read page](app/assets/read.png)
 
 Global settings can be configured in the UI
