@@ -6,7 +6,7 @@ tw:
 install:
 	npm install -D tailwindcss @tailwindcss/typography daisyui@latest @tailwindcss/forms
 	pip install -e .
-	playwright install --with-deps chromium
+	./install_playwright.sh
 
 .PHONY: install-ci
 install-ci:
