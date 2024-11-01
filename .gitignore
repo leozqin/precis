@@ -170,6 +170,3 @@ configs/*.yml
 
 node_modules
 app/static/output.css
-
-# nix stuff
-flake.lock
