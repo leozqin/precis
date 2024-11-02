@@ -50,7 +50,7 @@ make dev
 ```
 Then to develop, in one terminal start tailwind by doing `make tw`. Then, in other start the main app by doing `make run`.
 
-If you use `nix` or `nixos`, do `nix develop` to assumme a dev shell and then follow the install instructions above.
+If you use `nix` or `nixos`, do `nix develop` to assumme a dev shell and then follow the install instructions above (including creating and activating the venv).
 
 ### Integration Tests
 Precis has integration tests that are written in Go. They are automated to run during the pull request pipeline, but they also be run locally.
