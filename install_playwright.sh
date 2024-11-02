@@ -1,4 +1,4 @@
 #! /usr/bin/env bash
-if ! [ -x "$(command -v chromium)" ]; then
+if [ -z ${PLAYWRIGHT_BROWSERS_PATH} ]; then
     playwright install --with-deps chromium
 fi
