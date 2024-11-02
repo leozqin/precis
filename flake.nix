@@ -23,14 +23,13 @@
         pre-commit
         gnumake
         playwright
-        ungoogled-chromium
+        playwright-driver.browsers
         go_1_21
       ];
 
-      shellHook = ''
-        python -m venv .venv
-        source .venv/bin/activate
-      '';
+      PLAYWRIGHT_NODEJS_PATH = "${pkgs.nodejs_22}/bin/node";
+      PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = 1;
     };
   };
 }
