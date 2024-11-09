@@ -196,18 +196,26 @@ class LMDBStorageHandler(StorageHandler):
 
             return cur.set_key(self._serialize(id))
 
-    async def get_entry_content(
-        self, entry: FeedEntry, redrive: bool = False
-    ) -> EntryContent:
+    def entry_content_exists(self, entry: FeedEntry):
 
         with self.db.begin(db=self._db(Named.entry_content)) as txn:
             cur = txn.cursor()
             exists = cur.set_key(self._serialize(entry.id))
 
-        if exists and not redrive:
-            with self.db.begin(db=self._db(Named.entry_content)) as txn:
-                content = txn.get(self._serialize(entry.id))
+            return exists
+
+    def retrieve_entry_content(self, entry: FeedEntry):
+
+        with self.db.begin(db=self._db(Named.entry_content)) as txn:
+            content = txn.get(self._serialize(entry.id))
             return EntryContent(**self._deserialize(content))
+
+    async def get_entry_content(
+        self, entry: FeedEntry, redrive: bool = False
+    ) -> EntryContent:
+
+        if self.entry_content_exists(entry) and not redrive:
+            return self.retrieve_entry_content(entry=entry)
 
         else:
             if redrive:
@@ -321,10 +329,14 @@ class LMDBStorageHandler(StorageHandler):
         with self.db.begin(db=self._db(Named.feed_start), write=True) as txn:
             txn.delete(self._serialize(feed.id))
 
-    def delete_feed_entry(self, feed_entry: FeedEntry) -> None:
+    def delete_entry_content(self, entry: FeedEntry) -> None:
 
         with self.db.begin(db=self._db(Named.entry_content), write=True) as txn:
-            txn.delete(self._serialize(feed_entry.id))
+            txn.delete(self._serialize(entry.id))
+
+    def delete_feed_entry(self, feed_entry: FeedEntry) -> None:
+
+        self.delete_entry_content(feed_entry)
 
         with self.db.begin(db=self._db(Named.entry), write=True) as txn:
             txn.delete(self._serialize(feed_entry.id))

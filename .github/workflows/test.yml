@@ -13,3 +13,7 @@ jobs:
     uses: ./.github/workflows/integration_test.yml
     with:
       storage_handler: lmdb
+  integration-test-hybrid:
+    uses: ./.github/workflows/integration_test.yml
+    with:
+      storage_handler: hybrid
