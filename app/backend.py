@@ -1,6 +1,6 @@
 from importlib.metadata import version
 from json import dumps, loads
-from logging import getLogger
+from logging import INFO, getLogger
 from sys import version as py_version
 from time import localtime, strftime, time
 from typing import List, Mapping, Type
