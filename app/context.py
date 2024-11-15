@@ -5,9 +5,7 @@ from enum import Enum
 from logging import getLogger
 from typing import Any, List, Mapping, Optional, Type
 
-from markdown2 import markdown
 from pydantic import BaseModel, Field, validator
-from readabilipy import simple_json_from_html_string
 
 from app.content import content_retrieval_handlers
 from app.handlers import (
@@ -229,6 +227,21 @@ class StorageHandler(ABC):
         """
         Given an EntryContent object, insert it into the database.
         """
+        pass
+
+    @abstractmethod
+    def entry_content_exists(self, entry: FeedEntry) -> bool:
+        """
+        Return true if entry content exists for the FeedEntry else False
+        """
+        pass
+
+    @abstractmethod
+    def retrieve_entry_content(self, entry: FeedEntry) -> EntryContent:
+        """
+        Retrieve the content for the feed entry from storage
+        """
+        pass
 
     @abstractmethod
     def upsert_handler(
@@ -289,22 +302,25 @@ class StorageHandler(ABC):
         """
         pass
 
-    @staticmethod
-    async def get_entry_html(url: str, settings: GlobalSettings) -> str:
-        return await settings.content_retrieval_handler.get_content(url)
+    async def get_content(self, entry: FeedEntry) -> EntryContent:
 
-    @staticmethod
-    def get_main_content(content: str) -> str:
-        md = simple_json_from_html_string(html=content, use_readability=True)
+        raw_content = await self.get_settings().content_retrieval_handler.get_content(
+            entry=entry
+        )
+        return await raw_content.to_entry_content()
 
-        return md["plain_content"]
+    async def get_entry_content(
+        self, entry: FeedEntry, redrive: bool = False
+    ) -> EntryContent:
 
-    @staticmethod
-    def summarize(
-        feed: Feed, entry: FeedEntry, mk: str, settings: GlobalSettings
-    ) -> str:
+        if self.entry_content_exists(entry) and not redrive:
+            return self.retrieve_entry_content(entry=entry)
 
-        summary = settings.llm_handler.summarize(feed=feed, entry=entry, mk=mk)
+        else:
+            if redrive:
+                self.logger.info(f"starting redrive for feed entry {entry.id}")
 
-        if summary:
-            return markdown(summary)
+            entry_content = await self.get_content(entry=entry)
+            await self.upsert_entry_content(entry_content)
+
+            return entry_content

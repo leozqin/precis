@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod
+from fnmatch import fnmatch
 from os import environ
 from typing import ClassVar
 
 from pydantic import BaseModel
 
-from app.models import Feed, FeedEntry
+from app.constants import BANNED_GLOBS
+from app.models import Feed, FeedEntry, RawContent
 
 
 class HandlerBase(BaseModel, ABC):
@@ -15,8 +17,24 @@ class ContentRetrievalHandler(HandlerBase):
     id: ClassVar[str] = "generic_content_retrieval_handler"
 
     @abstractmethod
-    async def get_content(self, url: str) -> str:
+    async def get_html(self, url) -> str:
         pass
+
+    async def get_content(self, entry: FeedEntry) -> RawContent:
+        if await self.is_banned():
+            return RawContent(url=entry.url, banned=True)
+
+        try:
+            html = self.get_html()
+            if not html:
+                return RawContent(url=entry.url, unretrievable=True)
+            return RawContent(url=entry.url, content=html)
+        except Exception:
+            return RawContent(url=entry.url, unretrievable=True)
+
+    @staticmethod
+    async def is_banned(url) -> bool:
+        return any(fnmatch(url, i) for i in BANNED_GLOBS)
 
 
 class NotificationHandler(HandlerBase):

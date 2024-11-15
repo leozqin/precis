@@ -1,6 +1,8 @@
 from playwright.async_api import Playwright, Route, async_playwright
 
+from app.constants import USER_AGENT
 from app.handlers import ContentRetrievalHandler
+from app.models import EntryContent, FeedEntry
 
 
 class PlaywrightContentRetriever(ContentRetrievalHandler):
@@ -17,7 +19,7 @@ class PlaywrightContentRetriever(ContentRetrievalHandler):
     @staticmethod
     async def _retrieve(url: str, playright: Playwright):
         browser = await playright.chromium.launch()
-        page = await browser.new_page()
+        page = await browser.new_page(user_agent=USER_AGENT)
 
         await page.route("**/*", PlaywrightContentRetriever._block_common)
         await page.goto(url)
@@ -26,6 +28,6 @@ class PlaywrightContentRetriever(ContentRetrievalHandler):
 
         return await page.content()
 
-    async def get_content(self, url: str) -> str:
+    async def get_html(self, url: str) -> str:
         async with async_playwright() as pw:
             return await self._retrieve(url=url, playright=pw)

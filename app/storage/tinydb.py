@@ -126,40 +126,16 @@ class TinyDBStorageHandler(StorageHandler):
         else:
             return False
 
-    async def get_entry_content(
-        self, entry: FeedEntry, redrive: bool = False
-    ) -> EntryContent:
+    def retrieve_entry_content(self, entry: FeedEntry) -> EntryContent:
         table = self.db.table("entry_contents")
         query = Query().id.matches(entry.id)
-
         existing = table.search(query)
-        if existing and not redrive:
-            return EntryContent(**existing[0]["entry_contents"])
 
-        else:
-            if redrive:
-                self.logger.info(f"starting redrive for feed entry {entry.id}")
+        return existing
 
-            settings = self.get_settings()
+    def entry_content_exists(self, entry: FeedEntry) -> bool:
 
-            raw_content = await self.get_entry_html(entry.url, settings=settings)
-            content = self.get_main_content(content=raw_content)
-
-            feed = self.get_feed(entry.feed_id)
-
-            summary = self.summarize(
-                feed=feed, entry=entry, mk=content, settings=settings
-            )
-
-            entry_content = EntryContent(
-                url=entry.url,
-                content=content,
-                summary=summary if summary else None,
-            )
-
-            await self.upsert_entry_content(content=entry_content)
-
-            return entry_content
+        return bool(self.retrieve_entry_content(entry=entry))
 
     async def upsert_entry_content(self, content: EntryContent):
         table = self.db.table("entry_contents")
