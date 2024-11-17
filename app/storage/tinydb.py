@@ -5,9 +5,10 @@ from typing import List, Mapping, Optional, Type
 from tinydb import Query, TinyDB
 
 from app.constants import DATA_DIR
-from app.context import GlobalSettings, StorageHandler
+from app.db import StorageHandler
 from app.handlers import ContentRetrievalHandler, LLMHandler, NotificationHandler
 from app.models import EntryContent, Feed, FeedEntry
+from app.settings import GlobalSettings
 
 logger = getLogger("uvicorn.error")
 

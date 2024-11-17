@@ -1,3 +1,4 @@
+from logging import getLogger
 from os import remove
 from pathlib import Path
 from pickle import dump, load
@@ -6,6 +7,8 @@ from typing import Union
 from app.constants import DATA_DIR
 from app.models import EntryContent, FeedEntry
 from app.storage.lmdb import LMDBStorageHandler
+
+logger = getLogger("uvicorn.error")
 
 
 class HybridLMDBOfflineStorageHandler(LMDBStorageHandler):
@@ -16,6 +19,7 @@ class HybridLMDBOfflineStorageHandler(LMDBStorageHandler):
         self.offline_media_path.mkdir(parents=True, exist_ok=True)
 
     def _content_path(self, content: Union[EntryContent, FeedEntry]):
+        logger.debug(f"Making content path for {content}")
         return self.offline_media_path.joinpath(content.id).with_suffix(".pickle")
 
     async def upsert_entry_content(self, content: EntryContent):

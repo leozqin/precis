@@ -1,12 +1,19 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from fnmatch import fnmatch
+from logging import getLogger
 from os import environ
-from typing import ClassVar
+from typing import Callable, ClassVar
 
+from markdown2 import markdown
 from pydantic import BaseModel
+from readabilipy import simple_json_from_html_string
 
 from app.constants import BANNED_GLOBS
-from app.models import Feed, FeedEntry, RawContent
+from app.models import EntryContent, Feed, FeedEntry
+
+logger = getLogger("uvicorn.error")
 
 
 class HandlerBase(BaseModel, ABC):
@@ -20,21 +27,45 @@ class ContentRetrievalHandler(HandlerBase):
     async def get_html(self, url) -> str:
         pass
 
-    async def get_content(self, entry: FeedEntry) -> RawContent:
-        if await self.is_banned():
-            return RawContent(url=entry.url, banned=True)
+    async def get_content(
+        self,
+        entry: FeedEntry,
+        feed: Feed,
+        summarizer: Callable[[Feed, FeedEntry, str], str],
+    ) -> EntryContent:
+        if await self.is_banned(entry.url):
+            logger.info(f"Found banned entry from url {entry.url}")
+            return EntryContent(url=entry.url, banned=True)
 
         try:
-            html = self.get_html()
+            html = await self.get_html(url=entry.url)
             if not html:
-                return RawContent(url=entry.url, unretrievable=True)
-            return RawContent(url=entry.url, content=html)
-        except Exception:
-            return RawContent(url=entry.url, unretrievable=True)
+                return EntryContent(url=entry.url, unretrievable=True)
+            else:
+                content = self.get_main_content(content=html)
+                summary = summarizer(feed=feed, entry=entry, mk=content)
+
+                return EntryContent(
+                    url=entry.url,
+                    content=content,
+                    summary=markdown(summary) if summary else None,
+                )
+
+        except Exception as e:
+            logger.warning(
+                f"Encountered retrieval exception, returning unretrievable: {e}"
+            )
+            return EntryContent(url=entry.url, unretrievable=True)
 
     @staticmethod
     async def is_banned(url) -> bool:
         return any(fnmatch(url, i) for i in BANNED_GLOBS)
+
+    @staticmethod
+    def get_main_content(content: str) -> str:
+        md = simple_json_from_html_string(html=content, use_readability=True)
+
+        return md["plain_content"]
 
 
 class NotificationHandler(HandlerBase):

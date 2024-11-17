@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 from playwright.async_api import Playwright, Route, async_playwright
 
 from app.constants import USER_AGENT
 from app.handlers import ContentRetrievalHandler
-from app.models import EntryContent, FeedEntry
 
 
 class PlaywrightContentRetriever(ContentRetrievalHandler):

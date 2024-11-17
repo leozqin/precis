@@ -1,106 +1,17 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from enum import Enum
 from logging import getLogger
-from typing import Any, List, Mapping, Optional, Type
+from typing import List, Mapping, Optional, Type
 
-from pydantic import BaseModel, Field, validator
-
-from app.content import content_retrieval_handlers
-from app.handlers import (
-    ContentRetrievalHandler,
-    HandlerBase,
-    LLMHandler,
-    NotificationHandler,
-)
-from app.llm import llm_handlers
+from app.handlers import HandlerBase
 from app.models import *
-from app.notification import notification_handlers
-
-
-class Themes(str, Enum):
-    black = "black"
-    coffee = "coffee"
-    dark = "dark"
-    fantasy = "fantasy"
-    forest = "forest"
-    lemonade = "lemonade"
-    lofi = "lofi"
-    luxury = "luxury"
-    night = "night"
-    nord = "nord"
-    pastel = "pastel"
-    synthwave = "synthwave"
-    winter = "winter"
-
-
-class GlobalSettings(BaseModel):
-
-    send_notification: bool = True
-    theme: Themes = Themes.forest
-    refresh_interval: int = 5
-    reading_speed: int = 238
-
-    notification_handler_key: str = "null_notification"
-    llm_handler_key: str = "null_llm"
-    content_retrieval_handler_key: str = "playwright"
-    recent_hours: int = 36
-
-    finished_onboarding: bool = False
-
-    db: Any = Field(exclude=True)
-
-    @validator("db")
-    def validate_db(cls, val):
-        if issubclass(type(val), StorageHandler):
-            return val
-
-        raise TypeError("Wrong type for db, must be subclass of StorageHandler")
-
-    @property
-    def notification_handler(self) -> NotificationHandler:
-        try:
-            return self.db.get_handler(id=self.notification_handler_key)
-        except IndexError:
-            return self.db.handler_map[self.notification_handler_key]()
-
-    @property
-    def llm_handler(self) -> LLMHandler:
-        try:
-            return self.db.get_handler(id=self.llm_handler_key)
-        except IndexError:
-            return self.db.handler_map[self.llm_handler_key]()
-
-    @property
-    def content_retrieval_handler(self) -> ContentRetrievalHandler:
-        try:
-            return self.db.get_handler(id=self.content_retrieval_handler_key)
-        except IndexError:
-            return self.db.handler_map[self.content_retrieval_handler_key]()
+from app.settings import GlobalSettings
 
 
 class StorageHandler(ABC):
 
     logger = getLogger("uvicorn.error")
-
-    handler_map = {
-        **llm_handlers,
-        **notification_handlers,
-        **content_retrieval_handlers,
-    }
-
-    engine_map = {
-        "llm": llm_handlers,
-        "notification": notification_handlers,
-        "content": content_retrieval_handlers,
-    }
-
-    handler_type_map = {
-        **{k: "llm" for k in llm_handlers.keys()},
-        **{k: "notification" for k in notification_handlers.keys()},
-        **{k: "content" for k in content_retrieval_handlers.keys()},
-    }
 
     def reconfigure_handler(self, id: str, config: Mapping) -> Type[HandlerBase]:
         return self.handler_map[id](**config)
@@ -304,10 +215,17 @@ class StorageHandler(ABC):
 
     async def get_content(self, entry: FeedEntry) -> EntryContent:
 
-        raw_content = await self.get_settings().content_retrieval_handler.get_content(
-            entry=entry
+        feed = self.get_feed(entry.feed_id)
+        self.logger.debug(f"Found feed {feed} for entry {entry}")
+        settings = self.get_settings()
+        summarizer = settings.llm_handler.summarize
+
+        content = await settings.content_retrieval_handler.get_content(
+            feed=feed, entry=entry, summarizer=summarizer
         )
-        return await raw_content.to_entry_content()
+        self.logger.debug(f"Received content {content}")
+
+        return content
 
     async def get_entry_content(
         self, entry: FeedEntry, redrive: bool = False
@@ -320,6 +238,7 @@ class StorageHandler(ABC):
             if redrive:
                 self.logger.info(f"starting redrive for feed entry {entry.id}")
 
+            self.logger.debug(f"Getting content for entry {type(entry)}: {entry}")
             entry_content = await self.get_content(entry=entry)
             await self.upsert_entry_content(entry_content)
 

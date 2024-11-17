@@ -1,16 +1,19 @@
+from __future__ import annotations
+
 from enum import Enum
 from json import JSONDecodeError, dumps, loads
 from logging import getLogger
 from pathlib import Path
-from typing import Any, List, Mapping, Type
+from typing import Any, List, Mapping
 
-from lmdb import Environment, Transaction
+from lmdb import Environment
 from pydantic import BaseModel
 
 from app.constants import DATA_DIR
-from app.context import GlobalSettings, StorageHandler
+from app.db import StorageHandler
 from app.handlers import HandlerBase
-from app.models import EntryContent, Feed, FeedEntry, Type
+from app.models import EntryContent, Feed, FeedEntry
+from app.settings import GlobalSettings
 
 logger = getLogger("uvicorn.error")
 
