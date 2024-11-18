@@ -135,8 +135,11 @@ class TinyDBStorageHandler(StorageHandler):
         return existing
 
     def entry_content_exists(self, entry: FeedEntry) -> bool:
+        table = self.db.table("entry_contents")
+        query = Query().id.matches(entry.id)
+        existing = table.search(query)
 
-        return bool(self.retrieve_entry_content(entry=entry))
+        return bool(existing)
 
     async def upsert_entry_content(self, content: EntryContent):
         table = self.db.table("entry_contents")
