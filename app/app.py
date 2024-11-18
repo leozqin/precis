@@ -332,6 +332,7 @@ async def update_feed(
     notify: Annotated[bool, Form()] = False,
     preview_only: Annotated[bool, Form()] = False,
     refresh_enabled: Annotated[bool, Form()] = False,
+    use_script: Annotated[bool, Form()] = False,
 ):
     try:
         feed = Feed(
@@ -342,6 +343,7 @@ async def update_feed(
             notify_destination=notify_destination,
             preview_only=preview_only,
             refresh_enabled=refresh_enabled,
+            use_script=use_script,
         )
 
         await bk.update_feed(feed=feed)

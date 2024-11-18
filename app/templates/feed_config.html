@@ -92,6 +92,11 @@
           <input name="refresh_enabled" type="checkbox" class="toggle" {% if feed.refresh_enabled !=False %} checked {%
             endif %} />
         </label>
+        <label class="label cursor-pointer gap-2">
+          <span class="label-text text-2xl lg:text-xl">Enable JavaScript</span>
+          <input name="use_script" type="checkbox" class="toggle" {% if feed.use_script !=False %} checked {%
+            endif %} />
+        </label>
       </div>
       <div>
         <button type="submit"

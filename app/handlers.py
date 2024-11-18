@@ -24,7 +24,7 @@ class ContentRetrievalHandler(HandlerBase):
     id: ClassVar[str] = "generic_content_retrieval_handler"
 
     @abstractmethod
-    async def get_html(self, url) -> str:
+    async def get_html(self, url, use_script: bool) -> str:
         pass
 
     async def get_content(
@@ -38,17 +38,18 @@ class ContentRetrievalHandler(HandlerBase):
             return EntryContent(url=entry.url, banned=True)
 
         try:
-            html = await self.get_html(url=entry.url)
-            if not html:
+            html = await self.get_html(url=entry.url, use_script=feed.use_script)
+            content = self.get_main_content(content=html)
+            if not html or not content:
                 return EntryContent(url=entry.url, unretrievable=True)
             else:
-                content = self.get_main_content(content=html)
                 summary = summarizer(feed=feed, entry=entry, mk=content)
 
                 return EntryContent(
                     url=entry.url,
                     content=content,
                     summary=markdown(summary) if summary else None,
+                    unretrievable=True if content else False,
                 )
 
         except Exception as e:

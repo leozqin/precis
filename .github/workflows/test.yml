@@ -5,15 +5,33 @@ on:
       - main
 
 jobs:
-  integration-test-tinydb:
+  integration-test-tinydb-playwright:
     uses: ./.github/workflows/integration_test.yml
     with:
       storage_handler: tinydb
-  integration-test-lmdb:
+      content_retrieval_handler: playwright
+  integration-test-lmdb-playwright:
     uses: ./.github/workflows/integration_test.yml
     with:
       storage_handler: lmdb
-  integration-test-hybrid:
+      content_retrieval_handler: playwright
+  integration-test-hybrid-playwright:
     uses: ./.github/workflows/integration_test.yml
     with:
       storage_handler: hybrid
+      content_retrieval_handler: playwright
+  integration-test-tinydb-requests:
+    uses: ./.github/workflows/integration_test.yml
+    with:
+      storage_handler: tinydb
+      content_retrieval_handler: requests
+  integration-test-lmdb-requests:
+    uses: ./.github/workflows/integration_test.yml
+    with:
+      storage_handler: lmdb
+      content_retrieval_handler: requests
+  integration-test-hybrid-requests:
+    uses: ./.github/workflows/integration_test.yml
+    with:
+      storage_handler: hybrid
+      content_retrieval_handler: requests

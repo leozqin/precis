@@ -14,6 +14,7 @@ class Feed(BaseModel):
     notify: bool = True
     preview_only: bool = False
     refresh_enabled: bool = True
+    use_script: bool = False
 
     @property
     def rss(self) -> Type[FeedParserDict]:
