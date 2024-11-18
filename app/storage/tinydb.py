@@ -130,7 +130,7 @@ class TinyDBStorageHandler(StorageHandler):
     def retrieve_entry_content(self, entry: FeedEntry) -> EntryContent:
         table = self.db.table("entry_contents")
         query = Query().id.matches(entry.id)
-        existing = table.search(query)
+        existing = table.search(query)[0]
 
         return existing
 

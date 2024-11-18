@@ -120,20 +120,6 @@ class StorageHandler(ABC):
         pass
 
     @abstractmethod
-    async def get_entry_content(
-        self, entry: FeedEntry, redrive: bool = False
-    ) -> EntryContent:
-        """
-        Given a feed entry, return the EntryContent object for that entry
-        if one exists. If the redrive argument is true or if none exists,
-        create a new one using the URL of the feed entry and add it to the
-        database using upsert_entry_content. Use the get_main_content
-        static method for the class to clean the content as needed. Use the
-        summarize static method for the class to build the summary.
-        """
-        pass
-
-    @abstractmethod
     async def upsert_entry_content(self, content: EntryContent):
         """
         Given an EntryContent object, insert it into the database.
