@@ -12,11 +12,11 @@ from fastapi.templating import Jinja2Templates
 from fastapi_utils.tasks import repeat_every
 
 from app.backend import PrecisBackend
-from app.context import GlobalSettings, Themes
+from app.impls import load_storage_config
 from app.logging import HealthCheckFilter
 from app.models import Feed, HealthCheck
 from app.rss import PrecisRSS
-from app.storage.engine import load_storage_config
+from app.settings import GlobalSettings, Themes
 
 JSON = "application/json"
 
@@ -332,6 +332,7 @@ async def update_feed(
     notify: Annotated[bool, Form()] = False,
     preview_only: Annotated[bool, Form()] = False,
     refresh_enabled: Annotated[bool, Form()] = False,
+    use_script: Annotated[bool, Form()] = False,
 ):
     try:
         feed = Feed(
@@ -342,6 +343,7 @@ async def update_feed(
             notify_destination=notify_destination,
             preview_only=preview_only,
             refresh_enabled=refresh_enabled,
+            use_script=use_script,
         )
 
         await bk.update_feed(feed=feed)

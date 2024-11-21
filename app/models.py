@@ -14,6 +14,7 @@ class Feed(BaseModel):
     notify: bool = True
     preview_only: bool = False
     refresh_enabled: bool = True
+    use_script: bool = False
 
     @property
     def rss(self) -> Type[FeedParserDict]:
@@ -45,6 +46,8 @@ class EntryContent(BaseModel):
     url: str
     content: str = None
     summary: str = None
+    unretrievable: bool = False
+    banned: bool = False
 
     @property
     def id(self) -> str:

@@ -5,9 +5,10 @@ from typing import List, Mapping, Optional, Type
 from tinydb import Query, TinyDB
 
 from app.constants import DATA_DIR
-from app.context import GlobalSettings, StorageHandler
+from app.db import StorageHandler
 from app.handlers import ContentRetrievalHandler, LLMHandler, NotificationHandler
 from app.models import EntryContent, Feed, FeedEntry
+from app.settings import GlobalSettings
 
 logger = getLogger("uvicorn.error")
 
@@ -126,40 +127,19 @@ class TinyDBStorageHandler(StorageHandler):
         else:
             return False
 
-    async def get_entry_content(
-        self, entry: FeedEntry, redrive: bool = False
-    ) -> EntryContent:
+    def retrieve_entry_content(self, entry: FeedEntry) -> EntryContent:
         table = self.db.table("entry_contents")
         query = Query().id.matches(entry.id)
+        existing = table.search(query)[0]
 
+        return EntryContent(**existing["entry_contents"])
+
+    def entry_content_exists(self, entry: FeedEntry) -> bool:
+        table = self.db.table("entry_contents")
+        query = Query().id.matches(entry.id)
         existing = table.search(query)
-        if existing and not redrive:
-            return EntryContent(**existing[0]["entry_contents"])
 
-        else:
-            if redrive:
-                self.logger.info(f"starting redrive for feed entry {entry.id}")
-
-            settings = self.get_settings()
-
-            raw_content = await self.get_entry_html(entry.url, settings=settings)
-            content = self.get_main_content(content=raw_content)
-
-            feed = self.get_feed(entry.feed_id)
-
-            summary = self.summarize(
-                feed=feed, entry=entry, mk=content, settings=settings
-            )
-
-            entry_content = EntryContent(
-                url=entry.url,
-                content=content,
-                summary=summary if summary else None,
-            )
-
-            await self.upsert_entry_content(content=entry_content)
-
-            return entry_content
+        return bool(existing)
 
     async def upsert_entry_content(self, content: EntryContent):
         table = self.db.table("entry_contents")

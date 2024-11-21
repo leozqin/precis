@@ -1,16 +1,19 @@
+from __future__ import annotations
+
 from enum import Enum
 from json import JSONDecodeError, dumps, loads
 from logging import getLogger
 from pathlib import Path
-from typing import Any, List, Mapping, Type
+from typing import Any, List, Mapping
 
-from lmdb import Environment, Transaction
+from lmdb import Environment
 from pydantic import BaseModel
 
 from app.constants import DATA_DIR
-from app.context import GlobalSettings, StorageHandler
+from app.db import StorageHandler
 from app.handlers import HandlerBase
-from app.models import EntryContent, Feed, FeedEntry, Type
+from app.models import EntryContent, Feed, FeedEntry
+from app.settings import GlobalSettings
 
 logger = getLogger("uvicorn.error")
 
@@ -209,38 +212,6 @@ class LMDBStorageHandler(StorageHandler):
         with self.db.begin(db=self._db(Named.entry_content)) as txn:
             content = txn.get(self._serialize(entry.id))
             return EntryContent(**self._deserialize(content))
-
-    async def get_entry_content(
-        self, entry: FeedEntry, redrive: bool = False
-    ) -> EntryContent:
-
-        if self.entry_content_exists(entry) and not redrive:
-            return self.retrieve_entry_content(entry=entry)
-
-        else:
-            if redrive:
-                self.logger.info(f"starting redrive for feed entry {entry.id}")
-
-            settings = self.get_settings()
-
-            raw_content = await self.get_entry_html(entry.url, settings=settings)
-            content = self.get_main_content(content=raw_content)
-
-            feed = self.get_feed(entry.feed_id)
-
-            summary = self.summarize(
-                feed=feed, entry=entry, mk=content, settings=settings
-            )
-
-            entry_content = EntryContent(
-                url=entry.url,
-                content=content,
-                summary=summary if summary else None,
-            )
-
-            await self.upsert_entry_content(entry_content)
-
-            return entry_content
 
     async def upsert_entry_content(self, content: EntryContent):
 

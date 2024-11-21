@@ -5,15 +5,75 @@ on:
       - main
 
 jobs:
-  integration-test-tinydb:
+  integration-test-tinydb-playwright-null:
     uses: ./.github/workflows/integration_test.yml
     with:
       storage_handler: tinydb
-  integration-test-lmdb:
+      content_retrieval_handler: playwright
+      llm_handler: "null"
+  integration-test-lmdb-playwright-null:
     uses: ./.github/workflows/integration_test.yml
     with:
       storage_handler: lmdb
-  integration-test-hybrid:
+      content_retrieval_handler: playwright
+      llm_handler: "null"
+  integration-test-hybrid-playwright-null:
     uses: ./.github/workflows/integration_test.yml
     with:
       storage_handler: hybrid
+      content_retrieval_handler: playwright
+      llm_handler: "null"
+  integration-test-tinydb-requests-null:
+    uses: ./.github/workflows/integration_test.yml
+    with:
+      storage_handler: tinydb
+      content_retrieval_handler: requests
+      llm_handler: "null"
+  integration-test-lmdb-requests-null:
+    uses: ./.github/workflows/integration_test.yml
+    with:
+      storage_handler: lmdb
+      content_retrieval_handler: requests
+      llm_handler: "null"
+  integration-test-hybrid-requests-null:
+    uses: ./.github/workflows/integration_test.yml
+    with:
+      storage_handler: hybrid
+      content_retrieval_handler: requests
+      llm_handler: "null"
+  integration-test-tinydb-playwright-dummy:
+    uses: ./.github/workflows/integration_test.yml
+    with:
+      storage_handler: tinydb
+      content_retrieval_handler: playwright
+      llm_handler: dummy
+  integration-test-lmdb-playwright-dummy:
+    uses: ./.github/workflows/integration_test.yml
+    with:
+      storage_handler: lmdb
+      content_retrieval_handler: playwright
+      llm_handler: dummy
+  integration-test-hybrid-playwright-dummy:
+    uses: ./.github/workflows/integration_test.yml
+    with:
+      storage_handler: hybrid
+      content_retrieval_handler: playwright
+      llm_handler: dummy
+  integration-test-tinydb-requests-dummy:
+    uses: ./.github/workflows/integration_test.yml
+    with:
+      storage_handler: tinydb
+      content_retrieval_handler: requests
+      llm_handler: dummy
+  integration-test-lmdb-requests-dummy:
+    uses: ./.github/workflows/integration_test.yml
+    with:
+      storage_handler: lmdb
+      content_retrieval_handler: requests
+      llm_handler: dummy
+  integration-test-hybrid-requests-dummy:
+    uses: ./.github/workflows/integration_test.yml
+    with:
+      storage_handler: hybrid
+      content_retrieval_handler: requests
+      llm_handler: dummy
