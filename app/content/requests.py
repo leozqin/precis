@@ -9,7 +9,8 @@ class RequestsContentRetriever(ContentRetrievalHandler):
     id = "requests"
     headers = {"User-Agent": USER_AGENT}
 
-    async def get_html(self, url: str) -> str:
+    # requests does not implement the use_script option so we'll just ignore it
+    async def get_html(self, url: str, use_script: bool = False) -> str:
         try:
             page = requests.get(url, headers=self.headers)
             if page.text == "":
