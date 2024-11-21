@@ -11,7 +11,8 @@ GITHUB_LINK = environ.get("GITHUB_LINK", "https://github.com/leozqin/precis")
 USER_AGENT = f"Precis/{version('precis')}"
 BANNED_GLOBS = [
     "*x.com/*",
-    "*twitter.com/*" "*reddit.com/*",
+    "*twitter.com/*",
+    "*reddit.com/*",
     "*youtube.com/*",
     "*notion.site/*",
 ]
