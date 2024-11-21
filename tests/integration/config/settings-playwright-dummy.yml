@@ -1,0 +1,2 @@
+content_retrieval_handler_key: playwright
+llm_handler_key: dummy_llm
