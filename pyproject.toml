@@ -55,7 +55,8 @@ dependencies = [
     "textstat",
     "jira",
     "pytest",
-    "pytest_asyncio"
+    "pytest_asyncio",
+    "pytest-cov"
 ]
 
 [project.urls]
