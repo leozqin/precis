@@ -10,14 +10,14 @@ from opml import OpmlDocument, OpmlOutline
 from ruamel.yaml import YAML
 
 from app.constants import CONFIG_DIR, DATA_DIR
-from app.context import GlobalSettings, StorageHandler
 from app.models import EntryContent, Feed, FeedEntry
+from app.settings import GlobalSettings
 
 logger = getLogger("uvicorn.error")
 
 
 class PrecisRSS:
-    def __init__(self, db: Type[StorageHandler]) -> None:
+    def __init__(self, db) -> None:
         self.db = db
 
     def load_feeds(self) -> None:

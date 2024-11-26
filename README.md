@@ -6,7 +6,9 @@ The following components of the app are extensible:
 1. LLMs - LLMs including Ollama and OpenAI, used for functions such as summarization
 2. Content Retrieval - `requests` or `playwright`
 3. Notification - `matrix`, `slack`, `jira`, and `ntfy`
-4. Storage - At this time, we support two reasonable embedded DBs - `tinydb` or `lmdb` - defaults to `tinydb`. You can add support for your database of choice if you can implement about 20 shared transactions.
+4. Storage - At this time, we support two reasonable embedded DBs - `tinydb` or `lmdb` - defaults to `tinydb`. We also support a `hybrid` storage handler that uses LDMB for most things, but stores entry content offline, in the filesystem, as pickled objects (which helps to keep the database size manageable). You can add support for your database of choice if you can implement about 20 shared transactions.
+
+For production use, I recommend the `hybrid` storage handler.
 
 The LLM and Notification handlers also support a `null` handler that does nothing. Good for testing or if you don't care about notifications and summaries. The null handler is the default.
 
@@ -105,7 +107,16 @@ Commands:
   restore        Restore a json-format backup of the Precis state
 ```
 
-## UI Tour
+# Content Ownership
+Precis is meant for use as a personal RSS reader. The content retrieval methodology is basic at best, and I do not have much interest in refining it. So, I think it is unlikely that Precis will become a nuisance content scraper.
+
+Furthermore, we pass a unique user agent of the form `Precis/{version}` so if as a content owner you feel that Precis is acting disruptively, feel free to block that user agent. It will not have destructive impact on users; Precis should detect the rejection and display a link to your website instead of its content.
+
+Finally:
+1. If you'd like to opt-out of content retrieval by Precis, [this file](https://github.com/leozqin/precis/blob/main/app/constants.py) contains a set of globs that should return as banned. Feel free to send a PR with your site, but I reserve final say as to whether your request will be accepted. Expect a more understanding and lenient decision making process for small, independent media/publishers.
+2. If you're of the opinion that Precis should respect `robots.txt`, please thumbs up [this issue](https://github.com/leozqin/precis/issues/79)
+
+# UI Tour
 After initial onboarding, you'll be brought to the feeds page.
 ![The feeds page](app/assets/feeds.png)
 

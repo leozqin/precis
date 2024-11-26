@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 from importlib.metadata import version
 from json import dumps, loads
-from logging import getLogger
+from logging import INFO, getLogger
 from sys import version as py_version
 from time import localtime, strftime, time
 from typing import List, Mapping, Type
@@ -9,15 +11,15 @@ from pydantic import BaseModel
 from textstat import textstat as txt
 
 from app.constants import GITHUB_LINK, IS_DOCKER
-from app.context import GlobalSettings, StorageHandler
 from app.errors import InvalidFeedException
 from app.models import EntryContent, Feed, FeedEntry, HealthCheck
+from app.settings import GlobalSettings
 
 logger = getLogger("uvicorn.error")
 
 
 class PrecisBackend:
-    def __init__(self, db: Type[StorageHandler]):
+    def __init__(self, db):
         self.db = db
 
     @staticmethod
@@ -122,16 +124,18 @@ class PrecisBackend:
             content: EntryContent = await self.db.get_entry_content(
                 entry=entry, redrive=redrive
             )
-            word_count = txt.lexicon_count(content.content)
+            logger.debug(f"Received EntryContent: {content}")
+            txt_content = content.content if content.content else ""
+            word_count = txt.lexicon_count(txt_content)
             return {
                 **base,
+                "unretrievable": content.unretrievable,
+                "banned": content.banned,
                 "preview": None,
                 "content": content.content,
                 "summary": content.summary,
                 "word_count": word_count,
-                "reading_level": int(
-                    txt.text_standard(content.content, float_output=True)
-                ),
+                "reading_level": int(txt.text_standard(txt_content, float_output=True)),
                 "reading_time": int(word_count / settings.reading_speed),
             }
 
@@ -215,18 +219,18 @@ class PrecisBackend:
 
     @staticmethod
     async def list_content_handler_choices():
-        from app.content import content_retrieval_handlers
+        from app.impls import content_retrieval_handlers
 
         return list(content_retrieval_handlers.keys())
 
     @staticmethod
     async def list_llm_handler_choices():
-        from app.llm import llm_handlers
+        from app.impls import llm_handlers
 
         return list(llm_handlers.keys())
 
     @staticmethod
     async def list_notification_handler_choices():
-        from app.notification import notification_handlers
+        from app.impls import notification_handlers
 
         return list(notification_handlers.keys())

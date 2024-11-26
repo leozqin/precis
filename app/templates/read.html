@@ -55,14 +55,12 @@
                                 Settings
                             </a>
                         </li>
-                        {% if content.content %}
                         <li>
                             <a href="{{ url_for('read', feed_entry_id=content.id).include_query_params(redrive=True) }}"
                                 class="text-4xl lg:text-xl text-nowrap">
                                 Redrive this Article
                             </a>
                         </li>
-                        {% endif %}
                         <li>
                             <a href="{{ url_for('about') }}" class="text-4xl lg:text-xl text-nowrap no-underline">
                                 About Precis
@@ -80,9 +78,11 @@
         <div class="text-3xl lg:xl my-5">Published: {{ content.published_at }}</div>
         <div class="text-3xl lg:xl my-5">Updated: {{ content.updated_at }}</div>
         {% endif %}
+        {% if not (content.banned or content.unretrievable) %}
         <div class="text-2xl lg:xl my-5">Reading Time: {{ content.reading_time }} minute(s)</div>
         <div class="text-2xl lg:xl my-5">Word Count: {{ content.word_count }} words</div>
         <div class="text-2xl lg:xl my-5">Complexity: Grade {{ content.reading_level }}</div>
+        {% endif %}
     </section>
     <section class="w-11/12 lg:w-3/5 mx-auto">
         {% if content.preview %}
@@ -90,7 +90,6 @@
             <h2>Preview</h2>
             <div>{{ content.preview| safe }}</div>
         </section>
-
         <section class="justify-center flex my-5">
             <a href="{{ content.url }}">
                 <button class="btn btn-accent btn-lg rounded-xl text-4xl lg:text-lg text-nowrap"">
@@ -103,6 +102,26 @@
         <section class=" prose sm:prose-2xl lg:prose-lg max-w-none">
                     <h2>TL;DR</h2>
                     <div>{{ content.summary| safe }}</div>
+        </section>
+        {% endif %}
+        {% if content.banned %}
+        <span>The URL was on the banlist, so no content was retrieved!</span>
+        <section class="justify-center flex my-5">
+            <a href="{{ content.url }}">
+                <button class="btn btn-accent btn-lg rounded-xl text-4xl lg:text-lg text-nowrap"">
+                    View Original Article
+                </button>
+            </a>
+        </section>
+        {% endif %}
+        {% if content.unretrievable %}
+        <span>For some reason, content retrieval failed for this entry!</span>
+        <section class="justify-center flex my-5">
+            <a href="{{ content.url }}">
+                <button class="btn btn-accent btn-lg rounded-xl text-4xl lg:text-lg text-nowrap"">
+                    View Original Article
+                </button>
+            </a>
         </section>
         {% endif %}
         {% if content.content %}

@@ -5,12 +5,17 @@ on:
         storage_handler:
           required: true
           type: string
+        content_retrieval_handler:
+          required: true
+          type: string
+        llm_handler:
+          required: true
+          type: string
 
 env:
   IMAGE_NAME: precis
 #
 jobs:
-  # This pushes the image to GitHub Packages.
   integration_test:
     runs-on: ubuntu-latest
     permissions:
@@ -31,6 +36,8 @@ jobs:
       - name: test
         run: |
           source .venv/bin/activate
+          mv tests/integration/config/settings-${{ inputs.content_retrieval_handler }}-${{ inputs.llm_handler}}.yml tests/integration/config/settings.yml
+          precis load-settings
           precis load-feeds
           precis check-feeds
           make run-ci

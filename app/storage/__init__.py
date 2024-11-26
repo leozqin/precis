@@ -1,4 +1,4 @@
-from app.storage.lmdb import LMDBStorageHandler
-from app.storage.tinydb import TinyDBStorageHandler
+from app.constants import DATA_DIR
 
-storage_handlers = {"tinydb": TinyDBStorageHandler, "lmdb": LMDBStorageHandler}
+# ensure data dir exists
+DATA_DIR.mkdir(parents=True, exist_ok=True)

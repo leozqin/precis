@@ -1,108 +1,17 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from enum import Enum
 from logging import getLogger
-from typing import Any, List, Mapping, Optional, Type
+from typing import List, Mapping, Optional, Type
 
-from markdown2 import markdown
-from pydantic import BaseModel, Field, validator
-from readabilipy import simple_json_from_html_string
-
-from app.content import content_retrieval_handlers
-from app.handlers import (
-    ContentRetrievalHandler,
-    HandlerBase,
-    LLMHandler,
-    NotificationHandler,
-)
-from app.llm import llm_handlers
+from app.handlers import HandlerBase
 from app.models import *
-from app.notification import notification_handlers
-
-
-class Themes(str, Enum):
-    black = "black"
-    coffee = "coffee"
-    dark = "dark"
-    fantasy = "fantasy"
-    forest = "forest"
-    lemonade = "lemonade"
-    lofi = "lofi"
-    luxury = "luxury"
-    night = "night"
-    nord = "nord"
-    pastel = "pastel"
-    synthwave = "synthwave"
-    winter = "winter"
-
-
-class GlobalSettings(BaseModel):
-
-    send_notification: bool = True
-    theme: Themes = Themes.forest
-    refresh_interval: int = 5
-    reading_speed: int = 238
-
-    notification_handler_key: str = "null_notification"
-    llm_handler_key: str = "null_llm"
-    content_retrieval_handler_key: str = "playwright"
-    recent_hours: int = 36
-
-    finished_onboarding: bool = False
-
-    db: Any = Field(exclude=True)
-
-    @validator("db")
-    def validate_db(cls, val):
-        if issubclass(type(val), StorageHandler):
-            return val
-
-        raise TypeError("Wrong type for db, must be subclass of StorageHandler")
-
-    @property
-    def notification_handler(self) -> NotificationHandler:
-        try:
-            return self.db.get_handler(id=self.notification_handler_key)
-        except IndexError:
-            return self.db.handler_map[self.notification_handler_key]()
-
-    @property
-    def llm_handler(self) -> LLMHandler:
-        try:
-            return self.db.get_handler(id=self.llm_handler_key)
-        except IndexError:
-            return self.db.handler_map[self.llm_handler_key]()
-
-    @property
-    def content_retrieval_handler(self) -> ContentRetrievalHandler:
-        try:
-            return self.db.get_handler(id=self.content_retrieval_handler_key)
-        except IndexError:
-            return self.db.handler_map[self.content_retrieval_handler_key]()
+from app.settings import GlobalSettings
 
 
 class StorageHandler(ABC):
 
     logger = getLogger("uvicorn.error")
-
-    handler_map = {
-        **llm_handlers,
-        **notification_handlers,
-        **content_retrieval_handlers,
-    }
-
-    engine_map = {
-        "llm": llm_handlers,
-        "notification": notification_handlers,
-        "content": content_retrieval_handlers,
-    }
-
-    handler_type_map = {
-        **{k: "llm" for k in llm_handlers.keys()},
-        **{k: "notification" for k in notification_handlers.keys()},
-        **{k: "content" for k in content_retrieval_handlers.keys()},
-    }
 
     def reconfigure_handler(self, id: str, config: Mapping) -> Type[HandlerBase]:
         return self.handler_map[id](**config)
@@ -211,24 +120,25 @@ class StorageHandler(ABC):
         pass
 
     @abstractmethod
-    async def get_entry_content(
-        self, entry: FeedEntry, redrive: bool = False
-    ) -> EntryContent:
-        """
-        Given a feed entry, return the EntryContent object for that entry
-        if one exists. If the redrive argument is true or if none exists,
-        create a new one using the URL of the feed entry and add it to the
-        database using upsert_entry_content. Use the get_main_content
-        static method for the class to clean the content as needed. Use the
-        summarize static method for the class to build the summary.
-        """
-        pass
-
-    @abstractmethod
     async def upsert_entry_content(self, content: EntryContent):
         """
         Given an EntryContent object, insert it into the database.
         """
+        pass
+
+    @abstractmethod
+    def entry_content_exists(self, entry: FeedEntry) -> bool:
+        """
+        Return true if entry content exists for the FeedEntry else False
+        """
+        pass
+
+    @abstractmethod
+    def retrieve_entry_content(self, entry: FeedEntry) -> EntryContent:
+        """
+        Retrieve the content for the feed entry from storage
+        """
+        pass
 
     @abstractmethod
     def upsert_handler(
@@ -289,22 +199,33 @@ class StorageHandler(ABC):
         """
         pass
 
-    @staticmethod
-    async def get_entry_html(url: str, settings: GlobalSettings) -> str:
-        return await settings.content_retrieval_handler.get_content(url)
+    async def get_content(self, entry: FeedEntry) -> EntryContent:
 
-    @staticmethod
-    def get_main_content(content: str) -> str:
-        md = simple_json_from_html_string(html=content, use_readability=True)
+        feed = self.get_feed(entry.feed_id)
+        self.logger.debug(f"Found feed {feed} for entry {entry}")
+        settings = self.get_settings()
+        summarizer = settings.llm_handler.summarize
 
-        return md["plain_content"]
+        content = await settings.content_retrieval_handler.get_content(
+            feed=feed, entry=entry, summarizer=summarizer
+        )
+        self.logger.debug(f"Received content {content}")
 
-    @staticmethod
-    def summarize(
-        feed: Feed, entry: FeedEntry, mk: str, settings: GlobalSettings
-    ) -> str:
+        return content
 
-        summary = settings.llm_handler.summarize(feed=feed, entry=entry, mk=mk)
+    async def get_entry_content(
+        self, entry: FeedEntry, redrive: bool = False
+    ) -> EntryContent:
 
-        if summary:
-            return markdown(summary)
+        if self.entry_content_exists(entry) and not redrive:
+            return self.retrieve_entry_content(entry=entry)
+
+        else:
+            if redrive:
+                self.logger.info(f"starting redrive for feed entry {entry.id}")
+
+            self.logger.debug(f"Getting content for entry {type(entry)}: {entry}")
+            entry_content = await self.get_content(entry=entry)
+            await self.upsert_entry_content(entry_content)
+
+            return entry_content
