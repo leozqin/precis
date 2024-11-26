@@ -54,7 +54,8 @@ dependencies = [
     "asyncclick",
     "textstat",
     "jira",
-    "pytest"
+    "pytest",
+    "pytest_asyncio"
 ]
 
 [project.urls]
