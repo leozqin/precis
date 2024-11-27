@@ -13,12 +13,18 @@ repos:
     - id: trailing-whitespace
     - id: check-added-large-files
     - id: detect-private-key
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    # Ruff version.
-    rev: v0.8.0
+  - repo: local
     hooks:
       # Run the linter.
       - id: ruff
+        name: lint
+        language: python
+        types_or: [python, pyi, jupyter]
+        entry: ruff check --force-exclude
         args: [ --fix ]
       # Run the formatter.
       - id: ruff-format
+        name: format
+        language: python
+        types_or: [python, pyi, jupyter]
+        entry: ruff format --force-exclude

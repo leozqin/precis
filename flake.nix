@@ -25,6 +25,7 @@
         playwright
         playwright-driver.browsers
         go_1_21
+        ruff
       ];
 
       PLAYWRIGHT_NODEJS_PATH = "${pkgs.nodejs_22}/bin/node";

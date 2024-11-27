@@ -70,10 +70,7 @@ class ImplMixin:
     }
 
 
-def load_storage_config() -> Type[
-    Union[ImplMixin, Type[StorageHandler]],
-]:
-
+def load_storage_config() -> Type[Union[Type[StorageHandler], ImplMixin],]:
     config_type = environ.get("PRECIS_STORAGE_HANDLER", "tinydb")
     handler_type = storage_handlers.get(config_type)
     handler = handler_type()
