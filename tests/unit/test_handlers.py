@@ -1,6 +1,6 @@
 import pytest
 
-from app.handlers import ContentRetrievalHandler, LLMHandler, NotificationHandler
+from app.handlers import ContentRetrievalHandler, LLMHandler
 
 
 def test_llm_handler():
@@ -18,7 +18,6 @@ def test_llm_handler():
 
 @pytest.mark.asyncio
 async def test_content_retrieval_handler_is_banned():
-
     fn = ContentRetrievalHandler.is_banned
 
     assert await fn("reddit.com/abc123")
@@ -28,7 +27,6 @@ async def test_content_retrieval_handler_is_banned():
 
 
 def test_content_retrieval_handler_get_main_content():
-
     fn = ContentRetrievalHandler.get_main_content
 
     assert fn("hello world")

@@ -68,7 +68,9 @@ class PrecisBackend:
             for feed in feeds
         ]
 
-    def list_entries(self, feed_id: None, time: float = time(), recent: bool = False):
+    def list_entries(
+        self, feed_id: Feed = None, time: float = time(), recent: bool = False
+    ):
         if feed_id:
             feed = self.db.get_feed(id=feed_id)
         else:
