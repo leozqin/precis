@@ -16,10 +16,18 @@ class SlackNotificationHandler(NotificationHandler):
     channel_name: str
     routing: Mapping[str, str] = {}
 
+    @staticmethod
+    def _escape_title(title: str) -> str:
+        translation_table = {"&": "&amp;", "<": "&lt;", ">": "&gt;"}
+
+        # Iterate over the string and replace characters if needed
+        return "".join(translation_table.get(c, c) for c in title)
+
     async def send_notification(self, feed: Feed, entry: FeedEntry):
         client = AsyncWebClient(token=self.token)
+        title = self._escape_title(entry.title)
 
-        msg = f"{feed.name}: <{self.make_read_link(entry)}|{entry.title}>"
+        msg = f"{feed.name}: <{self.make_read_link(entry)}|{title}>"
 
         if feed.notify_destination:
             channel = self.routing.get(feed.notify_destination, self.channel_name)

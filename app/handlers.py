@@ -49,7 +49,7 @@ class ContentRetrievalHandler(HandlerBase):
                     url=entry.url,
                     content=content,
                     summary=markdown(summary) if summary else None,
-                    unretrievable=True if content else False,
+                    unretrievable=False if content else True,
                 )
 
         except Exception as e:
