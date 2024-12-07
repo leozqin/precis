@@ -36,7 +36,6 @@ jobs:
       - name: unit_test
         run: |
           source .venv/bin/activate
-          mkdir ${DATA_DIR}
           pytest -vvv -cov
           make clean
       - name: integration_test

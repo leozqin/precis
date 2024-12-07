@@ -20,6 +20,8 @@ class TinyDBStorageHandler(StorageHandler):
 
     def __init__(self):
         super().__init__()
+
+        DATA_DIR.mkdir(parents=True, exist_ok=True)
         db_path = Path(DATA_DIR, "db.json").resolve()
         self.db = TinyDB(db_path)
 
