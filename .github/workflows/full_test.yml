@@ -1,4 +1,4 @@
-name: Integration Test
+name: Full Test
 on:
   workflow_call:
       inputs:
@@ -14,16 +14,16 @@ on:
 
 env:
   IMAGE_NAME: precis
-#
+
 jobs:
-  integration_test:
+  test:
     runs-on: ubuntu-latest
     permissions:
       contents: read
     env:
       PRECIS_STORAGE_HANDLER: ${{ inputs.storage_handler }}
       CONFIG_DIR: ${{ github.workspace }}/tests/integration/config
-      DATA_DIR: ${{ github.workspace }}
+      DATA_DIR: ${{ github.workspace }}/data
       RSS_BASE_URL: http://localhost:8000
     steps:
       - name: checkout
@@ -33,7 +33,12 @@ jobs:
           pip install uv && uv venv
           source .venv/bin/activate
           make install-ci
-      - name: test
+      - name: unit_test
+        run: |
+          source .venv/bin/activate
+          pytest -vvv -cov
+          make clean
+      - name: integration_test
         run: |
           source .venv/bin/activate
           mv tests/integration/config/settings-${{ inputs.content_retrieval_handler }}-${{ inputs.llm_handler}}.yml tests/integration/config/settings.yml
