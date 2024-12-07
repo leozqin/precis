@@ -56,7 +56,8 @@ dependencies = [
     "jira",
     "pytest",
     "pytest_asyncio",
-    "pytest-cov"
+    "pytest-cov",
+    "pytest-mock"
 ]
 
 [project.urls]

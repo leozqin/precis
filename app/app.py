@@ -72,11 +72,9 @@ async def favicon():
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
-
     settings = await bk.get_settings()
 
     if settings.get("finished_onboarding"):
-
         return templates.TemplateResponse(
             "index.html",
             {
@@ -87,7 +85,6 @@ async def root(request: Request):
         )
 
     else:
-
         return RedirectResponse("/onboarding/")
 
 
@@ -99,7 +96,7 @@ async def about(
         "settings": await bk.get_settings(),
         "update_status": update_status,
         "update_exception": update_exception,
-        **bk.about(),
+        **await bk.about(),
     }
 
     if request.headers.get("accept") == JSON:
@@ -112,8 +109,7 @@ async def about(
 
 @app.get("/health", response_model=HealthCheck)
 async def health_check(request: Request) -> HealthCheck:
-
-    return bk.health_check()
+    return await bk.health_check()
 
 
 @app.get("/onboarding/")
@@ -235,7 +231,6 @@ async def handler_settings(
 async def update_handler(
     handler: Annotated[str, Form()], config: Annotated[str, Form()], request: Request
 ):
-
     try:
         await bk.update_handler(handler=handler, config=config)
 
@@ -246,7 +241,6 @@ async def update_handler(
             status_code=status.HTTP_303_SEE_OTHER,
         )
     except Exception as e:
-
         return RedirectResponse(
             request.url_for("handler_settings", handler=handler).include_query_params(
                 update_exception=e
@@ -257,7 +251,6 @@ async def update_handler(
 
 @app.get("/api/refresh_feed/{feed_id}", status_code=status.HTTP_200_OK)
 async def refresh_feed(feed_id: str, request: Request):
-
     await rss.check_feed_by_id(id=feed_id)
 
     return RedirectResponse(
@@ -270,7 +263,6 @@ async def refresh_feed(feed_id: str, request: Request):
 
 @app.get("/api/delete_feed/{feed_id}", status_code=status.HTTP_200_OK)
 async def delete_feed(feed_id: str, request: Request):
-
     await bk.delete_feed(feed_id=feed_id)
 
     return RedirectResponse(
@@ -315,7 +307,6 @@ async def update_settings(
             status_code=status.HTTP_303_SEE_OTHER,
         )
     except Exception as e:
-
         return RedirectResponse(
             request.url_for("settings").include_query_params(update_exception=e),
             status_code=status.HTTP_303_SEE_OTHER,
@@ -371,7 +362,6 @@ async def update_feed(
 
 @app.get("/api/export_opml/", status_code=status.HTTP_200_OK)
 async def export_opml(request: Request):
-
     write_path, file_name = await rss.feeds_to_opml()
 
     return FileResponse(path=write_path, filename=file_name)
@@ -379,7 +369,6 @@ async def export_opml(request: Request):
 
 @app.get("/api/backup/", status_code=status.HTTP_200_OK)
 async def backup(request: Request):
-
     write_path, file_name = await rss.backup()
 
     return FileResponse(path=write_path, filename=file_name)
@@ -387,7 +376,6 @@ async def backup(request: Request):
 
 @app.post("/api/restore/", status_code=status.HTTP_200_OK)
 async def restore(request: Request, file: UploadFile):
-
     try:
         await rss.restore(file=file.file)
 
@@ -404,7 +392,6 @@ async def restore(request: Request, file: UploadFile):
 
 @app.post("/api/import_opml/", status_code=status.HTTP_200_OK)
 async def import_opml(request: Request, file: UploadFile):
-
     try:
         await rss.opml_to_feeds(file=file.file)
 
@@ -413,7 +400,6 @@ async def import_opml(request: Request, file: UploadFile):
             status_code=status.HTTP_303_SEE_OTHER,
         )
     except Exception as e:
-
         return RedirectResponse(
             request.url_for("feeds").include_query_params(update_exception=e),
             status_code=status.HTTP_303_SEE_OTHER,
@@ -424,7 +410,6 @@ async def import_opml(request: Request, file: UploadFile):
 async def feeds(
     request: Request, update_status: bool = False, update_exception: str = None
 ):
-
     return templates.TemplateResponse(
         "feeds.html",
         {
@@ -477,13 +462,11 @@ async def new_feed(request: Request, update_exception: str = None):
 
 @app.get("/util/list-feeds", status_code=status.HTTP_200_OK)
 async def list_feeds(request: Request) -> Sequence[Mapping]:
-
     return bk.list_feeds()
 
 
 @app.get("/util/list-feed-entries", status_code=status.HTTP_200_OK)
 async def list_feed_entries(request: Request) -> Sequence[Mapping]:
-
     all_feeds = bk.list_feeds()
 
     entries = [list(bk.list_entries(feed["id"])) for feed in all_feeds]
@@ -493,7 +476,6 @@ async def list_feed_entries(request: Request) -> Sequence[Mapping]:
 
 @app.get("/util/list-handlers", status_code=status.HTTP_200_OK)
 async def list_handlers(request: Request) -> Sequence[Mapping]:
-
     handlers = bk.get_handlers()
 
     # config might have secrets so we only return if its configured

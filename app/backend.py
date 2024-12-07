@@ -26,10 +26,10 @@ class PrecisBackend:
     def _format_time(time: int) -> str:
         return strftime("%Y-%m-%d %I:%M %p", localtime(time)).lower()
 
-    def health_check(self):
+    async def health_check(self):
         return HealthCheck()
 
-    def about(self):
+    async def about(self):
         return {
             "version": version("precis"),
             "python_version": py_version,
