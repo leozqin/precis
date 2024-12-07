@@ -1,7 +1,9 @@
 from json import dumps, loads
 from os import makedirs
 from shutil import rmtree
+from uuid import uuid4
 
+import mock
 import pytest
 
 from app.backend import PrecisBackend
@@ -38,13 +40,15 @@ def dummy_entries(id: str, count: int, url: str, offset: int = 0):
 
 @pytest.fixture
 def setup():
-    makedirs(DATA_DIR, exist_ok=True)
+    patch_dir = DATA_DIR.joinpath(uuid4().hex)
+    makedirs(patch_dir, exist_ok=True)
 
-    db = load_storage_config()
-    backend = PrecisBackend(db)
-    yield db, backend
+    with mock.patch("app.impls.DATA_DIR", patch_dir):
+        db = load_storage_config()
+        backend = PrecisBackend(db)
+        yield db, backend
 
-    rmtree(DATA_DIR)
+    rmtree(patch_dir)
 
 
 def test_format_time():
