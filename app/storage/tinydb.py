@@ -18,8 +18,12 @@ class TinyDBStorageHandler(StorageHandler):
     Use this class to encapsulate DB interactions
     """
 
-    db_path = Path(DATA_DIR, "db.json").resolve()
-    db = TinyDB(db_path)
+    def __init__(self):
+        super().__init__()
+
+        DATA_DIR.mkdir(parents=True, exist_ok=True)
+        db_path = Path(DATA_DIR, "db.json").resolve()
+        self.db = TinyDB(db_path)
 
     def clear_active_feeds(self) -> None:
         self.db.drop_table("feeds")
@@ -165,7 +169,6 @@ class TinyDBStorageHandler(StorageHandler):
         table.upsert(row, cond=query)
 
     def _make_handler_obj(self, id: str, config: Mapping):
-
         return self.handler_map[id](**config)
 
     def get_handlers(

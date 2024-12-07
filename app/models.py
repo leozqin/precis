@@ -25,7 +25,10 @@ class Feed(BaseModel):
         return md5(self.url.encode()).hexdigest()
 
     def validate(self):
-        return bool(self.rss.entries)
+        try:
+            return bool(self.rss.entries)
+        except Exception:
+            return False
 
 
 class FeedEntry(BaseModel):
@@ -55,5 +58,4 @@ class EntryContent(BaseModel):
 
 
 class HealthCheck(BaseModel):
-
     status: str = "OK"

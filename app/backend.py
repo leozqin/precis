@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from importlib.metadata import version
 from json import dumps, loads
-from logging import INFO, getLogger
+from logging import getLogger
 from sys import version as py_version
 from time import localtime, strftime, time
 from typing import List, Mapping, Type
@@ -26,12 +26,10 @@ class PrecisBackend:
     def _format_time(time: int) -> str:
         return strftime("%Y-%m-%d %I:%M %p", localtime(time)).lower()
 
-    def health_check(self):
-
+    async def health_check(self):
         return HealthCheck()
 
-    def about(self):
-
+    async def about(self):
         return {
             "version": version("precis"),
             "python_version": py_version,
@@ -70,15 +68,16 @@ class PrecisBackend:
             for feed in feeds
         ]
 
-    def list_entries(self, feed_id: None, recent: bool = False):
-
+    def list_entries(
+        self, feed_id: Feed = None, time: float = time(), recent: bool = False
+    ):
         if feed_id:
             feed = self.db.get_feed(id=feed_id)
         else:
             feed = None
 
         settings: GlobalSettings = self.db.get_settings()
-        start_time = time() - (settings.recent_hours * 3600)
+        start_time = time - (settings.recent_hours * 3600)
 
         if recent:
             entries = self.db.get_entries(feed, after=start_time)
@@ -140,7 +139,6 @@ class PrecisBackend:
             }
 
     def get_handlers(self):
-
         handlers = self.db.get_handlers()
 
         return [
@@ -153,7 +151,6 @@ class PrecisBackend:
         ]
 
     def get_handler_config(self, handler: str):
-
         try:
             handler = self.db.get_handler(id=handler)
             return {"type": handler.id, "config": dumps(handler.dict(), indent=4)}
@@ -162,19 +159,16 @@ class PrecisBackend:
             return {"type": handler, "config": None}
 
     def get_handler_schema(self, handler: str):
-
         handler_obj: Type[BaseModel] = self.db.handler_map.get(handler)
 
         return dumps(handler_obj.schema(), indent=4)
 
     async def get_settings(self):
-
         settings: GlobalSettings = self.db.get_settings()
 
         return settings.dict()
 
     async def get_feed_config(self, id: str) -> Mapping:
-
         feed: Feed = self.db.get_feed(id=id)
 
         return {"id": feed.id, **feed.dict()}
@@ -197,17 +191,14 @@ class PrecisBackend:
             self.db.upsert_settings(settings=settings)
 
     async def update_settings(self, settings: GlobalSettings):
-
         self.db.upsert_settings(settings=settings)
 
     async def update_handler(self, handler: str, config: str):
-
         config_dict = loads(config)
         handler_obj = self.db.reconfigure_handler(id=handler, config=config_dict)
         self.db.upsert_handler(handler=handler_obj)
 
     async def delete_feed(self, feed_id: str):
-
         feed = self.db.get_feed(id=feed_id)
 
         entries = self.db.get_entries(feed=feed)

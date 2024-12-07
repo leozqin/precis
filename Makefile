@@ -33,7 +33,7 @@ build:
 
 .PHONY: clean
 clean:
-	rm *.mdb db.json
+	rm -r ${DATA_DIR}
 
 .PHONY: test
 test:

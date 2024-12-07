@@ -5,15 +5,26 @@ repos:
       - id: isort
         name: isort (python)
         args: ["--profile", "black"]
-  -   repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v2.3.0
-      hooks:
-      - id: check-yaml
-      - id: end-of-file-fixer
-      - id: trailing-whitespace
-      - id: check-added-large-files
-      - id: detect-private-key
-  -   repo: https://github.com/psf/black
-      rev: 22.10.0
-      hooks:
-      - id: black
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.3.0
+    hooks:
+    - id: check-yaml
+    - id: end-of-file-fixer
+    - id: trailing-whitespace
+    - id: check-added-large-files
+    - id: detect-private-key
+  - repo: local
+    hooks:
+      # Run the linter.
+      - id: ruff
+        name: lint
+        language: python
+        types_or: [python, pyi, jupyter]
+        entry: ruff check --force-exclude
+        args: [ --fix ]
+      # Run the formatter.
+      - id: ruff-format
+        name: format
+        language: python
+        types_or: [python, pyi, jupyter]
+        entry: ruff format --force-exclude

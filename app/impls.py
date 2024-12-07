@@ -1,9 +1,10 @@
 from logging import getLogger
 from os import environ
-from typing import Union
+from typing import Type, Union
 
 from app.content.playwright import PlaywrightContentRetriever
 from app.content.requests import RequestsContentRetriever
+from app.db import StorageHandler
 from app.llm.dummy import DummyLLMHandler
 from app.llm.null import NullLLMHandler
 from app.llm.ollama import OllamaLLMHandler
@@ -69,10 +70,7 @@ class ImplMixin:
     }
 
 
-def load_storage_config() -> (
-    Union[TinyDBStorageHandler, LMDBStorageHandler, HybridLMDBOfflineStorageHandler]
-):
-
+def load_storage_config() -> Type[Union[Type[StorageHandler], ImplMixin],]:
     config_type = environ.get("PRECIS_STORAGE_HANDLER", "tinydb")
     handler_type = storage_handlers.get(config_type)
     handler = handler_type()
