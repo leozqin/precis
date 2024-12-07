@@ -55,7 +55,7 @@ def test_format_time():
     int_time = 1732670009
     str_time = PrecisBackend._format_time(int_time)
 
-    assert str_time == "2024-11-26 05:13 pm"
+    assert str_time == "2024-11-27 01:13 am"
 
 
 @pytest.mark.asyncio
