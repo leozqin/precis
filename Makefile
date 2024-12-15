@@ -35,6 +35,10 @@ build:
 clean:
 	rm -r ${DATA_DIR}
 
-.PHONY: test
-test:
+.PHONY: integration-test
+integration-test:
 	go test tests/integration/*.go -v
+
+.PHONY: unit-test
+unit-test:
+	pytest -vvv -cov
