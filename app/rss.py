@@ -4,7 +4,7 @@ from json import dump, load
 from logging import getLogger
 from pathlib import Path
 from tempfile import SpooledTemporaryFile
-from typing import List, Mapping, Type
+from typing import List, Mapping
 
 from opml import OpmlDocument, OpmlOutline
 from ruamel.yaml import YAML
@@ -54,6 +54,7 @@ class PrecisRSS:
         self, entry: Mapping, feed: Feed, start_ts: int
     ) -> True:
         published_time = timegm(entry.published_parsed)
+        content = "".join(i.get("value", "") for i in entry.get("content", []))
         feed_entry = FeedEntry(
             **{
                 "title": entry.title,
@@ -61,6 +62,7 @@ class PrecisRSS:
                 "published_at": timegm(entry.published_parsed),
                 "updated_at": timegm(entry.updated_parsed),
                 "preview": entry.summary,
+                "content": content if content != "" else None,
                 "feed_id": feed.id,
                 "authors": (
                     [i["name"] for i in entry.authors] if "authors" in entry else []
@@ -105,7 +107,6 @@ class PrecisRSS:
         logger.info(f"Found {counter} new item(s) for feed {feed.name}")
 
     async def check_feeds(self) -> List:
-
         now = int(datetime.now(tz=timezone.utc).timestamp())
         logger.info(f"Checking feeds starting at time {now}")
 
@@ -115,7 +116,6 @@ class PrecisRSS:
                 await self._check_feed(feed=feed)
 
     async def check_feed_by_id(self, id: str) -> List:
-
         feed = self.db.get_feed(id=id)
 
         logger.info(f"Manual refresh requested for feed {feed.name}")
@@ -123,7 +123,6 @@ class PrecisRSS:
         await self._check_feed(feed=feed)
 
     async def add_feed_entry(self, feed: Feed, entry: FeedEntry) -> None:
-
         logger.info(f"Upserting entry from {feed.name}: {entry.title} - id {entry.id}")
 
         self.db.upsert_feed_entry(feed=feed, entry=entry)
@@ -170,7 +169,6 @@ class PrecisRSS:
         return out_path, file_name
 
     async def opml_to_feeds(self, file: SpooledTemporaryFile):
-
         opml = OpmlDocument.load(fp=file)
 
         feeds = []
@@ -193,7 +191,6 @@ class PrecisRSS:
             self.db.upsert_settings(settings=settings)
 
     async def backup(self):
-
         feeds = self.db.get_feeds()
         settings: GlobalSettings = self.db.get_settings()
         handlers = self.db.get_handlers()
@@ -229,7 +226,6 @@ class PrecisRSS:
         return out_path, file_name
 
     async def restore(self, file: SpooledTemporaryFile):
-
         bk = load(file)
 
         settings = GlobalSettings(db=self.db, **bk.get("settings", {}))

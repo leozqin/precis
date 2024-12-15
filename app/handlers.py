@@ -38,7 +38,14 @@ class ContentRetrievalHandler(HandlerBase):
             return EntryContent(url=entry.url, banned=True)
 
         try:
-            html = await self.get_html(url=entry.url, use_script=feed.use_script)
+            if not feed.retrieve_content:
+                logger.info(
+                    "Feed is configured to not retrieve content, using rss content"
+                )
+                html = entry.content
+            else:
+                html = await self.get_html(url=entry.url, use_script=feed.use_script)
+
             content = self.get_main_content(content=html)
             if not html or not content:
                 return EntryContent(url=entry.url, unretrievable=True)

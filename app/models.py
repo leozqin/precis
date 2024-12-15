@@ -15,6 +15,7 @@ class Feed(BaseModel):
     preview_only: bool = False
     refresh_enabled: bool = True
     use_script: bool = False
+    retrieve_content: bool = True
 
     @property
     def rss(self) -> Type[FeedParserDict]:
@@ -37,6 +38,7 @@ class FeedEntry(BaseModel):
     url: str
     published_at: int
     updated_at: int
+    content: str = None
     authors: list[str] = []
     preview: str = None
 
