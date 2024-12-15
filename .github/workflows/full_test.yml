@@ -36,7 +36,7 @@ jobs:
       - name: unit_test
         run: |
           source .venv/bin/activate
-          pytest -vvv -cov
+          make unit-test
           make clean
       - name: integration_test
         run: |
@@ -46,4 +46,4 @@ jobs:
           precis load-feeds
           precis check-feeds
           make run-ci
-          make test
+          make integration-test
