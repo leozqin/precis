@@ -4,3 +4,7 @@
 - name: The Verge
   category: tech
   url: https://www.theverge.com/rss/index.xml
+- name: How to Fix the Internet
+  category: tech
+  url: https://feeds.eff.org/howtofixtheinternet
+  retrieve_content: false
