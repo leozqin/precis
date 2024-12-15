@@ -54,12 +54,17 @@ Then to develop, in one terminal start tailwind by doing `make tw`. Then, in oth
 
 If you use `nix` or `nixos`, do `nix develop` to assumme a dev shell and then follow the install instructions above (including creating and activating the venv).
 
+### Unit Tests
+Precis has unit tests written against `pytest`. They are automated to run during the pull request pipeline, but you can also run them locally.
+
+Simply do `make unit-test` to run unit tests.
+
 ### Integration Tests
 Precis has integration tests that are written in Go. They are automated to run during the pull request pipeline, but they also be run locally.
 
 First, install the version of Go specified in `go.mod`. I recommend to use a Golang version manager such as `gvm` or `g`.
 
-Then, start the application using `make run`. Finally, run the integration tests with `make test`.
+Then, start the application using `make run`. Finally, run the integration tests with `make integration-test`.
 
 # Features
 ## OPML Import/Export
